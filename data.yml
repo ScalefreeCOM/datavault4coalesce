@@ -1,0 +1,3294 @@
+defaultStorageMapping: CORE
+jobs: {}
+locations:
+  CORE:
+    mappingDefinitions: {}
+  EXTERNAL_TABLES:
+    mappingDefinitions: {}
+  RAW_STAGE:
+    mappingDefinitions: {}
+  TEST:
+    mappingDefinitions: {}
+macros: {}
+packages:
+  COALESCE-DATA_VAULT:
+    addedBy: K2XWoywkSJObLCIwZGW4xprzNYo2
+    createdAt:
+      nanoseconds: 1000000
+      seconds: 1661791225
+    id: COALESCE-DATA_VAULT
+    manifest:
+      macros: {}
+      stepTypes:
+        COALESCE-DATA_VAULT::1:
+          id: COALESCE-DATA_VAULT::1
+          name: "DV Package: Hub"
+        COALESCE-DATA_VAULT::2:
+          id: COALESCE-DATA_VAULT::2
+          name: "DV Package: Link"
+        COALESCE-DATA_VAULT::3:
+          id: COALESCE-DATA_VAULT::3
+          name: "DV Package: Satellite"
+        COALESCE-DATA_VAULT::4:
+          id: COALESCE-DATA_VAULT::4
+          name: "DV Package: Link Satellite"
+        COALESCE-DATA_VAULT::5:
+          id: COALESCE-DATA_VAULT::5
+          name: "DV Package: Satellite Multi-Active"
+        COALESCE-DATA_VAULT::6:
+          id: COALESCE-DATA_VAULT::6
+          name: "DV Package: Effectivity Satellite"
+        COALESCE-DATA_VAULT::7:
+          id: COALESCE-DATA_VAULT::7
+          name: "DV Package: BV Sat Current View"
+    status: added
+    version: https://github.com/Coalesce-Software-Inc/packages.git#data_vault
+    versionInfo:
+      commit: fcb60873d720b0641e2d837fece6af7043d76ea4
+projects: {}
+stepTypes:
+  StepType-1:
+    id: "1"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: New Type
+        short: NEW
+        tagColor: gray
+        plural: New Types
+      templates:
+        create:
+          templateString: ""
+        run:
+          templateString: ""
+    name: New Type
+    version: 1
+  StepType-2:
+    id: "2"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: New Type
+        short: NEW
+        tagColor: gray
+        plural: New Types
+      templates:
+        create:
+          templateString: ""
+        run:
+          templateString: ""
+    name: New Type
+    version: 1
+  StepType-COALESCE-DATA_VAULT::1:
+    id: COALESCE-DATA_VAULT::1
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: HUB
+        short: 'HUB'
+        plural: 'Hubs'
+
+        tagColor: '#92712E'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            options: 
+            - table
+            default: table
+
+          - displayName: Hub Hash Column
+            type: columnSelector
+            attributeName: isHubHash
+            isRequired: true
+
+          - type: multisourceToggle
+          
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Hub Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+            	{% for col in columns %}
+            		"{{ col.name }}" {{ col.dataType }}
+            		{%- if not col.nullable %} NOT NULL
+            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            		{% endif %}
+            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            		{%- if not loop.last -%}, {% endif %}
+            	{% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+            	{{ stage('Pre-SQL') }}
+            	{{ config.preSQL }}
+            {% endif %}
+
+            {% for source in sources %}
+
+            	{{ stage('Merge Hub - ' ~ source.name) }}
+            	MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
+            	(
+            		SELECT DISTINCT
+            		{% for col in source.columns %}
+            			{{ get_source_transform(col) }} AS "{{ col.name }}"
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+
+            		{{ source.join }}
+
+            		{% if not loop.last %}
+            			{{ config.insertStrategy }}
+            		{% endif %}
+            	)
+            	AS "SRC"
+            	ON
+            	{% for col in sources[0].columns if (col.isHubHash) -%}
+            		{% if not loop.first %}
+            			AND
+            		{% endif %}
+            		"SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+            	{% endfor %}
+            	WHEN NOT MATCHED THEN
+            	INSERT
+            	(
+            		{% for col in columns %}
+            			"{{ col.name }}"
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            	) VALUES
+            	(
+            		{% for col in columns %}
+            			"SRC"."{{ col.name }}"
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            	)
+
+            {% endfor %}
+
+            {% if config.postSQL %}
+            	{{ stage('Post-SQL') }}
+            	{{ config.postSQL }}
+            {% endif %}
+    name: "DV Package: Hub"
+    packageInfo:
+      id: COALESCE-DATA_VAULT
+      version: https://github.com/Coalesce-Software-Inc/packages.git#data_vault
+    version: 1
+  StepType-COALESCE-DATA_VAULT::2:
+    id: COALESCE-DATA_VAULT::2
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: LINK
+        short: 'LNK'
+        plural: 'Links'
+        tagColor: '#CA2287'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Insert Strategy
+            attributeName: insertStrategy
+            type: dropdownSelector
+            default: UNION
+            options:
+            - "UNION"
+            - "UNION ALL"
+            isRequired: true
+
+          - displayName: Link Hash Column
+            type: columnSelector
+            attributeName: isLinkHash
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          transform: "''"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Link Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                    "{{ col.name }}" {{ col.dataType }}
+                    {%- if not col.nullable %} NOT NULL
+                        {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                    {% endif %}
+                    {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+
+            {% endif %}
+
+            {% for source in sources %}
+                        
+                {{ stage('Merge Link - ' ~ source.name) }}
+                MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
+                (
+                    SELECT DISTINCT
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+
+                    {% if not loop.last %}
+                        {{ config.insertStrategy }}
+                    {% endif %}
+                )
+                AS "SRC"
+                ON
+                {% for col in sources[0].columns if (col.isLinkHash) -%}
+                    {% if not loop.first %}
+                        AND
+                    {% endif %}
+                    "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+                {% endfor %}
+                WHEN NOT MATCHED THEN
+                INSERT
+                (
+                    {% for col in columns %}
+                        "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+                ) VALUES
+                (
+                    {% for col in columns %}
+                        "SRC"."{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+                )
+
+            {% endfor %}
+
+            {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}    
+            {% endif %}
+    name: "DV Package: Link"
+    packageInfo:
+      id: COALESCE-DATA_VAULT
+      version: https://github.com/Coalesce-Software-Inc/packages.git#data_vault
+    version: 1
+  StepType-COALESCE-DATA_VAULT::3:
+    id: COALESCE-DATA_VAULT::3
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: SATELLITE
+        short: 'SAT'
+        plural: 'Satellites'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Hub Hash Column
+            type: columnSelector
+            attributeName: isHubHash
+            isRequired: true
+
+          - displayName: Change Hash Column
+            type: columnSelector
+            attributeName: isChangeHash
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          transform: "''"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
+      templates:
+        create:
+          templateString: |
+            {{ stage('Create Satellite Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+            	{% for col in columns %}
+            		"{{ col.name }}" {{ col.dataType }}
+            		{%- if not col.nullable %} NOT NULL
+            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            		{% endif %}
+            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            		{%- if not loop.last -%}, {% endif %}
+            	{% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+            	{{ stage('Pre-SQL') }}
+            	{{ config.preSQL }}
+            {% endif %}
+
+            {{ stage('Insert New Rows') }}
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            WITH "SAT_CURR_ROWS" AS (
+            	/* get current rows from satellite */
+            	{% for col in columns if col.isHubHash or col.isChangeHash %}
+            		{%- if loop.first -%}SELECT {% endif %} 
+            		"{{col.name}}"
+            		{%- if not loop.last -%}, {% endif %}
+            		{%- if loop.last %} 
+            			FROM {{ ref_no_link(node.location.name, node.name) }} 
+            			QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ get_value_by_column_attribute("isHubHash") }}" ORDER BY "{{ get_value_by_column_attribute("isSystemCreateDate") }}" DESC) = 1
+            		{% endif %}
+            	{% endfor %}
+            )
+
+            	{% for source in sources %}
+            		SELECT DISTINCT
+            		{% for col in source.columns %}
+            			{{ get_source_transform(col) }} AS "{{ col.name }}"
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+
+            		{{ source.join }}
+            	WHERE NOT EXISTS(
+            		SELECT 1 FROM "SAT_CURR_ROWS"
+            		WHERE 
+            		{% for col in source.columns if col.isHubHash or col.isChangeHash %}
+            			{% if not loop.first %}
+            				AND
+            			{% endif %}
+            			{{ get_source_transform(col) }} = "SAT_CURR_ROWS"."{{ col.name }}"
+            		{% endfor %}
+            	)
+
+            	{% endfor %}
+
+            {% if config.postSQL %}
+            	{{ stage('Post-SQL') }}
+            	{{ config.postSQL }}
+            {% endif %}
+    name: "DV Package: Satellite"
+    packageInfo:
+      id: COALESCE-DATA_VAULT
+      version: https://github.com/Coalesce-Software-Inc/packages.git#data_vault
+    version: 1
+  StepType-COALESCE-DATA_VAULT::4:
+    id: COALESCE-DATA_VAULT::4
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: LINK SATELLITE
+        short: 'LSAT'
+        plural: 'Link Satellites'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Link Hash Column
+            type: columnSelector
+            attributeName: isLinkHash
+            isRequired: true
+
+          - displayName: Change Hash Column
+            type: columnSelector
+            attributeName: isChangeHash
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          transform: "''"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Link Satellite Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                    "{{ col.name }}" {{ col.dataType }}
+                    {%- if not col.nullable %} NOT NULL
+                        {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                    {% endif %}
+                    {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+            {% endif %}
+
+            {{ stage('Insert New Rows') }}
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            WITH "SAT_CURR_ROWS" AS (
+                /* get current rows from satellite */
+                {% for col in columns if col.isLinkHash or col.isChangeHash %}
+                    {%- if loop.first -%}SELECT {% endif %} 
+                    {{col.name}}
+                    {%- if not loop.last -%}, {% endif %}
+                    {%- if loop.last %} 
+                        FROM {{ ref_no_link(node.location.name, node.name) }} 
+                        QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ get_value_by_column_attribute("isLinkHash") }}" ORDER BY "{{ get_value_by_column_attribute("isSystemCreateDate") }}" DESC) = 1
+                    {% endif %}
+                {% endfor %}
+            )
+
+                {% for source in sources %}
+                    SELECT DISTINCT
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+                WHERE NOT EXISTS(
+                    SELECT 1 FROM "SAT_CURR_ROWS"
+                    WHERE 
+                    {% for col in source.columns if col.isLinkHash or col.isChangeHash %}
+                        {% if not loop.first %}
+                            AND
+                        {% endif %}
+                        {{ get_source_transform(col) }} = "SAT_CURR_ROWS"."{{ col.name }}"
+                    {% endfor %}
+                )
+
+                {% endfor %}
+
+            {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}
+            {% endif %}
+    name: "DV Package: Link Satellite"
+    packageInfo:
+      id: COALESCE-DATA_VAULT
+      version: https://github.com/Coalesce-Software-Inc/packages.git#data_vault
+    version: 1
+  StepType-COALESCE-DATA_VAULT::5:
+    id: COALESCE-DATA_VAULT::5
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |
+        capitalized: SATELLITE MULTI-ACTIVE
+        short: 'SAT_MA'
+        plural: 'Satellites Multi-Active'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Hub Hash Column
+            type: columnSelector
+            attributeName: isHubHash
+            isRequired: false
+
+          - displayName: Change Hash Column
+            type: columnSelector
+            attributeName: isChangeHash
+            isRequired: false
+
+          - displayName: Multi-Active Column
+            type: columnSelector
+            attributeName: isMAAttrib
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Satellite Table') }}
+
+            	CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            	(
+            		{% for col in columns %}
+            			"{{ col.name }}" {{ col.dataType }}
+            			{%- if not col.nullable %} NOT NULL
+            				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            			{% endif %}
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            	)
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+            {% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+            	{{ stage('Pre-SQL') }}
+            	{{ config.preSQL }}
+            {% endif %}
+
+            {{ stage('Insert New Rows') }}
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            WITH "SAT_CURR_ROWS" AS (
+            	/* get current rows from satellite */
+            	{% for col in columns if col.isHubHash or col.isChangeHash or col.isMAAttrib %}
+            		{%- if loop.first -%}SELECT {% endif %} 
+            		{{col.name}}
+            		{%- if not loop.last -%}, {% endif %}
+            		{%- if loop.last %} 
+            			FROM {{ ref_no_link(node.location.name, node.name) }} 
+            			QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ get_value_by_column_attribute("isHubHash") }}","{{ get_value_by_column_attribute("isMAAttrib") }}" ORDER BY LOAD_DATE DESC) = 1
+            		{% endif %}
+            	{% endfor %}
+            )
+
+            	{% for source in sources %}
+            		SELECT DISTINCT
+            		{% for col in source.columns %}
+            			{{ get_source_transform(col) }} AS "{{ col.name }}"
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+
+            		{{ source.join }}
+            	WHERE NOT EXISTS(
+            		SELECT 1 FROM "SAT_CURR_ROWS"
+            		WHERE 
+            		{% for col in source.columns if col.isHubHash or col.isChangeHash or col.isMAAttrib %}
+            			{% if not loop.first %}
+            				AND
+            			{% endif %}
+            			{{ get_source_transform(col) }} = "SAT_CURR_ROWS"."{{ col.name }}"
+            		{% endfor %}
+            	)
+
+            	{% endfor %}
+
+            {% if config.postSQL %}
+            	{{ stage('Post-SQL') }}
+            	{{ config.postSQL }}
+            {% endif %}
+    name: "DV Package: Satellite Multi-Active"
+    packageInfo:
+      id: COALESCE-DATA_VAULT
+      version: https://github.com/Coalesce-Software-Inc/packages.git#data_vault
+    version: 1
+  StepType-COALESCE-DATA_VAULT::6:
+    id: COALESCE-DATA_VAULT::6
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Effectivity Satellite
+        short: 'SAT_EFF'
+        plural: 'Effectivity Satellites'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Link Hash Column
+            type: columnSelector
+            attributeName: isLinkHash
+            isRequired: false
+
+          - displayName: Driving Key Column
+            type: columnSelector
+            attributeName: isDrivingKey
+            isRequired: false
+
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          transform: "''"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Effectivity Satellite Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                    "{{ col.name }}" {{ col.dataType }}
+                    {%- if not col.nullable %} NOT NULL
+                        {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                    {% endif %}
+                    {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+            {% endif %}
+
+            {{ stage('Insert New Rows') }}
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            WITH "SAT_CURR_ROWS" AS (
+                /* get current rows from satellite */
+                {% for col in columns if col.isDrivingKey or col.isLinkHash %}
+                    {%- if loop.first -%}SELECT {% endif %} 
+                    {{col.name}}
+                    {%- if not loop.last -%}, {% endif %}
+                    {%- if loop.last %} 
+                        FROM {{ ref_no_link(node.location.name, node.name) }} 
+                        QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ get_value_by_column_attribute("isDrivingKey") }}" ORDER BY "{{ get_value_by_column_attribute("isSystemCreateDate") }}" DESC) = 1
+                    {% endif %}
+                {% endfor %}
+            )
+
+                {% for source in sources %}
+                    SELECT DISTINCT
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+                WHERE NOT EXISTS(
+                    SELECT 1 FROM "SAT_CURR_ROWS"
+                    WHERE 
+                    {% for col in source.columns if col.isDrivingKey or col.isLinkHash %}
+                        {% if not loop.first %}
+                            AND
+                        {% endif %}
+                        {{ get_source_transform(col) }} = "SAT_CURR_ROWS"."{{ col.name }}"
+                    {% endfor %}
+                )
+
+                {% endfor %}
+
+            {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}
+            {% endif %}
+    name: "DV Package: Effectivity Satellite"
+    packageInfo:
+      id: COALESCE-DATA_VAULT
+      version: https://github.com/Coalesce-Software-Inc/packages.git#data_vault
+    version: 1
+  StepType-COALESCE-DATA_VAULT::7:
+    id: COALESCE-DATA_VAULT::7
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: BV SAT CURRENT VIEW
+        short: SAT_CURR
+        tagColor: '#C4C4C4'
+        isDisabled: true
+        plural: BV Sat Current Views
+
+        config:
+        - groupName: Options
+          items:
+          - displayName: Sat Hash Column(s) (Include Multi-Active)
+            type: columnSelector
+            attributeName: isSatKey
+            isRequired: true
+
+          - displayName: Sat Date Column(s)
+            type: columnSelector
+            attributeName: isDateColumn
+            isRequired: true
+
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            options: 
+            - view
+            default: view
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create View') }}
+
+            {% set order_by = namespace(order_by_txt='') %}
+            {% set partition_by = namespace(partition_by_txt='') %}
+
+
+            CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                    "{{ col.name }}"
+                    {%- if not loop.last -%}, {% endif %}
+                    {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    
+                            {%- if col.isDateColumn  %} 
+                        {%- if order_by.order_by_text  | length >= 1 %}{% set order_by.order_by_text = order_by.order_by_text + ',"' + col.name + '"' %}{% endif %} 
+                        {%- if order_by.order_by_text  | length == 0 %}{% set order_by.order_by_text = '"' + col.name + '"' %}{% endif %}
+                {% endif %} 
+
+                {%- if col.isSatKey  %} 
+                        {%- if partition_by.partition_by_text  | length >= 1 %}{% set partition_by.partition_by_text = partition_by.partition_by_text + ',"' + col.name + '"' %}{% endif %} 
+                        {%- if partition_by.partition_by_text  | length == 0 %}{% set partition_by.partition_by_text = '"'+ col.name + '"' %}{% endif %}
+                {% endif %}  
+
+
+                {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            AS
+            {% for source in sources %}
+                SELECT {% if config.selectDistinct %} DISTINCT {% endif %}
+                {% for col in source.columns %}
+                    {{ get_source_transform(col) }} AS "{{ col.name }}"
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+                
+                {{ source.join }}
+                QUALIFY LEAD({{order_by.order_by_text}}) 
+                        OVER (PARTITION BY {{partition_by.partition_by_text}} 
+                            ORDER BY {{order_by.order_by_text}} ASC) IS NULL
+
+
+            {% endfor %}
+        run:
+          templateString: ""
+    name: "DV Package: BV Sat Current View"
+    packageInfo:
+      id: COALESCE-DATA_VAULT
+      version: https://github.com/Coalesce-Software-Inc/packages.git#data_vault
+    version: 1
+  StepType-Dimension:
+    id: Dimension
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Dimension
+        short: DIM
+        tagColor: '#1E339A'
+        plural: Dimensions
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            default: table
+            options:
+            - table
+            - view
+
+          - type: multisourceToggle
+            enableIf: "{% if node.materializationType == 'table' %} true {% else %} false {% endif %}"
+
+          - type: businessKeyColumns
+            isRequired: true
+
+          - type: changeTrackingColumns
+            isRequired: false
+
+          - type: overrideSQLToggle
+            enableIf: "{% if node.materializationType == 'view' %} true {% else %} false {% endif %}"
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+            
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+        systemColumns:
+        - displayName: '{{NODE_NAME}}_KEY'
+          transform: ''
+          dataType: NUMBER
+          placement: beginning
+          attributeName: isSurrogateKey
+
+        - displayName: SYSTEM_VERSION
+          transform: ''
+          dataType: NUMBER
+          placement: end
+          attributeName: isSystemVersion
+
+        - displayName: SYSTEM_CURRENT_FLAG
+          transform: ''
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemCurrentFlag
+
+        - displayName: SYSTEM_START_DATE
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemStartDate
+
+        - displayName: SYSTEM_END_DATE
+          transform: CAST('2999-12-31 00:00:00' AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemEndDate
+
+        - displayName: SYSTEM_CREATE_DATE
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: SYSTEM_UPDATE_DATE
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemUpdateDate
+      templates:
+        create:
+          templateString: |
+            {% if node.materializationType == 'table' %}
+            	{{ stage('Create Dimension Table') }}
+
+            	CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            	(
+            		{% for col in columns %}
+            			"{{ col.name }}" {{ col.dataType }}
+            			{% if col.isSurrogateKey %}
+            		        identity
+            			{% endif %}
+            			{%- if not col.nullable %} NOT NULL
+            				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            			{% endif %}
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            	)
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+
+            {% elif node.materializationType == 'view' %}
+            	{{ stage('Create Dimension View') }}
+
+            	CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+            	(
+            		{% for col in columns %}
+            			"{{ col.name }}"
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if not loop.last -%},{% endif %}
+            		{% endfor %}
+            	)
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            	AS
+            	{% for source in sources %}
+
+            		{% if loop.first %}SELECT {% endif %}
+
+            		{% for col in source.columns %}
+            			{% if col.isSurrogateKey or col.isSystemUpdateDate or col.isSystemCreateDate %}
+                            NULL
+            			{% else %}
+                            {{ get_source_transform(col) }}
+            			{% endif %}
+            			AS "{{ col.name }}"
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            		{{ source.join }}
+
+            		{% if not loop.last %} UNION ALL {% endif %}
+            	{% endfor %}
+
+            {% endif %}
+        run:
+          templateString: |
+            
+            {% set is_type_2 = columns | selectattr("isChangeTracking") | list | length > 0 %}
+
+                {% for test in node.tests if config.testsEnabled %}
+                    {% if test.runOrder == 'Before' %}
+                        {{ test_stage(test.name, test.continueOnFailure) }}
+                        {{ test.templateString }}
+                    {% endif %}
+                {% endfor %}
+
+            {% if node.materializationType == 'table' %}
+
+            	{% if config.preSQL %}			
+            		{{ stage('Pre-SQL') }}
+            		{{ config.preSQL }}
+            	{% endif %}
+            	
+                {% if is_type_2 %}
+
+                    {% for source in sources %}
+                        {{ stage('MERGE ' + source.name | string) }}
+                        MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT"
+                        USING (
+                        /* New Rows That Don't Exist */
+                        SELECT
+                        {% for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemVersion %}
+                                1
+                            {% elif col.isSystemCurrentFlag %}
+                                'Y'
+                            {% else %}
+                               {{ get_source_transform(col) }}
+                            {% endif %}
+                            AS "{{ col.name }}",
+                        {% endfor %}
+                            'INSERT_INITAL_VERSION_ROWS' AS "DML_OPERATION"
+                        {{ source.join }}
+                        LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} "DIM" ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                                {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %}
+                        WHERE
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            "DIM"."{{ col.name }}" IS NULL
+                        {% endfor %}
+                        UNION ALL
+                        /* New Row Needing To Be Inserted Due To Type-2 Column Changes */
+                        SELECT
+                        {% for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemVersion %}
+                                "DIM"."{{ col.name }}" + 1
+                            {% elif col.isSystemCurrentFlag %}
+                                'Y'
+                            {% else %}
+                               {{ get_source_transform(col) }}
+                            {% endif %}
+                            AS "{{ col.name }}",
+                        {% endfor %}
+                            'INSERT_NEW_VERSION_ROWS' AS "DML_OPERATION"
+                        {{ source.join }}
+                        INNER JOIN {{ ref_no_link(node.location.name, node.name) }} "DIM" ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %}
+                        WHERE "DIM"."{{ get_value_by_column_attribute("isSystemCurrentFlag") }}" = 'Y'
+                        {% for col in source.columns if (col.isChangeTracking == true) %}
+                            {% if loop.first %}
+                                AND (
+                            {% else %}
+                                OR
+                            {% endif %}
+                            ( NVL( CAST({{ get_source_transform(col) }} as STRING), '**NULL**') <> NVL( CAST("DIM"."{{ col.name }}" as STRING), '**NULL**') )
+                            {% if loop.last %}
+                                )
+                            {% endif %}
+                        {% endfor %}
+                        UNION ALL
+                        /* Rows Needing To Be Expired Due To Type-2 Column Changes
+                        In this case, only two columns are merged (version and end date) */
+                        SELECT
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemEndDate %}
+                                DATEADD(MILLISECONDS, -1, CAST(CURRENT_TIMESTAMP AS TIMESTAMP))
+                            {% elif col.isSystemCurrentFlag %}
+                                'N'
+                            {% else %}
+                                "DIM"."{{ col.name }}"
+                            {% endif %}
+                            AS "{{ col.name }}",
+                        {% endfor -%}
+                            'update_expired_version_rows' AS "DML_OPERATION"
+                        {{ source.join }}
+                        INNER JOIN {{ ref_no_link(node.location.name, node.name) }} "DIM" ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %}
+                        WHERE "DIM"."{{ get_value_by_column_attribute("isSystemCurrentFlag") }}" = 'Y'
+                        {% for col in source.columns if (col.isChangeTracking == true) %}
+                            {% if loop.first %}
+                                AND (
+                            {% else %}
+                                OR
+                            {% endif %}
+                            ( NVL( CAST({{ get_source_transform(col) }} as STRING), '**NULL**') <> NVL( CAST("DIM"."{{ col.name }}" as STRING), '**NULL**') )
+                            {% if loop.last %}
+                                )
+                            {% endif %}
+                        {% endfor %}
+                        UNION ALL
+                        /* Rows Needing To Be Updated Due To Changes To Non-Type-2 source.columns
+                        This case merges only when there are changes in non-type-2 column updates, but no changes in type-2 columns*/
+                        SELECT
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemVersion or col.isSystemCreateDate or col.isSystemStartDate or col.isSystemEndDate %}
+                                "DIM"."{{ col.name }}"
+                            {% elif col.isSystemCurrentFlag %}
+                                'Y'
+                            {% else %}
+                                {{ get_source_transform(col) }}
+                            {% endif %}
+                            AS "{{ col.name }}",
+                        {% endfor -%}
+                            'UPDATE_NON_TYPE2_ROWS' AS "DML_OPERATION"
+                        {{ source.join }}
+                        INNER JOIN {{ ref_no_link(node.location.name, node.name) }} "DIM" ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %}
+                        WHERE "DIM"."{{ get_value_by_column_attribute("isSystemCurrentFlag") }}" = 'Y'
+                        AND (
+                        {% for col in source.columns if (col.isChangeTracking) -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %} )
+                        {% for col in source.columns if not (   col.isBusinessKey or
+                                                                col.isChangeTracking or
+                                                                col.isSurrogateKey or
+                                                                col.isSystemVersion or
+                                                                col.isSystemCurrentFlag or
+                                                                col.isSystemStartDate or
+                                                                col.isSystemEndDate or
+                                                                col.isSystemUpdateDate or
+                                                                col.isSystemCreateDate) -%}
+                            {% if loop.first %}
+                                AND (
+                            {% endif %}
+                            {% if not loop.first %}
+                                OR
+                            {% endif %}
+                            NVL( CAST({{ get_source_transform(col) }} as STRING), '**NULL**') <> NVL( CAST("DIM"."{{ col.name }}" as STRING), '**NULL**')
+                            {% if loop.last %}
+                                )
+                            {% endif %}
+                        {% endfor %}
+                    ) AS "SRC"
+                    ON
+                    {% for col in source.columns if col.isBusinessKey -%}
+                        {% if not loop.first %}
+                            AND
+                        {% endif %}
+                        "TGT"."{{ col.name }}" = "SRC"."{{ col.name }}"
+                    {% endfor %}
+                    AND "TGT"."{{ get_value_by_column_attribute("isSystemVersion") }}" = "SRC"."{{ get_value_by_column_attribute("isSystemVersion") }}"
+                    WHEN MATCHED THEN UPDATE SET
+                    {%- for col in source.columns if not (col.isBusinessKey or col.isSurrogateKey or col.isSystemCreateDate) %}
+                        "TGT"."{{ col.name }}" = "SRC"."{{ col.name }}"
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor -%}
+                    WHEN NOT MATCHED THEN INSERT (
+                    {%- for col in source.columns if not col.isSurrogateKey %}
+                        "{{ col.name }}"
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor -%}
+                    )
+                    VALUES (
+                    {%- for col in source.columns if not col.isSurrogateKey %}
+                        "SRC"."{{ col.name }}"
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor -%}
+                    )
+
+                {% endfor %}
+
+
+
+                {% else %}
+                    {% for source in sources %}
+                        {{ stage('MERGE ' + source.name | string ) }}
+                        MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT"
+                        USING (
+                            SELECT
+                            {% for col in source.columns if not col.isSurrogateKey %}
+                                {% if col.isSystemVersion %}
+                                	1
+                                {% elif col.isSystemCurrentFlag %}
+                                	'Y'
+                                {% else %}
+                                    {{ get_source_transform(col) }}
+                                {% endif %}
+                                AS "{{ col.name }}"
+                                {%- if not loop.last %}, {% endif %}
+                            {% endfor %}
+                            {{ source.join }})
+                            AS "SRC"
+                        ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+                        {% endfor %}
+                        WHEN MATCHED
+                        {% for col in source.columns if not (   col.isBusinessKey or
+                                                                col.isSurrogateKey or
+                                                                col.isSystemVersion or
+                                                                col.isSystemCurrentFlag or
+                                                                col.isSystemStartDate or
+                                                                col.isSystemEndDate or
+                                                                col.isSystemUpdateDate or
+                                                                col.isSystemCreateDate) %}
+                            {% if loop.first %}
+                                AND (
+                            {% else %}
+                                OR
+                            {% endif %}
+                            NVL( CAST("SRC"."{{ col.name }}" as STRING), '**NULL**') <> NVL( CAST("TGT"."{{ col.name }}" as STRING), '**NULL**')
+                            {% if loop.last %}
+                                )
+                            {% endif %}
+                        {% endfor %}
+                        THEN UPDATE SET
+                        {%- for col in source.columns if not (  col.isBusinessKey or
+                                                                col.isSurrogateKey or
+                                                                col.isSystemVersion or
+                                                                col.isSystemCurrentFlag or
+                                                                col.isSystemStartDate or
+                                                                col.isSystemEndDate or
+                                                                col.isSystemCreateDate) %}
+                                "TGT"."{{ col.name }}" = "SRC"."{{ col.name }}"
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                        WHEN NOT MATCHED THEN
+                        INSERT (
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            "{{ col.name }}"
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor -%}
+                        )
+                        VALUES (
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            "SRC"."{{ col.name }}"
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor -%}
+                        )
+                    {% endfor %}
+                {% endif %}
+            	
+            	{% if config.postSQL %}			
+            		{{ stage('Post-SQL') }}
+            		{{ config.postSQL }}
+            	{% endif %}
+            {% endif %}
+
+            {% if config.testsEnabled %}
+            	{% for test in node.tests %}
+            		{% if test.runOrder == 'After' %}
+            			{{ test_stage(test.name, test.continueOnFailure) }}
+            			{{ test.templateString }}
+                    {% endif %}
+            	{% endfor %}
+
+            	{% for column in columns %}
+            		{% for test in column.tests %}
+            			{{ test_stage(column.name + ": " + test.name) }}
+            			{{ test.templateString }}
+            		{% endfor %}
+            	{% endfor %}
+            {% endif %}
+    name: Dimension
+    version: 1
+  StepType-Fact:
+    id: Fact
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |
+        capitalized: Fact
+        plural: Facts
+        short: FCT
+        tagColor: '#D9A438'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            options:
+            - table
+            - view
+          
+          - type: businessKeyColumns
+            isRequired: false
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+            
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+        systemColumns:
+        - displayName: SYSTEM_CREATE_DATE
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: SYSTEM_UPDATE_DATE
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemUpdateDate
+      templates:
+        create:
+          templateString: "
+
+            \    {% if node.materializationType == 'table' %}
+
+            \        {{ stage('Create Fact Table') }}
+
+            \   \ 
+
+            \        CREATE OR REPLACE TABLE {{
+            ref_no_link(node.location.name, node.name) }}
+
+            \        (
+
+            \            {% for col in columns %}
+
+            \                \"{{ col.name }}\" {{ col.dataType }}
+
+            \                {%- if not col.nullable %} NOT NULL
+
+            \                    {%- if col.defaultValue | length >
+            0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+
+            \                {% endif %}
+
+            \                {%- if col.description | length > 0 %}
+            COMMENT '{{ col.description }}'{% endif %}
+
+            \                {%- if not loop.last -%}, {% endif %}
+
+            \            {% endfor %}
+
+            \        )
+
+            \        {%- if node.description | length > 0 %} COMMENT
+            = '{{ node.description }}'{% endif %}
+
+            \   \ 
+
+            \   \ 
+
+            \    {% elif node.materializationType == 'view' %}
+
+            \        {{ stage('Create Fact View') }}
+
+            \   \ 
+
+            \        CREATE OR REPLACE VIEW {{
+            ref_no_link(node.location.name, node.name) }}
+
+            \        (
+
+            \            {% for col in columns %}
+
+            \                \"{{ col.name }}\"
+
+            \                {%- if col.description | length > 0 %}
+            COMMENT '{{ col.description }}'{% endif %}
+
+            \                {%- if not loop.last -%},{% endif %}
+
+            \            {% endfor %}
+
+            \        )
+
+            \        {%- if node.description | length > 0 %} COMMENT
+            = '{{ node.description }}'{% endif %}
+
+            \        AS
+
+            \        {% for source in sources %}
+
+            \   \ 
+
+            \            {% if loop.first %}SELECT {% endif %}
+
+            \   \ 
+
+            \            {% for col in source.columns %}
+
+            \                {{ get_source_transform(col) }} AS \"{{
+            col.name }}\"
+
+            \                {%- if not loop.last -%}, {% endif %}
+
+            \            {% endfor %}
+
+            \            {{ source.join }}
+
+            \   \ 
+
+            \            {% if not loop.last %} UNION ALL {% endif
+            %}
+
+            \        {% endfor %}
+
+            \   \ 
+
+            \    {% endif %}
+
+            \    "
+        run:
+          templateString: "
+
+            \    {% for test in node.tests if config.testsEnabled %}
+
+            \        {% if test.runOrder == 'Before' %}
+
+            \            {{ test_stage(test.name,
+            test.continueOnFailure) }}
+
+            \            {{ test.templateString }}
+
+            \        {% endif %}
+
+            \    {% endfor %}
+
+
+            \    {% if node.materializationType == 'table' %}
+
+            \        {% if config.preSQL %}
+
+            \            {{ stage('Pre-SQL') }}
+
+            \            {{ config.preSQL }}
+
+            \        {% endif %}
+
+            \       \ 
+
+            \        {% set has_business_key = columns |
+            selectattr(\"isBusinessKey\") | list | length > 0 %}
+
+            \       \ 
+
+            \        {% for source in sources %}
+
+            \       \ 
+
+            \            {% if has_business_key %}
+
+            \       \ 
+
+            \                {{ stage('MERGE ' + source.name |
+            string ) }}
+
+            \                MERGE INTO {{
+            ref_no_link(node.location.name, node.name) }} \"TGT\"
+
+            \                USING (
+
+            \                    SELECT
+
+            \                    {% for col in source.columns %}
+
+            \                        {{ get_source_transform(col) }}
+            AS \"{{ col.name }}\"
+
+            \                        {%- if not loop.last %}, {%
+            endif %}
+
+            \                    {% endfor %}
+
+            \                    {{ source.join }})
+
+            \                    AS \"SRC\"
+
+            \                ON
+
+            \                {% for col in source.columns if
+            col.isBusinessKey -%}
+
+            \                    {% if not loop.first %}
+
+            \                        AND
+
+            \                    {% endif %}
+
+            \                    \"SRC\".\"{{ col.name }}\" =
+            \"TGT\".\"{{ col.name }}\"
+
+            \                {% endfor %}
+
+            \                WHEN MATCHED
+
+            \                {% for col in source.columns if not
+            (   col.isBusinessKey or
+
+            \                                                        \
+            col.isSystemUpdateDate or
+
+            \                                                        \
+            col.isSystemCreateDate) %}
+
+            \                    {% if loop.first %}
+
+            \                        AND (
+
+            \                    {% else %}
+
+            \                        OR
+
+            \                    {% endif %}
+
+            \                    NVL( CAST(\"SRC\".\"{{ col.name
+            }}\" as STRING), '**NULL**') <> NVL( CAST(\"TGT\".\"{{ col.name }}\"
+            as STRING), '**NULL**')
+
+            \                    {% if loop.last %}
+
+            \                        )
+
+            \                    {% endif %}
+
+            \                {% endfor %}
+
+            \                THEN UPDATE SET
+
+            \                {%- for col in source.columns if not
+            (col.isBusinessKey or col.isSystemCreateDate) %}
+
+            \                        \"TGT\".\"{{ col.name }}\" =
+            \"SRC\".\"{{ col.name }}\"
+
+            \                    {% if not loop.last %}, {% endif %}
+
+            \                {% endfor %}
+
+            \                WHEN NOT MATCHED THEN
+
+            \                INSERT (
+
+            \                {%- for col in source.columns if not
+            col.isSurrogateKey %}
+
+            \                    \"{{ col.name }}\"
+
+            \                    {% if not loop.last %}, {% endif %}
+
+            \                {% endfor -%}
+
+            \                )
+
+            \                VALUES (
+
+            \                {%- for col in source.columns if not
+            col.isSurrogateKey %}
+
+            \                    \"SRC\".\"{{ col.name }}\"
+
+            \                    {% if not loop.last %}, {% endif %}
+
+            \                {% endfor -%}
+
+            \                )
+
+            \       \ 
+
+            \            {% else %}
+
+            \       \ 
+
+            \                {{ stage('Insert ' + source.name |
+            string ) }}
+
+            \       \ 
+
+            \                    INSERT INTO {{
+            ref_no_link(node.location.name, node.name) }}
+
+            \                    (
+
+            \                        {% for col in source.columns %}
+
+            \                            \"{{ col.name }}\"
+
+            \                            {%- if not loop.last -%},{%
+            endif %}
+
+            \                        {% endfor %}
+
+            \                    )
+
+            \       \ 
+
+            \                    SELECT
+
+            \                    {% for col in source.columns %}
+
+            \                        {{ get_source_transform(col) }}
+            AS \"{{ col.name }}\"
+
+            \                        {%- if not loop.last -%}, {%
+            endif %}
+
+            \                    {% endfor %}
+
+            \                    {{ source.join }}
+
+            \            {% endif %}
+
+            \        {% endfor %}
+
+            \        {% if config.postSQL %}
+
+            \            {{ stage('Post-SQL') }}
+
+            \            {{ config.postSQL }}
+
+            \        {% endif %}
+
+            \    {% endif %}
+
+
+            \    {% if config.testsEnabled %}
+
+            \        {% for test in node.tests %}
+
+            \            {% if test.runOrder == 'After' %}
+
+            \                {{ test_stage(test.name,
+            test.continueOnFailure) }}
+
+            \                {{ test.templateString }}
+
+            \            {% endif %}
+
+            \        {% endfor %}
+
+
+            \        {% for column in columns %}
+
+            \            {% for test in column.tests %}
+
+            \                {{ test_stage(column.name + \": \" +
+            test.name) }}
+
+            \                {{ test.templateString }}
+
+            \            {% endfor %}
+
+            \        {% endfor %}
+
+            \    {% endif %}
+
+            \   \ 
+
+            \    "
+    name: Fact
+    version: 1
+  StepType-Hub:
+    id: Hub
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Hub
+        short: 'HUB'
+        plural: 'Hubs'
+
+        tagColor: '#92712E'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            options: 
+            - table
+            default: table
+
+          - displayName: Multi Source Strategy
+            attributeName: insertStrategy
+            type: dropdownSelector
+            default: UNION
+            options:
+            - "UNION"
+            - "UNION ALL"
+            isRequired: true
+            enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+            
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          transform: "''"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
+      templates:
+        create:
+          templateString: |-
+            {% if node.materializationType == 'table' %}
+            				{{ stage('Create Hub Table') }}
+            			
+            				CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            				(
+            					{% for col in columns %}
+            						"{{ col.name }}" {{ col.dataType }}
+            						{%- if not col.nullable %} NOT NULL
+            							{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            						{% endif %}
+            						{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            						{%- if not loop.last -%}, {% endif %}
+            					{% endfor %}
+            				)
+            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            			
+            			{% endif %}
+        run:
+          templateString: "
+
+            \    {% for test in node.tests if config.testsEnabled %}
+
+            \        {% if test.runOrder == 'Before' %}
+
+            \            {{ test_stage(test.name,
+            test.continueOnFailure) }}
+
+            \            {{ test.templateString }}
+
+            \        {% endif %}
+
+            \    {% endfor %}
+
+
+            {% if node.materializationType == 'table' %}
+
+            \t{% if config.preSQL %}
+
+            \t\t{{ stage('Pre-SQL') }}
+
+            \t\t{{ config.preSQL }}
+
+            \t{% endif %}
+
+
+
+            \t{{ stage('Merge Hub') }}
+
+            \tMERGE INTO {{ ref_no_link(node.location.name,
+            node.name) }} \"TGT\" USING
+
+            \t(
+
+            \t\t{% for source in sources %}
+
+            \t\tSELECT
+
+            \t\t{% for col in source.columns %}
+
+            \            {{ get_source_transform(col) }} AS \"{{
+            col.name }}\"
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}
+
+            \t\t{% endfor %}
+
+
+            \t\t{{ source.join }}
+
+
+            \t\t{% if not loop.last %}
+
+            \t\t\t{{ config.insertStrategy }}
+
+            \t\t{% endif %}
+
+            \t{% endfor %}
+
+            \t)
+
+            \tAS \"SRC\"
+
+            \tON
+
+            \t{% for col in sources[0].columns if
+            (col.sourceColumns[0]\ 
+
+            \                                        and
+            col.sourceColumns[0].column\ 
+
+            \                                        and
+            col.sourceColumns[0].column.isHubHash
+
+            \                                        ) -%}
+
+            \t\t{% if not loop.first %}
+
+            \t\t\tAND
+
+            \t\t{% endif %}
+
+            \t\t\"SRC\".\"{{ col.name }}\" = \"TGT\".\"{{ col.name
+            }}\"
+
+            \t{% endfor %}
+
+            \tWHEN NOT MATCHED THEN
+
+            \tINSERT
+
+            \t(
+
+            \t\t{% for col in columns %}
+
+            \t\t\t\"{{ col.name }}\"
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}
+
+            \t\t{% endfor %}
+
+            \t) VALUES
+
+            \t(
+
+            \t\t{% for col in columns %}
+
+            \t\t\t\"SRC\".\"{{ col.name }}\"
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}
+
+            \t\t{% endfor %}
+
+            \t)
+
+
+
+            \t{% if config.postSQL %}
+
+            \t\t{{ stage('Post-SQL') }}
+
+            \t\t{{ config.postSQL }}
+
+            \t{% endif %}
+
+            \t
+
+            {% endif %}
+
+
+            {% if config.testsEnabled %}
+
+            \t{% for test in node.tests %}
+
+            \t\t{% if test.runOrder == 'After' %}
+
+            \t\t\t{{ test_stage(test.name, test.continueOnFailure)
+            }}
+
+            \t\t\t{{ test.templateString }}
+
+            \        {% endif %}
+
+            \t{% endfor %}
+
+
+            \t{% for column in columns %}
+
+            \t\t{% for test in column.tests %}
+
+            \t\t\t{{ test_stage(column.name + \": \" + test.name) }}
+
+            \t\t\t{{ test.templateString }}
+
+            \t\t{% endfor %}
+
+            \t{% endfor %}
+
+            {% endif %}
+
+            \t\t\t"
+    name: Hub
+    version: 1
+  StepType-Link:
+    id: Link
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Link
+        short: 'LNK'
+        plural: 'Links'
+        tagColor: '#CA2287'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            default: table
+            options:
+            - table
+
+          - displayName: Multi Source Strategy
+            attributeName: insertStrategy
+            type: dropdownSelector
+            default: UNION
+            options:
+            - "UNION"
+            - "UNION ALL"
+            isRequired: true
+            enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+            
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          transform: "''"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
+      templates:
+        create:
+          templateString: |-
+            {% if node.materializationType == 'table' %}
+            				{{ stage('Create Link Table') }}
+            			
+            				CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            				(
+            					{% for col in columns %}
+            						"{{ col.name }}" {{ col.dataType }}
+            						{%- if not col.nullable %} NOT NULL
+            							{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            						{% endif %}
+            						{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            						{%- if not loop.last -%}, {% endif %}
+            					{% endfor %}
+            				)
+            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            			
+            			{% endif %}
+        run:
+          templateString: "
+
+            \    {% for test in node.tests if config.testsEnabled %}
+
+            \        {% if test.runOrder == 'Before' %}
+
+            \            {{ test_stage(test.name,
+            test.continueOnFailure) }}
+
+            \            {{ test.templateString }}
+
+            \        {% endif %}
+
+            \    {% endfor %}
+
+
+            {% if node.materializationType == 'table' %}
+
+            \t{% if config.preSQL %}
+
+            \t\t{{ stage('Pre-SQL') }}
+
+            \t\t{{ config.preSQL }}
+
+            \t
+
+            \t{% endif %}
+
+
+            \t\t\t
+
+            \t{{ stage('Merge Link') }}
+
+            \tMERGE INTO {{ ref_no_link(node.location.name,
+            node.name) }} \"TGT\" USING
+
+            \t(
+
+            \t\t{% for source in sources %}
+
+            \t\tSELECT
+
+            \t\t{% for col in source.columns %}
+
+            \            {{ get_source_transform(col) }} AS \"{{
+            col.name }}\"
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}
+
+            \t\t{% endfor %}
+
+
+            \t\t{{ source.join }}
+
+
+            \t\t{% if not loop.last %}
+
+            \t\t\t{{ config.insertStrategy }}
+
+            \t\t{% endif %}
+
+            \t{% endfor %}
+
+            \t)
+
+            \tAS \"SRC\"
+
+            \tON
+
+            \t{% for col in sources[0].columns if
+            (col.sourceColumns[0]\ 
+
+            \                                        and
+            col.sourceColumns[0].column\ 
+
+            \                                        and
+            col.sourceColumns[0].column.isLinkHash
+
+            \                                        ) -%}
+
+            \t\t{% if not loop.first %}
+
+            \t\t\tAND
+
+            \t\t{% endif %}
+
+            \t\t\"SRC\".\"{{ col.name }}\" = \"TGT\".\"{{ col.name
+            }}\"
+
+            \t{% endfor %}
+
+            \tWHEN NOT MATCHED THEN
+
+            \tINSERT
+
+            \t(
+
+            \t\t{% for col in columns %}
+
+            \t\t\t\"{{ col.name }}\"
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}
+
+            \t\t{% endfor %}
+
+            \t) VALUES
+
+            \t(
+
+            \t\t{% for col in columns %}
+
+            \t\t\t\"SRC\".\"{{ col.name }}\"
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}
+
+            \t\t{% endfor %}
+
+            \t)
+
+
+            \t{% if config.postSQL %}
+
+            \t\t{{ stage('Post-SQL') }}
+
+            \t\t{{ config.postSQL }}\t
+
+            \t{% endif %}
+
+            {% endif %}
+
+
+            {% if config.testsEnabled %}
+
+            \t{% for test in node.tests %}
+
+            \t\t{% if test.runOrder == 'After' %}
+
+            \t\t\t{{ test_stage(test.name, test.continueOnFailure)
+            }}
+
+            \t\t\t{{ test.templateString }}
+
+            \        {% endif %}
+
+            \t{% endfor %}
+
+
+            \t{% for column in columns %}
+
+            \t\t{% for test in column.tests %}
+
+            \t\t\t{{ test_stage(column.name + \": \" + test.name) }}
+
+            \t\t\t{{ test.templateString }}
+
+            \t\t{% endfor %}
+
+            \t{% endfor %}
+
+            {% endif %}
+
+            \t\t\t"
+    name: Link
+    version: 1
+  StepType-Satellite:
+    id: Satellite
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Satellite
+        short: 'SAT'
+        plural: 'Satellites'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            default: table
+            options:
+            - table
+
+          - displayName: Multi Source Strategy
+            attributeName: insertStrategy
+            type: dropdownSelector
+            default: UNION
+            options:
+            - "UNION"
+            - "UNION ALL"
+            isRequired: true
+            enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+            
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          transform: "''"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
+      templates:
+        create:
+          templateString: |-
+            {% if node.materializationType == 'table' %}
+            				{{ stage('Create Satellite Table') }}
+            			
+            				CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            				(
+            					{% for col in columns %}
+            						"{{ col.name }}" {{ col.dataType }}
+            						{%- if not col.nullable %} NOT NULL
+            							{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            						{% endif %}
+            						{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            						{%- if not loop.last -%}, {% endif %}
+            					{% endfor %}
+            				)
+            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            			
+            			{% endif %}
+        run:
+          templateString: "
+
+            \    {% for test in node.tests if config.testsEnabled %}
+
+            \        {% if test.runOrder == 'Before' %}
+
+            \            {{ test_stage(test.name,
+            test.continueOnFailure) }}
+
+            \            {{ test.templateString }}
+
+            \        {% endif %}
+
+            \    {% endfor %}
+
+
+            {% if node.materializationType == 'table' %}
+
+            \t\t{% if config.preSQL %}
+
+            \t\t\t{{ stage('Pre-SQL') }}
+
+            \t\t\t{{ config.preSQL }}
+
+            \t\t{% endif %}
+
+            \t
+
+            \t\t{{ stage('Merge Satellite') }}
+
+            \t\tMERGE INTO {{ ref_no_link(node.location.name,
+            node.name) }} \"TGT\" USING
+
+            \t\t(
+
+            \t\t\t{% for source in sources %}
+
+            \t\t\tSELECT
+
+            \t\t\t{% for col in source.columns %}
+
+            \                {{ get_source_transform(col) }} AS \"{{
+            col.name }}\"
+
+            \t\t\t\t{%- if not loop.last -%}, {% endif %}
+
+            \t\t\t{% endfor %}
+
+            \t
+
+            \t\t\t{{ source.join }}
+
+            \t
+
+            \t\t\t{% if not loop.last %}
+
+            \t\t\t\t{{ config.insertStrategy }}
+
+            \t\t\t{% endif %}
+
+            \t\t{% endfor %}
+
+            \t\t)
+
+            \t\tAS \"SRC\"
+
+            \t\tON
+
+            \t\t{% for col in sources[0].columns if
+            (col.sourceColumns[0]\ 
+
+            \                                            and
+            col.sourceColumns[0].column\ 
+
+            \                                            and
+            col.sourceColumns[0].column.isChangeHash
+
+            \                                            ) -%}
+
+            \t\t\t{% if not loop.first %}
+
+            \t\t\t\tAND
+
+            \t\t\t{% endif %}
+
+            \t\t\t\"SRC\".\"{{ col.name }}\" = \"TGT\".\"{{ col.name
+            }}\"
+
+            \t\t{% endfor %}
+
+            \t\tWHEN NOT MATCHED THEN
+
+            \t\tINSERT
+
+            \t\t(
+
+            \t\t\t{% for col in columns %}
+
+            \t\t\t\t\"{{ col.name }}\"
+
+            \t\t\t\t{%- if not loop.last -%}, {% endif %}
+
+            \t\t\t{% endfor %}
+
+            \t\t) VALUES
+
+            \t\t(
+
+            \t\t\t{% for col in columns %}
+
+            \t\t\t\t\"SRC\".\"{{ col.name }}\"
+
+            \t\t\t\t{%- if not loop.last -%}, {% endif %}
+
+            \t\t\t{% endfor %}
+
+            \t\t)
+
+            \t
+
+            \t{% if config.postSQL %}
+
+            \t\t{{ stage('Post-SQL') }}
+
+            \t\t{{ config.postSQL }}\t
+
+            \t{% endif %}
+
+            \t
+
+            {% endif %}
+
+
+            {% if config.testsEnabled %}
+
+            \t{% for test in node.tests %}
+
+            \t\t{% if test.runOrder == 'After' %}
+
+            \t\t\t{{ test_stage(test.name, test.continueOnFailure)
+            }}
+
+            \t\t\t{{ test.templateString }}
+
+            \        {% endif %}
+
+            \t{% endfor %}
+
+
+            \t{% for column in columns %}
+
+            \t\t{% for test in column.tests %}
+
+            \t\t\t{{ test_stage(column.name + \": \" + test.name) }}
+
+            \t\t\t{{ test.templateString }}
+
+            \t\t{% endfor %}
+
+            \t{% endfor %}
+
+            {% endif %}
+
+            \t\t\t"
+    name: Satellite
+    version: 1
+  StepType-Source:
+    id: Source
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Source
+        short: null
+        tagColor: '#D26000'
+        plural: Sources
+      templates:
+        create:
+          templateString: |
+            {{ stage('Validating Source Exists') }}
+            SELECT 1 FROM {{ ref(node.location.name, node.name) }} LIMIT 0
+        run:
+          templateString: |
+            {{ stage('Validating Source Exists') }}
+            SELECT 1 FROM {{ ref(node.location.name, node.name) }} LIMIT 0
+    name: Source
+    version: 1
+  StepType-Stage:
+    id: Stage
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |
+        capitalized: Stage
+        short: STG
+        plural: Stages
+        tagColor: '#2EB67D'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            default: table
+            options:
+            - table
+            - view
+            isRequired: true
+
+          - type: multisourceToggle
+            enableIf: "{% if node.materializationType == 'table' %} true {% else %} false {% endif %}" 
+
+          - type: overrideSQLToggle
+            enableIf: "{% if node.materializationType == 'view' %} true {% else %} false {% endif %}"
+            
+          - displayName: Multi Source Strategy
+            attributeName: insertStrategy
+            type: dropdownSelector
+            default: INSERT
+            options:
+            - "INSERT"
+            - "UNION"
+            - "UNION ALL"
+            isRequired: true
+            enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
+
+          - displayName: Truncate Before
+            attributeName: truncateBefore
+            type: toggleButton
+            default: true
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+            
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+      templates:
+        create:
+          templateString: |
+            {% if node.override.create.enabled %}
+            	
+            	{{ node.override.create.script }}
+
+            {% elif node.materializationType == 'table' %}
+            	{{ stage('Create Stage Table') }}
+
+            	CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            	(
+            		{% for col in columns %}
+            			"{{ col.name }}" {{ col.dataType }}
+            			{%- if not col.nullable %} NOT NULL
+            				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            			{% endif %}
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            	)
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+
+            {% elif node.materializationType == 'view' %}
+                {{ stage('Create Stage View') }}
+
+                CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+                (
+                    {% for col in columns %}
+                        "{{ col.name }}"
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+                )
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                AS
+                {% for source in sources %}
+                    SELECT
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+
+                    {% if not loop.last %}
+                        {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
+                            {{ config.insertStrategy }}
+                        {% else %}
+                            UNION
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+            {% endif %}
+        run:
+          templateString: |2
+            
+                {% for test in node.tests if config.testsEnabled %}
+                    {% if test.runOrder == 'Before' %}
+                        {{ test_stage(test.name, test.continueOnFailure) }}
+                        {{ test.templateString }}
+                    {% endif %}
+                {% endfor %}
+
+            {% if node.materializationType == 'table' %}
+            	{% if config.preSQL %}
+            		{{ stage('Pre-SQL') }}
+            		{{ config.preSQL }}
+            	{% endif %}
+            	
+            	
+            	
+            		{% if config.truncateBefore %}
+            	
+            			{{ stage('Truncate Stage Table') }}
+            			TRUNCATE IF EXISTS {{ ref_no_link(node.location.name, node.name) }}
+            	
+            		{% endif %}
+            	
+            	
+            		{% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
+            			{{ stage( config.insertStrategy + ' Sources' | string ) }}
+            			INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            				(
+            					{% for col in columns %}
+            						"{{ col.name }}"
+            						{%- if not loop.last -%},{% endif %}
+            					{% endfor %}
+            				)
+            		{% endif %}
+            	
+            	
+            		{% for source in sources %}
+            	
+            			{% if config.insertStrategy == 'INSERT' %}
+            				{{ stage('Insert ' + source.name | string ) }}
+            	
+            				INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            				(
+            					{% for col in source.columns %}
+            						"{{ col.name }}"
+            						{%- if not loop.last -%},{% endif %}
+            					{% endfor %}
+            				)
+            			{% endif %}
+            	
+            			SELECT
+            			{% for col in source.columns %}
+                            {{ get_source_transform(col) }} AS "{{ col.name }}"
+            				{%- if not loop.last -%}, {% endif %}
+            			{% endfor %}
+            	
+            			{{ source.join }}
+            	
+            			{% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+            				{{config.insertStrategy}}
+            			{% endif %}
+            	
+            		{% endfor %}
+            	
+            	{% if config.postSQL %}
+            		{{ stage('Post-SQL') }}
+            		{{ config.postSQL }}
+            	{% endif %}
+            {% endif %}
+
+            {% if config.testsEnabled %}
+            	{% for test in node.tests %}
+            		{% if test.runOrder == 'After' %}
+            			{{ test_stage(test.name, test.continueOnFailure) }}
+            			{{ test.templateString }}
+                    {% endif %}
+            	{% endfor %}
+
+            	{% for column in columns %}
+            		{% for test in column.tests %}
+            			{{ test_stage(column.name + ": " + test.name) }}
+            			{{ test.templateString }}
+            		{% endfor %}
+            	{% endfor %}
+            {% endif %}
+    name: Stage
+    version: 1
+  StepType-View:
+    id: View
+    isDisabled: true
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |
+        capitalized: View
+        short: V
+        tagColor: '#C4C4C4'
+        isDisabled: true
+        plural: Views
+
+        config:
+          - groupName: Options
+            items: 
+            - type: materializationSelector
+              options:
+                - view
+              default: view
+              isRequired: true
+
+            - type: toggleButton
+              attributeName: selectDistinct
+              displayName: Distinct
+
+            - type: multisourceToggle
+
+            - type: overrideSQLToggle
+
+            - displayName: Multi Source Strategy
+              attributeName: insertStrategy
+              type: dropdownSelector
+              default: UNION
+              options:
+              - "UNION"
+              - "UNION ALL" 
+              isRequired: true
+              enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
+      templates:
+        create:
+          templateString: |
+            {% if node.override.create.enabled %}
+                
+                {{ node.override.create.script }}
+
+            {% else %}
+                {{ stage('Create View') }}
+                CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+                (
+                    {% for col in columns %}
+                        "{{ col.name }}"
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+                )
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                AS
+                {% for source in sources %}
+                    SELECT {% if config.selectDistinct %} DISTINCT {% endif %}
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+
+                    {% if not loop.last %}
+                        {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
+                            {{ config.insertStrategy }}
+                        {% else %}
+                            UNION
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        run:
+          templateString: ""
+    name: View
+    version: 1
+  StepType-persistentStage:
+    id: persistentStage
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |
+        capitalized: Persistent Stage
+        short: PSTG
+        plural: Persistent Stages
+        tagColor: '#29B2DB'
+            
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            default: table
+            options:
+            - table
+            - view
+          
+          - type: businessKeyColumns
+            isRequired: false
+
+          - type: multisourceToggle
+            enableIf: "{% if node.materializationType == 'table' %} true {% else %} false {% endif %}"
+
+          - type: overrideSQLToggle
+            enableIf: "{% if node.materializationType == 'view' %} true {% else %} false {% endif %}"
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+            
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+        systemColumns:
+
+        - displayName: '{{NODE_NAME}}_KEY'
+          transform: ''
+          dataType: NUMBER
+          placement: beginning
+          attributeName: isSurrogateKey
+
+        - displayName: SYSTEM_VERSION
+          transform: ''
+          dataType: NUMBER
+          placement: end
+          attributeName: isSystemVersion
+
+        - displayName: SYSTEM_CURRENT_FLAG
+          transform: ''
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemCurrentFlag
+
+        - displayName: SYSTEM_START_DATE
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemStartDate
+
+        - displayName: SYSTEM_END_DATE
+          transform: CAST('2999-12-31 00:00:00' AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemEndDate
+
+        - displayName: SYSTEM_CREATE_DATE
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: SYSTEM_UPDATE_DATE
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemUpdateDate
+      templates:
+        create:
+          templateString: |
+            {% if node.materializationType == 'table' %}
+                {{ stage('Create Persistent Stage Table') }}
+
+                CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+                (
+                    {% for col in columns %}
+                        "{{ col.name }}" {{ col.dataType }}
+                        {% if col.isSurrogateKey %}
+            		        identity
+                        {% endif %}
+                        {%- if not col.nullable %} NOT NULL
+                            {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                        {% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+                )
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+
+            {% elif node.materializationType == 'view' %}
+                {{ stage('Create Persistent Stage View') }}
+
+                CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+                (
+                    {% for col in columns %}
+                        "{{ col.name }}"
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if not loop.last -%},{% endif %}
+                    {% endfor %}
+                )
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                AS
+                {% for source in sources %}
+
+            		{% if not loop.last %} UNION ALL {% endif %}
+            	{% endfor %}
+
+                    {% for col in source.columns %}
+                        {% if col.isSurrogateKey or col.isSystemUpdateDate or col.isSystemCreateDate %}
+                            NULL
+                        {% else %}
+                            {{ get_source_transform(col) }}
+                        {% endif %}
+                        AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+                    {{ source.join }}
+
+            {% endif %}
+        run:
+          templateString: |-
+            
+            {% set has_business_key = columns | selectattr("isBusinessKey") | list | length > 0 %}
+            {% set is_type_2 = columns | selectattr("isChangeTracking") | list | length > 0 %}
+
+                {% for test in node.tests if config.testsEnabled %}
+                    {% if test.runOrder == 'Before' %}
+                        {{ test_stage(test.name, test.continueOnFailure) }}
+                        {{ test.templateString }}
+                    {% endif %}
+                {% endfor %}
+
+            {% if node.materializationType == 'table' %}
+            	{% if config.preSQL %}
+            		{{ stage('Pre-SQL') }}
+            		{{ config.preSQL }}
+            	{% endif %}
+            	
+                {% if has_business_key and is_type_2 %}
+
+                    {% for source in sources %}
+                        {{ stage('MERGE ' + source.name | string) }}
+                        MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT"
+                        USING (
+                        /* New Rows That Don't Exist */
+                        SELECT
+                        {% for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemVersion %}
+                                1
+                            {% elif col.isSystemCurrentFlag %}
+                                'Y'
+                            {% else %}
+                               {{ get_source_transform(col) }}
+                            {% endif %}
+                            AS "{{ col.name }}",
+                        {% endfor %}
+                            'INSERT_INITAL_VERSION_ROWS' AS "DML_OPERATION"
+                        {{ source.join }}
+                        LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} "DIM" ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                                {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %}
+                        WHERE
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            "DIM"."{{ col.name }}" IS NULL
+                        {% endfor %}
+                        UNION ALL
+                        /* New Row Needing To Be Inserted Due To Type-2 Column Changes */
+                        SELECT
+                        {% for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemVersion %}
+                                "DIM"."{{ col.name }}" + 1
+                            {% elif col.isSystemCurrentFlag %}
+                                'Y'
+                            {% else %}
+                               {{ get_source_transform(col) }}
+                            {% endif %}
+                            AS "{{ col.name }}",
+                        {% endfor %}
+                            'INSERT_NEW_VERSION_ROWS' AS "DML_OPERATION"
+                        {{ source.join }}
+                        INNER JOIN {{ ref_no_link(node.location.name, node.name) }} "DIM" ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %}
+                        WHERE "DIM"."{{ get_value_by_column_attribute("isSystemCurrentFlag") }}" = 'Y'
+                        {% for col in source.columns if (col.isChangeTracking == true) %}
+                            {% if loop.first %}
+                                AND (
+                            {% else %}
+                                OR
+                            {% endif %}
+                            ( NVL( CAST({{ get_source_transform(col) }} as STRING), '**NULL**') <> NVL( CAST("DIM"."{{ col.name }}" as STRING), '**NULL**') )
+                            {% if loop.last %}
+                                )
+                            {% endif %}
+                        {% endfor %}
+                        UNION ALL
+                        /* Rows Needing To Be Expired Due To Type-2 Column Changes
+                        In this case, only two columns are merged (version and end date) */
+                        SELECT
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemEndDate %}
+                                DATEADD(MILLISECONDS, -1, CAST(CURRENT_TIMESTAMP AS TIMESTAMP))
+                            {% elif col.isSystemCurrentFlag %}
+                                'N'
+                            {% else %}
+                                "DIM"."{{ col.name }}"
+                            {% endif %}
+                            AS "{{ col.name }}",
+                        {% endfor -%}
+                            'update_expired_version_rows' AS "DML_OPERATION"
+                        {{ source.join }}
+                        INNER JOIN {{ ref_no_link(node.location.name, node.name) }} "DIM" ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %}
+                        WHERE "DIM"."{{ get_value_by_column_attribute("isSystemCurrentFlag") }}" = 'Y'
+                        {% for col in source.columns if (col.isChangeTracking == true) %}
+                            {% if loop.first %}
+                                AND (
+                            {% else %}
+                                OR
+                            {% endif %}
+                            ( NVL( CAST({{ get_source_transform(col) }} as STRING), '**NULL**') <> NVL( CAST("DIM"."{{ col.name }}" as STRING), '**NULL**') )
+                            {% if loop.last %}
+                                )
+                            {% endif %}
+                        {% endfor %}
+                        UNION ALL
+                        /* Rows Needing To Be Updated Due To Changes To Non-Type-2 source.columns
+                        This case merges only when there are changes in non-type-2 column updates, but no changes in type-2 columns*/
+                        SELECT
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemVersion or col.isSystemCreateDate or col.isSystemStartDate or col.isSystemEndDate %}
+                                "DIM"."{{ col.name }}"
+                            {% elif col.isSystemCurrentFlag %}
+                                'Y'
+                            {% else %}
+                                {{ get_source_transform(col) }}
+                            {% endif %}
+                            AS "{{ col.name }}",
+                        {% endfor -%}
+                            'UPDATE_NON_TYPE2_ROWS' AS "DML_OPERATION"
+                        {{ source.join }}
+                        INNER JOIN {{ ref_no_link(node.location.name, node.name) }} "DIM" ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %}
+                        WHERE "DIM"."{{ get_value_by_column_attribute("isSystemCurrentFlag") }}" = 'Y'
+                        AND (
+                        {% for col in source.columns if (col.isChangeTracking) -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %} )
+                        {% for col in source.columns if not (   col.isBusinessKey or
+                                                                col.isChangeTracking or
+                                                                col.isSurrogateKey or
+                                                                col.isSystemVersion or
+                                                                col.isSystemCurrentFlag or
+                                                                col.isSystemStartDate or
+                                                                col.isSystemEndDate or
+                                                                col.isSystemUpdateDate or
+                                                                col.isSystemCreateDate) -%}
+                            {% if loop.first %}
+                                AND (
+                            {% endif %}
+                            {% if not loop.first %}
+                                OR
+                            {% endif %}
+                            NVL( CAST({{ get_source_transform(col) }} as STRING), '**NULL**') <> NVL( CAST("DIM"."{{ col.name }}" as STRING), '**NULL**')
+                            {% if loop.last %}
+                                )
+                            {% endif %}
+                        {% endfor %}
+                    ) AS "SRC"
+                    ON
+                    {% for col in source.columns if col.isBusinessKey -%}
+                        {% if not loop.first %}
+                            AND
+                        {% endif %}
+                        "TGT"."{{ col.name }}" = "SRC"."{{ col.name }}"
+                    {% endfor %}
+                    AND "TGT"."{{ get_value_by_column_attribute("isSystemVersion") }}" = "SRC"."{{ get_value_by_column_attribute("isSystemVersion") }}"
+                    WHEN MATCHED THEN UPDATE SET
+                    {%- for col in source.columns if not (col.isBusinessKey or col.isSurrogateKey or col.isSystemCreateDate) %}
+                        "TGT"."{{ col.name }}" = "SRC"."{{ col.name }}"
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor -%}
+                    WHEN NOT MATCHED THEN INSERT (
+                    {%- for col in source.columns if not col.isSurrogateKey %}
+                        "{{ col.name }}"
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor -%}
+                    )
+                    VALUES (
+                    {%- for col in source.columns if not col.isSurrogateKey %}
+                        "SRC"."{{ col.name }}"
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor -%}
+                    )
+
+                {% endfor %}
+
+                {% elif has_business_key and not is_type_2 %}
+                    {% for source in sources %}
+                        {{ stage('MERGE ' + source.name | string ) }}
+                        MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT"
+                        USING (
+                            SELECT
+                            {% for col in source.columns if not col.isSurrogateKey %}
+                                {% if col.isSystemVersion %}
+                                	1
+                                {% elif col.isSystemCurrentFlag %}
+                                	'Y'
+                                {% else %}
+                                    {{ get_source_transform(col) }}
+                                {% endif %}
+                                AS "{{ col.name }}"
+                                {%- if not loop.last %}, {% endif %}
+                            {% endfor %}
+                            {{ source.join }})
+                            AS "SRC"
+                        ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+                        {% endfor %}
+                        WHEN MATCHED
+                        {% for col in source.columns if not (   col.isBusinessKey or
+                                                                col.isSurrogateKey or
+                                                                col.isSystemVersion or
+                                                                col.isSystemCurrentFlag or
+                                                                col.isSystemStartDate or
+                                                                col.isSystemEndDate or
+                                                                col.isSystemUpdateDate or
+                                                                col.isSystemCreateDate) %}
+                            {% if loop.first %}
+                                AND (
+                            {% else %}
+                                OR
+                            {% endif %}
+                            NVL( CAST("SRC"."{{ col.name }}" as STRING), '**NULL**') <> NVL( CAST("TGT"."{{ col.name }}" as STRING), '**NULL**')
+                            {% if loop.last %}
+                                )
+                            {% endif %}
+                        {% endfor %}
+                        THEN UPDATE SET
+                        {%- for col in source.columns if not (  col.isBusinessKey or
+                                                                col.isSurrogateKey or
+                                                                col.isSystemVersion or
+                                                                col.isSystemCurrentFlag or
+                                                                col.isSystemStartDate or
+                                                                col.isSystemEndDate or
+                                                                col.isSystemCreateDate) %}
+                                "TGT"."{{ col.name }}" = "SRC"."{{ col.name }}"
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                        WHEN NOT MATCHED THEN
+                        INSERT (
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            "{{ col.name }}"
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor -%}
+                        )
+                        VALUES (
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            "SRC"."{{ col.name }}"
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor -%}
+                        )
+                    {% endfor %}
+                {% else %}
+                    {% for source in sources %}
+                        {{ stage('Insert ' + source.name | string ) }}
+                        INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+                        (
+                            {% for col in source.columns if not col.isSurrogateKey %}
+                                "{{ col.name }}"
+                                {%- if not loop.last -%},{% endif %}
+                            {% endfor %}
+                        )
+
+                        SELECT
+                        {% for col in source.columns if not col.isSurrogateKey %}
+
+                            {% if col.isSystemVersion %}
+                                1
+                            {% elif col.isSystemCurrentFlag %}
+                                'Y'
+                            {% else %}
+                                {{ get_source_transform(col) }}
+                            {% endif %}
+                            AS "{{ col.name }}"
+                            {%- if not loop.last -%}, {% endif %}
+                            
+                        {% endfor %}
+                        {{ source.join }}
+                    {% endfor %}            
+                {% endif %}
+            	
+            	{% if config.postSQL %}
+            		{{ stage('Post-SQL') }}
+            		{{ config.postSQL }}
+            	{% endif %}
+            	
+            {% endif %}
+
+            {% if config.testsEnabled %}
+            	{% for test in node.tests %}
+            		{% if test.runOrder == 'After' %}
+            			{{ test_stage(test.name, test.continueOnFailure) }}
+            			{{ test.templateString }}
+                    {% endif %}
+            	{% endfor %}
+
+            	{% for column in columns %}
+            		{% for test in column.tests %}
+            			{{ test_stage(column.name + ": " + test.name) }}
+            			{{ test.templateString }}
+            		{% endfor %}
+            	{% endfor %}
+            {% endif %}
+    name: Persistent Stage
+    version: 1
+subgraphs: {}
+version: 1
