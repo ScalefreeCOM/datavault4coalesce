@@ -1,0 +1,102 @@
+steps:
+  HUB_NATION-97:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2345
+              stepCounter: "97"
+            config:
+              isHubHash: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_h_nation
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2189
+                    stepCounter: "70"
+                transform: ""
+          - columnReference:
+              columnCounter: 2341
+              stepCounter: "97"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: N_NATIONKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2185
+                    stepCounter: "70"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2349
+              stepCounter: "97"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemCreateDate: true
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2350
+              stepCounter: "97"
+            config: {}
+            dataType: VARCHAR
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemRecordSource: true
+            name: RECORD_SOURCE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: "'SAMPLE_DATA.NATION'"
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_NATION
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_NATION') }} "STG_NATION"
+            name: HUB_NATION
+            noLinkRefs: []
+      name: HUB_NATION
+      overrideSQL: false
+      schema: ""
+      sqlType: COALESCE-DATA_VAULT::1
+      type: sql
+    stepCounter: "97"

@@ -1,0 +1,178 @@
+steps:
+  SAT_CURR_SUPPLIER-98:
+    operation:
+      config: {}
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2351
+              stepCounter: "98"
+            config:
+              isSatKey: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_h_supplier
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2232
+                    stepCounter: "80"
+                transform: ""
+          - columnReference:
+              columnCounter: 2352
+              stepCounter: "98"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hd_supplier_n_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2235
+                    stepCounter: "80"
+                transform: ""
+          - columnReference:
+              columnCounter: 2353
+              stepCounter: "98"
+            config:
+              isDateColumn: true
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2236
+                    stepCounter: "80"
+                transform: ""
+          - columnReference:
+              columnCounter: 2354
+              stepCounter: "98"
+            dataType: VARCHAR
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: RECORD_SOURCE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2237
+                    stepCounter: "80"
+                transform: ""
+          - columnReference:
+              columnCounter: 2355
+              stepCounter: "98"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: S_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2226
+                    stepCounter: "80"
+                transform: ""
+          - columnReference:
+              columnCounter: 2356
+              stepCounter: "98"
+            dataType: VARCHAR(40)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: S_ADDRESS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2227
+                    stepCounter: "80"
+                transform: ""
+          - columnReference:
+              columnCounter: 2357
+              stepCounter: "98"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: S_NATIONKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2228
+                    stepCounter: "80"
+                transform: ""
+          - columnReference:
+              columnCounter: 2358
+              stepCounter: "98"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: S_PHONE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2229
+                    stepCounter: "80"
+                transform: ""
+          - columnReference:
+              columnCounter: 2359
+              stepCounter: "98"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: S_ACCTBAL
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2230
+                    stepCounter: "80"
+                transform: ""
+          - columnReference:
+              columnCounter: 2360
+              stepCounter: "98"
+            dataType: VARCHAR(101)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: S_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2231
+                    stepCounter: "80"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: SAT_SUPPLIER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'SAT_SUPPLIER') }} "SAT_SUPPLIER"
+            name: SAT_CURR_SUPPLIER
+            noLinkRefs: []
+      name: SAT_CURR_SUPPLIER
+      overrideSQL: false
+      schema: ""
+      sqlType: COALESCE-DATA_VAULT::7
+      type: sql
+    stepCounter: "98"

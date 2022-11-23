@@ -1,0 +1,117 @@
+steps:
+  LNK_ORDERS-114:
+    operation:
+      config:
+        insertStrategy: UNION
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2560
+              stepCounter: "114"
+            config:
+              isLinkHash: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_l_orders_customers
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2547
+                    stepCounter: "39"
+                transform: ""
+          - columnReference:
+              columnCounter: 2558
+              stepCounter: "114"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_h_order
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2078
+                    stepCounter: "39"
+                transform: ""
+          - columnReference:
+              columnCounter: 2561
+              stepCounter: "114"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_h_customer
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2548
+                    stepCounter: "39"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2562
+              stepCounter: "114"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemCreateDate: true
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2563
+              stepCounter: "114"
+            config: {}
+            dataType: VARCHAR
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemRecordSource: true
+            name: RECORD_SOURCE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: "''"
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_ORDERS
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS') }} "STG_ORDERS"
+            name: LNK_ORDERS
+            noLinkRefs: []
+      name: LNK_ORDERS
+      overrideSQL: false
+      schema: ""
+      sqlType: COALESCE-DATA_VAULT::2
+      type: sql
+    stepCounter: "114"

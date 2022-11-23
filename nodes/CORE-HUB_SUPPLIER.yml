@@ -1,0 +1,102 @@
+steps:
+  HUB_SUPPLIER-95:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2328
+              stepCounter: "95"
+            config:
+              isHubHash: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_h_supplier
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2089
+                    stepCounter: "44"
+                transform: ""
+          - columnReference:
+              columnCounter: 2321
+              stepCounter: "95"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: S_SUPPKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2082
+                    stepCounter: "44"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2332
+              stepCounter: "95"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemCreateDate: true
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2333
+              stepCounter: "95"
+            config: {}
+            dataType: VARCHAR
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemRecordSource: true
+            name: RECORD_SOURCE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: "'SAMPLE_DATA.SUPPLIER'"
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_SUPPLIER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_SUPPLIER') }} "STG_SUPPLIER"
+            name: HUB_SUPPLIER
+            noLinkRefs: []
+      name: HUB_SUPPLIER
+      overrideSQL: false
+      schema: ""
+      sqlType: COALESCE-DATA_VAULT::1
+      type: sql
+    stepCounter: "95"

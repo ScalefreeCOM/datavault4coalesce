@@ -1,0 +1,117 @@
+steps:
+  LNK_NATION-88:
+    operation:
+      config:
+        insertStrategy: UNION
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2289
+              stepCounter: "88"
+            config:
+              isLinkHash: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_l_nation_region
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2191
+                    stepCounter: "70"
+                transform: ""
+          - columnReference:
+              columnCounter: 2287
+              stepCounter: "88"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_h_nation
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2189
+                    stepCounter: "70"
+                transform: ""
+          - columnReference:
+              columnCounter: 2288
+              stepCounter: "88"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_h_region
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2190
+                    stepCounter: "70"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2291
+              stepCounter: "88"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemCreateDate: true
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2292
+              stepCounter: "88"
+            config: {}
+            dataType: VARCHAR
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemRecordSource: true
+            name: RECORD_SOURCE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: "'SAMPLE_DATA.NATION'"
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_NATION
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_NATION') }} "STG_NATION"
+            name: LNK_NATION
+            noLinkRefs: []
+      name: LNK_NATION
+      overrideSQL: false
+      schema: ""
+      sqlType: COALESCE-DATA_VAULT::2
+      type: sql
+    stepCounter: "88"

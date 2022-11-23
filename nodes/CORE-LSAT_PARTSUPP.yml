@@ -1,0 +1,146 @@
+steps:
+  LSAT_PARTSUPP-73:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2220
+              stepCounter: "73"
+            config:
+              isLinkHash: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_l_part_supplier
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2200
+                    stepCounter: "71"
+                transform: ""
+          - columnReference:
+              columnCounter: 2221
+              stepCounter: "73"
+            config:
+              isChangeHash: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hd_part_supplier_n_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2201
+                    stepCounter: "71"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2222
+              stepCounter: "73"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemCreateDate: true
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2223
+              stepCounter: "73"
+            config: {}
+            dataType: VARCHAR
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemRecordSource: true
+            name: RECORD_SOURCE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: "'SAMPLE_DATA.PARTSUPP'"
+          - columnReference:
+              columnCounter: 2215
+              stepCounter: "73"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: PS_AVAILQTY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2195
+                    stepCounter: "71"
+                transform: ""
+          - columnReference:
+              columnCounter: 2216
+              stepCounter: "73"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: PS_SUPPLYCOST
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2196
+                    stepCounter: "71"
+                transform: ""
+          - columnReference:
+              columnCounter: 2217
+              stepCounter: "73"
+            dataType: VARCHAR(199)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: PS_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2197
+                    stepCounter: "71"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_PARTSUPP
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_PARTSUPP') }} "STG_PARTSUPP"
+            name: LSAT_PARTSUPP
+            noLinkRefs: []
+      name: LSAT_PARTSUPP
+      overrideSQL: false
+      schema: ""
+      sqlType: COALESCE-DATA_VAULT::4
+      type: sql
+    stepCounter: "73"

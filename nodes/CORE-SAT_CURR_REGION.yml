@@ -1,0 +1,122 @@
+steps:
+  SAT_CURR_REGION-99:
+    operation:
+      config: {}
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2361
+              stepCounter: "99"
+            config:
+              isSatKey: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_h_region
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2241
+                    stepCounter: "82"
+                transform: ""
+          - columnReference:
+              columnCounter: 2362
+              stepCounter: "99"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hd_region_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2242
+                    stepCounter: "82"
+                transform: ""
+          - columnReference:
+              columnCounter: 2363
+              stepCounter: "99"
+            config:
+              isDateColumn: true
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2243
+                    stepCounter: "82"
+                transform: ""
+          - columnReference:
+              columnCounter: 2364
+              stepCounter: "99"
+            dataType: VARCHAR
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: RECORD_SOURCE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2244
+                    stepCounter: "82"
+                transform: ""
+          - columnReference:
+              columnCounter: 2365
+              stepCounter: "99"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: R_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2239
+                    stepCounter: "82"
+                transform: ""
+          - columnReference:
+              columnCounter: 2366
+              stepCounter: "99"
+            dataType: VARCHAR(152)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: R_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2240
+                    stepCounter: "82"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: SAT_REGION
+            join:
+              joinCondition: FROM {{ ref('CORE', 'SAT_REGION') }} "SAT_REGION"
+            name: SAT_CURR_REGION
+            noLinkRefs: []
+      name: SAT_CURR_REGION
+      overrideSQL: false
+      schema: ""
+      sqlType: COALESCE-DATA_VAULT::7
+      type: sql
+    stepCounter: "99"

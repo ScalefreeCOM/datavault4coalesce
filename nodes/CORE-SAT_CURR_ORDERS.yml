@@ -1,0 +1,192 @@
+steps:
+  SAT_CURR_ORDERS-102:
+    operation:
+      config: {}
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2386
+              stepCounter: "102"
+            config:
+              isSatKey: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_h_order
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2267
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2387
+              stepCounter: "102"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hd_order_n_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2270
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2388
+              stepCounter: "102"
+            config:
+              isDateColumn: true
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2271
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2389
+              stepCounter: "102"
+            dataType: VARCHAR
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: RECORD_SOURCE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2272
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2390
+              stepCounter: "102"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERSTATUS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2260
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2391
+              stepCounter: "102"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_TOTALPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2261
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2392
+              stepCounter: "102"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2262
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2393
+              stepCounter: "102"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2263
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2394
+              stepCounter: "102"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_CLERK
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2264
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2395
+              stepCounter: "102"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_SHIPPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2265
+                    stepCounter: "86"
+                transform: ""
+          - columnReference:
+              columnCounter: 2396
+              stepCounter: "102"
+            dataType: VARCHAR(79)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_COMMENT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2266
+                    stepCounter: "86"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: SAT_ORDERS
+            join:
+              joinCondition: FROM {{ ref('CORE', 'SAT_ORDERS') }} "SAT_ORDERS"
+            name: SAT_CURR_ORDERS
+            noLinkRefs: []
+      name: SAT_CURR_ORDERS
+      overrideSQL: false
+      schema: ""
+      sqlType: COALESCE-DATA_VAULT::7
+      type: sql
+    stepCounter: "102"

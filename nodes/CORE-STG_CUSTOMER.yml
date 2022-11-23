@@ -1,0 +1,206 @@
+steps:
+  STG_CUSTOMER-38:
+    operation:
+      config:
+        insertStrategy: INSERT
+        postSQL: ""
+        preSQL: ""
+        testsEnabled: true
+        truncateBefore: true
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2058
+              stepCounter: "38"
+            dataType: NUMBER(38,0)
+            description: ""
+            name: C_CUSTKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 1997
+                    stepCounter: "30"
+                transform: ""
+          - columnReference:
+              columnCounter: 2059
+              stepCounter: "38"
+            dataType: VARCHAR(25)
+            description: ""
+            name: C_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 1998
+                    stepCounter: "30"
+                transform: ""
+          - columnReference:
+              columnCounter: 2060
+              stepCounter: "38"
+            dataType: VARCHAR(40)
+            description: ""
+            name: C_ADDRESS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 1999
+                    stepCounter: "30"
+                transform: ""
+          - columnReference:
+              columnCounter: 2061
+              stepCounter: "38"
+            dataType: NUMBER(38,0)
+            description: ""
+            name: C_NATIONKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2000
+                    stepCounter: "30"
+                transform: ""
+          - columnReference:
+              columnCounter: 2062
+              stepCounter: "38"
+            dataType: VARCHAR(15)
+            description: ""
+            name: C_PHONE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2001
+                    stepCounter: "30"
+                transform: ""
+          - columnReference:
+              columnCounter: 2063
+              stepCounter: "38"
+            dataType: NUMBER(12,2)
+            description: ""
+            name: C_ACCTBAL
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2002
+                    stepCounter: "30"
+                transform: ""
+          - columnReference:
+              columnCounter: 2064
+              stepCounter: "38"
+            dataType: VARCHAR(10)
+            description: ""
+            name: C_MKTSEGMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2003
+                    stepCounter: "30"
+                transform: ""
+          - columnReference:
+              columnCounter: 2065
+              stepCounter: "38"
+            dataType: VARCHAR(117)
+            description: ""
+            name: C_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2004
+                    stepCounter: "30"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2067
+              stepCounter: "38"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 2059
+                stepCounter: "38"
+              - columnCounter: 2060
+                stepCounter: "38"
+              - columnCounter: 2062
+                stepCounter: "38"
+            name: hd_customer_p_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2068
+              stepCounter: "38"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 2063
+                stepCounter: "38"
+              - columnCounter: 2064
+                stepCounter: "38"
+              - columnCounter: 2065
+                stepCounter: "38"
+            name: hd_customer_n_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2533
+              stepCounter: "38"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 2058
+                stepCounter: "38"
+            name: hk_h_customer
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: TPCH_SF1
+                nodeName: CUSTOMER
+            join:
+              joinCondition: FROM {{ ref('TPCH_SF1', 'CUSTOMER') }} "CUSTOMER"
+            name: STG_CUSTOMER
+            noLinkRefs: []
+      name: STG_CUSTOMER
+      overrideSQL: false
+      schema: ""
+      sqlType: Stage
+      type: sql
+    stepCounter: "38"

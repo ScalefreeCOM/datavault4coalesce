@@ -1,0 +1,286 @@
+steps:
+  LSAT_LINEITEM-53:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2176
+              stepCounter: "53"
+            config:
+              isLinkHash: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_l_lineitem
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2113
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2177
+              stepCounter: "53"
+            config:
+              isChangeHash: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hd_lineitem_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2114
+                    stepCounter: "45"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2178
+              stepCounter: "53"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemCreateDate: true
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2179
+              stepCounter: "53"
+            config: {}
+            dataType: VARCHAR
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            isSystemRecordSource: true
+            name: RECORD_SOURCE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: "'SAMPLE_DATA.LINEITEM'"
+          - columnReference:
+              columnCounter: 2160
+              stepCounter: "53"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_LINENUMBER
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2096
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2163
+              stepCounter: "53"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_DISCOUNT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2099
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2161
+              stepCounter: "53"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_QUANTITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2097
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2162
+              stepCounter: "53"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_EXTENDEDPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2098
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2164
+              stepCounter: "53"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_TAX
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2100
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2165
+              stepCounter: "53"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_RETURNFLAG
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2101
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2166
+              stepCounter: "53"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_LINESTATUS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2102
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2167
+              stepCounter: "53"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_SHIPDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2103
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2168
+              stepCounter: "53"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_COMMITDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2104
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2169
+              stepCounter: "53"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_RECEIPTDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2105
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2170
+              stepCounter: "53"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_SHIPINSTRUCT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2106
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2171
+              stepCounter: "53"
+            dataType: VARCHAR(10)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_SHIPMODE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2107
+                    stepCounter: "45"
+                transform: ""
+          - columnReference:
+              columnCounter: 2172
+              stepCounter: "53"
+            dataType: VARCHAR(44)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_COMMENT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2108
+                    stepCounter: "45"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_LINEITEM
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_LINEITEM') }} "STG_LINEITEM"
+            name: LSAT_LINEITEM
+            noLinkRefs: []
+      name: LSAT_LINEITEM
+      overrideSQL: false
+      schema: ""
+      sqlType: COALESCE-DATA_VAULT::4
+      type: sql
+    stepCounter: "53"
