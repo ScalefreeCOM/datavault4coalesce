@@ -1,0 +1,661 @@
+{%- macro datavault4coalesce__is_list(obj, empty_is_false=false) -%}
+
+    {%- if obj is iterable and obj is not string and obj is not mapping -%}
+        {%- if obj is none and obj is undefined and not obj and empty_is_false -%}
+            {%- do return(false) -%}
+        {%- endif -%}
+
+        {%- do return(true) -%}
+    {%- else -%}
+        {%- do return(false) -%}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__is_nothing(obj) -%}
+
+    {%- if obj is none or obj is undefined or not obj -%}
+        {%- do return(true) -%}
+    {%- else -%}
+        {%- do return(false) -%}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__is_something(obj) -%}
+
+    {%- if obj is not none and obj is defined and obj -%}
+        {%- do return(true) -%}
+    {%- else -%}
+        {%- do return(false) -%}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__is_expression(obj) -%}
+
+    {%- if obj is string -%}
+        {%- if (obj | first == "'" and obj | last == "'") or ("(" in obj and ")" in obj) or "::" in obj -%}
+            {%- do return(true) -%}
+        {%- else -%}
+            {%- do return(false) -%}
+        {%- endif -%}
+    {%- else -%}
+        {%- do return(false) -%}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__is_attribute(obj) -%}
+
+{%- if obj is not none and obj is string and obj -%}
+
+        {%- if obj | first == "!" -%}
+        
+            {{- return(false) -}}
+        
+        {%- else -%}
+        
+            {%- if datavault4coalesce__is_expression(obj) -%}
+            
+                {{- return(false) -}}
+
+            {%- else -%}
+
+                {{- return(true) -}}
+
+            {%- endif -%}
+
+        {%- endif -%}
+    {%- else -%}
+        {%- if execute -%}
+            {{ exceptions.raise_compiler_error("Invalid 'obj' object provided to 'is_attribute' check. Must be a string and not null.") }}
+        {%- endif %}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__process_columns_to_select(columns_list=none, exclude_columns_list=none) -%}
+    {% set exclude_columns_list = exclude_columns_list | map('upper') | list %}
+    {% set columns_to_select = [] %}
+
+    {% if not datavault4coalesce__is_list(columns_list) or not datavault4coalesce__is_list(exclude_columns_list)  %}
+
+        {{- exceptions.raise_compiler_error("One or both arguments are not of list type.") -}}
+
+    {%- endif -%}
+
+    {%- if datavault4coalesce__is_something(columns_list) and datavault4coalesce__is_something(exclude_columns_list) -%}
+        {%- for col in columns_list -%}
+
+            {%- if col|lower not in exclude_columns_list | map('lower') -%}
+                {%- do columns_to_select.append(col) -%}
+            {%- endif -%}
+
+        {%- endfor -%}
+    {%- elif datavault4coalesce__is_something(columns_list) and not datavault4coalesce__is_something(exclude_columns_list) %}
+        {% set columns_to_select = columns_list %}
+    {%- endif -%}
+
+    {%- do return(columns_to_select) -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__extract_column_names(columns_dict=none) -%}
+
+    {%- set extracted_column_names = [] -%}
+
+    {%- if columns_dict is mapping -%}
+        {%- for key, value in columns_dict.items() -%}
+            {%- do extracted_column_names.append(key) -%}
+        {%- endfor -%}
+
+        {%- do return(extracted_column_names) -%}
+    {%- else -%}
+        {%- do return([]) -%}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__extract_input_columns(columns_dict=none) -%}
+
+    {%- set extracted_input_columns = [] -%}
+
+    {%- if columns_dict is mapping -%}
+        {%- for key, value in columns_dict.items() -%}
+            {%- if value is mapping and 'src_cols_required' in value.keys() -%}
+                {%- do extracted_input_columns.append(value['src_cols_required']) -%}
+            {%- elif value is mapping and 'value' in value.keys() and 'src_cols_required' not in value.keys() -%}
+                {# Do nothing. No source column required. #}    
+            {%- elif value is mapping and value.is_hashdiff -%}
+                {%- do extracted_input_columns.append(value['columns']) -%}
+            {%- elif value is mapping and 'this_column_name' in value.keys() -%}
+                {%- do extracted_input_columns.append(value['this_column_name']) -%}
+            {%- else -%}
+                {%- do extracted_input_columns.append(value) -%}
+            {%- endif -%}
+        {%- endfor -%}
+
+        {%- do return(extracted_input_columns) -%}
+    {%- else -%}
+        {%- do return([]) -%}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__process_hash_column_excludes(hash_columns=none, source_columns=none) -%}
+
+    {%- set processed_hash_columns = {} -%}
+
+    {%- for col, col_mapping in hash_columns.items() -%}
+        
+        {%- if col_mapping is mapping -%}
+            {%- if col_mapping.exclude_columns -%}
+
+                {%- if col_mapping.columns -%}
+
+                    {%- set columns_to_hash = datavault4coalesce__process_columns_to_select(source_columns, col_mapping.columns) -%}
+
+                    {%- do hash_columns[col].pop('exclude_columns') -%}
+                    {%- do hash_columns[col].update({'columns': columns_to_hash}) -%}
+
+                    {%- do processed_hash_columns.update({col: hash_columns[col]}) -%}
+                {%- else -%}
+
+                    {%- do hash_columns[col].pop('exclude_columns') -%}
+                    {%- do hash_columns[col].update({'columns': source_columns}) -%}
+
+                    {%- do processed_hash_columns.update({col: hash_columns[col]}) -%}
+                {%- endif -%}
+            {%- else -%}
+                {%- do processed_hash_columns.update({col: col_mapping}) -%}
+            {%- endif -%}
+        {%- else -%}
+            {%- do processed_hash_columns.update({col: col_mapping}) -%}
+        {%- endif -%}
+
+    {%- endfor -%}
+
+    {%- do return(processed_hash_columns) -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__print_list(list_to_print=none, indent=4, src_alias=none) -%}
+
+    {%- for col_name in list_to_print -%}
+        {%- if src_alias %}
+        {{ (src_alias ~ '.' ~ col_name) | indent(indent) }}{{ "," if not loop.last }}
+        {%- else %}
+        {{ col_name | indent(indent) }}{{ "," if not loop.last }}
+        {%- endif %}
+    {%- endfor -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__as_constant(column_str) -%}
+
+    {%- if column_str is not none and column_str is string and column_str -%}
+
+        {%- if column_str | first == "!" -%}
+        
+            {{- return("'" ~ column_str[1:] ~ "'") -}}
+        
+        {%- else -%}
+        
+            {{- return(column_str) -}}
+
+        {%- endif -%}
+    {%- else -%}
+        {%- if execute -%}
+            {{ exceptions.raise_compiler_error("Invalid columns_str object provided. Must be a string and not null.") }}
+        {%- endif %}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__escape_column_names(columns=none) -%}
+
+{# Different platforms use different escape characters, the default below is for Snowflake which uses double quotes #}
+
+    {%- if datavault4coalesce__is_something(columns) -%}
+
+        {%- set col_string = '' -%}
+        {%- set col_list = [] -%}
+        {%- set col_mapping = {} -%}
+
+        {%- if columns is string -%}
+
+            {%- set col_string = datavault4coalesce__escape_column_name(columns) -%}
+
+        {%- elif datavault4coalesce__is_list(columns) -%}
+
+            {%- for col in columns -%}
+
+                {%- if col is string -%}
+
+                    {%- set escaped_col = datavault4coalesce__escape_column_name(col) -%}
+
+                    {%- do col_list.append(escaped_col) -%}
+
+                {%- else -%}
+
+                    {%- if execute -%}
+                        {{- exceptions.raise_compiler_error("Invalid column name(s) provided. Must be a string.") -}}
+                    {%- endif -%}
+
+                {%- endif -%}
+
+            {%- endfor -%}
+
+        {%- elif columns is mapping -%}
+
+            {%- if columns['source_column'] and columns['alias'] -%}
+
+                {%- set escaped_source_col = datavault4coalesce__escape_column_name(columns['source_column']) -%}
+                {%- set escaped_alias_col = datavault4coalesce__escape_column_name(columns['alias']) -%}
+                {%- set col_mapping = {"source_column": escaped_source_col, "alias": escaped_alias_col} -%}
+
+            {%- else -%}
+
+                {%- if execute -%}
+                    {{- exceptions.raise_compiler_error("Invalid column name(s) provided. Must be a string, a list of strings, or a dictionary of hashdiff metadata.") -}}
+                {%- endif %}
+
+            {%- endif -%}
+
+        {%- else -%}
+
+            {%- if execute -%}
+                {{- exceptions.raise_compiler_error("Invalid column name(s) provided. Must be a string, a list of strings, or a dictionary of hashdiff metadata.") -}}
+            {%- endif %}
+
+        {%- endif -%}
+
+    {%- elif columns == '' -%}
+
+        {%- if execute -%}
+            {{- exceptions.raise_compiler_error("Expected a column name or a list of column names, got an empty string") -}}
+        {%- endif -%}
+
+    {%- endif -%}
+
+{%- if columns is none -%}
+
+    {%- do return(none) -%}
+
+{%- elif columns == [] -%}
+
+    {%- do return([]) -%}
+
+{%- elif columns == {} -%}
+
+    {%- do return({}) -%}
+
+{%- elif columns is string -%}
+
+    {%- do return(col_string) -%}
+
+{%- elif datavault4coalesce__is_list(columns) -%}
+
+    {%- do return(col_list) -%}
+
+{%- elif columns is mapping -%}
+
+    {%- do return(col_mapping) -%}
+
+{%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__expand_column_list(columns=none) -%}
+
+{%- if not columns -%}
+    {%- if execute -%}
+         {{- exceptions.raise_compiler_error("Expected a list of columns, got: " ~ columns) -}}
+    {%- endif -%}
+{%- endif -%}
+
+{%- set col_list = [] -%}
+
+{%- if datavault4coalesce__is_list(columns) -%}
+
+    {%- set columns = columns | reject("none") %}
+
+    {%- for col in columns -%}
+
+        {%- if col is string -%}
+
+            {%- do col_list.append(col) -%}
+
+        {#- If list of lists -#}
+        {%- elif datavault4coalesce__is_list(col) -%}
+
+            {%- for cols in col -%}
+
+                {%- do col_list.append(cols) -%}
+
+            {%- endfor -%}
+        {%- elif col is mapping -%}
+
+            {%- do col_list.append(col) -%}
+
+        {%- else -%}
+
+            {%- if execute -%}
+                {{- exceptions.raise_compiler_error("Invalid columns object provided. Must be a list of lists, dictionaries or strings.") -}}
+            {%- endif %}
+
+        {%- endif -%}
+
+    {%- endfor -%}
+{%- else -%}
+
+    {%- if execute -%}
+        {{- exceptions.raise_compiler_error("Invalid columns object provided. Must be a list.") -}}
+    {%- endif %}
+
+{%- endif -%}
+
+{%- do return(col_list) -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__beginning_of_all_times() %}
+
+{%- set global_var = var('datavault4coalesce__beginning_of_all_times', none) -%}
+{%- set beginning_of_all_times = '' -%}
+
+{%- if global_var is mapping -%}
+    {%- if 'snowflake' in global_var.keys()|map('lower') -%}
+        {% set beginning_of_all_times = global_var['snowflake'] %}
+    {%- else -%}
+        {%- if execute -%}
+            {%- do exceptions.warn("Warning: You have set the global variable 'datavault4coalesce__beginning_of_all_times' to a dictionary, but have not included the adapter you use (snowflake) as a key. Applying the default value.") -%}
+        {% endif %}
+        {%- set beginning_of_all_times = "0001-01-01T00:00:01" -%}
+    {% endif %}
+{%- elif global_var is not mapping and datavault4coalesce__is_something(global_var) -%}
+    {%- set beginning_of_all_times = global_var -%}
+{%- else -%}
+    {%- set beginning_of_all_times = "0001-01-01T00:00:01" -%}
+{%- endif -%}
+
+{{ return(beginning_of_all_times) }}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__end_of_all_times() %}
+
+{%- set global_var = var('datavault4coalesce__end_of_all_times', none) -%}
+{%- set end_of_all_times = '' -%}
+
+{%- if global_var is mapping -%}
+    {%- if 'snowflake' in global_var.keys()|map('lower') -%}
+        {% set end_of_all_times = global_var['snowflake'] %}
+    {%- else -%}
+        {%- if execute -%}
+            {%- do exceptions.warn("Warning: You have set the global variable 'datavault4coalesce__end_of_all_times' to a dictionary, but have not included the adapter you use (snowflake) as a key. Applying the default value.") -%}
+        {% endif %}
+        {%- set end_of_all_times = "8888-12-31T23:59:59" -%}
+    {% endif %}
+{%- elif global_var is not mapping and datavault4coalesce__is_something(global_var) -%}
+    {%- set end_of_all_times = global_var -%}
+{%- else -%}
+    {%- set end_of_all_times = "8888-12-31T23:59:59" -%}
+{%- endif -%}
+
+{{ return(end_of_all_times) }}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__string_to_timestamp(format, timestamp) -%}
+    TO_TIMESTAMP('{{ timestamp }}', '{{ format }}')
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__timestamp_format() %}
+
+{%- set global_var = var('datavault4coalesce__timestamp_format', none) -%}
+{%- set timestamp_format = '' -%}
+
+{%- if global_var is mapping -%}
+    {%- if 'snowflake' in global_var.keys()|map('lower') -%}
+        {% set timestamp_format = global_var['snowflake'] %}
+    {%- else -%}
+        {%- if execute -%}
+            {%- do exceptions.warn("Warning: You have set the global variable 'datavault4coalesce__timestamp_format' to a dictionary, but have not included the adapter you use (snowflake) as a key. Applying the default value.") -%}
+        {% endif %}
+        {%- set timestamp_format = "YYYY-MM-DDTHH24:MI:SS" -%}
+    {% endif %}
+{%- elif global_var is not mapping and datavault4coalesce__is_something(global_var) -%}
+    {%- set timestamp_format = global_var -%}
+{%- else -%}
+    {%- set timestamp_format = "YYYY-MM-DDTHH24:MI:SS" -%}
+{%- endif -%}
+
+{{ return(timestamp_format) }}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__ghost_record_per_datatype(column_name, datatype, ghost_record_type, col_size) -%}
+
+{%- set beginning_of_all_times = datavault4coalesce__beginning_of_all_times() -%}
+{%- set end_of_all_times = datavault4coalesce__end_of_all_times() -%}
+{%- set timestamp_format = datavault4coalesce__timestamp_format() -%}
+
+{%- if ghost_record_type == 'unknown' -%}
+     {%- if datatype in ['TIMESTAMP_NTZ','TIMESTAMP'] %}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
+     {% elif datatype in ['STRING','VARCHAR'] %}'(unknown)' AS {{ column_name }}
+     {% elif datatype in ['NUMBER','INT','FLOAT','DECIMAL'] %}0 AS {{ column_name }}
+     {% elif datatype == 'BOOLEAN' %}CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
+     {% else %}NULL AS {{ column_name }}
+     {% endif %}
+{%- elif ghost_record_type == 'error' -%}
+     {%- if datatype in ['TIMESTAMP_NTZ','TIMESTAMP'] %}{{ datavault4coalesce__string_to_timestamp(timestamp_format, end_of_all_times) }} AS {{ column_name }}
+     {% elif datatype in ['STRING','VARCHAR'] %}'(error)' AS {{ column_name }}
+     {% elif datatype in ['NUMBER','INT','FLOAT','DECIMAL'] %}-1 AS {{ column_name }}
+     {% elif datatype == 'BOOLEAN' %}CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
+     {% else %}NULL AS {{ column_name }}
+      {% endif %}
+{%- else -%}
+    {%- if execute -%}
+     {{ exceptions.raise_compiler_error("Invalid Ghost Record Type. Accepted are 'unknown' and 'error'.") }}
+    {%- endif %}
+{%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__hash_default_values(hash_function, hash_datatype) -%}
+
+    {%- set dict_result = {} -%}
+
+    {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
+        {%- set hash_alg = 'MD5' -%}
+        {%- set unknown_key = "00000000000000000000000000000000" -%}
+        {%- set error_key = "ffffffffffffffffffffffffffffffff" -%}
+    {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' -%} 
+        {%- if hash_datatype == 'STRING' -%}
+            {%- set hash_alg = 'SHA1' -%}
+            {%- set unknown_key = "0000000000000000000000000000000000000000" -%}
+            {%- set error_key = "ffffffffffffffffffffffffffffffffffffffff" -%}
+        {%- elif hash_datatype == 'BINARY' -%}
+            {%- set hash_alg = 'SHA1_BINARY' -%}
+            {%- set unknown_key = "TO_BINARY(0000000000000000000000000000000000000000)" -%}
+            {%- set error_key = "TO_BINARY(ffffffffffffffffffffffffffffffffffffffff)" -%}        
+        {%- endif -%}
+    {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' -%}
+        {%- if hash_datatype == 'STRING' -%}
+            {%- set hash_alg = 'SHA2' -%}
+            {%- set unknown_key = "0000000000000000000000000000000000000000000000000000000000000000" -%}
+            {%- set error_key = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" -%}
+        {%- elif hash_datatype == 'BINARY' -%}
+            {%- set hash_alg = 'SHA2_BINARY' -%}
+            {%- set unknown_key = "TO_BINARY(0000000000000000000000000000000000000000000000000000000000000000)" -%}
+            {%- set error_key = "TO_BINARY(ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)" -%}        
+        {%- endif -%}   
+    {%- endif -%}
+
+    {%- do dict_result.update({"hash_alg": hash_alg, "unknown_key": unknown_key, "error_key": error_key }) -%}
+
+    {{ return(dict_result | tojson ) }}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__prefix(columns=none, prefix_str=none, alias_target='source') -%}
+
+    {%- if columns and prefix_str -%}
+
+        {%- for col in columns -%}
+
+            {%- if col is mapping -%}
+
+                {%- if alias_target == 'source' -%}
+
+                    {{- datavault4coalesce__prefix([col['source_column']], prefix_str) -}}
+
+                {%- elif alias_target == 'target' -%}
+
+                    {{- datavault4coalesce__prefix([col['alias']], prefix_str) -}}
+
+                {%- else -%}
+
+                    {{- datavault4coalesce__prefix([col['source_column']], prefix_str) -}}
+
+                {%- endif -%}
+
+                {%- if not loop.last -%} , {% endif %}
+
+            {%- else -%}
+
+                {%- if col is iterable and col is not string -%}
+
+                    {{- datavault4coalesce__prefix(col, prefix_str) -}}
+
+                {%- elif col is not none -%}
+
+                    {{- prefix_str}}.{{col.strip() -}}
+                {% else %}
+
+                    {%- if execute -%}
+                        {{- exceptions.raise_compiler_error("Unexpected or missing configuration for '" ~ this ~ "' Unable to prefix columns.") -}}
+                    {%- endif -%}
+                {%- endif -%}
+
+                {{- ', ' if not loop.last -}}
+
+            {%- endif -%}
+
+        {%- endfor -%}
+
+    {%- else -%}
+
+        {%- if execute -%}
+            {{- exceptions.raise_compiler_error("Invalid parameters provided to prefix macro. Expected: (columns [list/string], prefix_str [string]) got: (" ~ columns ~ ", " ~ prefix_str ~ ")") -}}
+        {%- endif -%}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__source_columns(source_relation=none) -%}
+
+    {%- if source_relation -%}
+        {%- set source_model_cols = adapter.get_columns_in_relation(source_relation) -%}
+
+        {%- set column_list = [] -%}
+
+        {%- for source_col in source_model_cols -%}
+            {%- do column_list.append(source_col.column) -%}
+        {%- endfor -%}
+
+        {%- do return(column_list) -%}
+    {%- endif %}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__concat_ws(string_list, separator="||") -%}
+
+    {{  "CONCAT_WS('" ~ separator ~ "', " ~ string_list | join(", ") ~ ")" }}
+
+{%- endmacro -%}
+
+
+{%- macro datavault4coalesce__derive_columns(source_relation=none, columns=none) -%}
+
+{%- set exclude_columns = [] -%}
+{%- set include_columns = [] -%}
+{%- set src_columns = [] -%}
+{%- set der_columns = [] -%}
+
+{%- set source_cols = datavault4coalesce__source_columns(source_relation=source_relation) -%}
+
+{%- if columns is mapping and columns is not none -%}
+
+    {#- Add aliases of derived columns to exclude and full SQL to include -#}
+    {%- for col in columns -%}
+
+        {%- if datavault4coalesce__is_list(columns[col]['value']) -%}
+            {%- set column_list = [] -%}
+
+            {%- for concat_component in columns[col]['value'] -%}
+                {%- set column_str = datavault4coalesce__as_constant(concat_component) -%}
+                {%- do column_list.append(column_str) -%}
+            {%- endfor -%}
+            {%- set concat = datavault4coalesce__concat_ws(column_list, "||") -%}
+            {%- set concat_string = concat ~ " AS " ~ datavault4coalesce__escape_column_names(col) -%}
+
+            {%- do der_columns.append(concat_string) -%}
+            {%- set exclude_columns = exclude_columns + columns[col]['value'] -%}
+        {% else %}
+            {%- set column_str = datavault4coalesce__as_constant(columns[col]['value']) -%}
+            {%- do der_columns.append(column_str ~ " AS " ~ datavault4coalesce__escape_column_names(col)) -%}
+            {%- do exclude_columns.append(col) -%}
+        {% endif %}
+
+    {%- endfor -%}
+
+    {#- Add all columns from source_model relation -#}
+    {%- if source_relation is defined and source_relation is not none -%}
+
+        {%- for col in source_cols -%}
+            {%- if col not in exclude_columns -%}
+                {%- do src_columns.append(datavault4coalesce__escape_column_names(col)) -%}
+            {%- endif -%}
+        {%- endfor -%}
+
+    {%- endif -%}
+
+    {#- Makes sure the columns are appended in a logical order. Source columns then derived columns -#}
+    {%- set include_columns = src_columns + der_columns -%}
+
+        {#- Print out all columns in includes -#}
+        {%- for col in include_columns -%}
+            {{- col | indent(4) -}}{{ ",\n" if not loop.last }}
+        {%- endfor -%}
+    {%- else -%}
+        {%- if execute -%}
+            {{ exceptions.raise_compiler_error("Invalid column configuration:
+            expected format: {'source_relation': Relation, 'columns': {column_name: column_value}}
+            got: {'source_relation': " ~ source_relation ~ ", 'columns': " ~ columns ~ "}") }}
+        {%- endif %}
+    {%- endif %}
+{%- endmacro -%}
