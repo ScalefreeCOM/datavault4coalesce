@@ -1,0 +1,26 @@
+{
+    "datavault4dbt__ldts_alias": "ldts",
+    "datavault4dbt__rsrc_alias": "rsrc", 
+    "datavault4dbt__ledts_alias": "ledts", 
+    "datavault4dbt__snapshot_trigger_column": "is_active",
+    "datavault4dbt__sdts_alias": "sdts", 
+    "datavault4dbt__stg_alias": "stg", 
+    "datavault4dbt__is_current_col_alias": "IS_CURRENT", 
+    "datavault4dbt__hash": "MD5", 
+    "datavault4dbt.hash_datatype": "STRING", 
+    "datavault4dbt__hashkey_input_case_sensitive": "FALSE", 
+    "datavault4dbt__hashdiff_input_case_sensitive": "TRUE",
+    "datavault4dbt__copy_rsrc_ldts_input_columns": "false",  
+    "datavault4dbt__beginning_of_all_times": "0001-01-01T00:00:01", 
+    "datavault4dbt__end_of_all_times": "8888-12-31T23:59:59", "datavault4dbt__timestamp_format": "YYYY-MM-DDTHH24:MI:SS", 
+    "datavault4dbt__default_unknown_rsrc": "SYSTEM", 
+    "datavault4dbt__default_error_rsrc": "ERROR", 
+    "datavault4dbt__rsrc_default_dtype": "STRING", 
+    "datavault4dbt__stg_default_dtype": "STRING", 
+    "datavault4dbt__derived_columns_default_dtype": "STRING",
+    "datavault4dbt__error_value__STRING": "(error)", 
+    "datavault4dbt__error_value_alt__STRING": "e", 
+    "datavault4dbt__unknown_value__STRING": "(unknown)",
+    "datavault4dbt__unknown_value_alt__STRING": "u"
+    
+    }

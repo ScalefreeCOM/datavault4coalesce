@@ -48,6 +48,22 @@
                 UNION
             {% endif %}
         {% endif %}
+
+        {%- if config.generate_ghost_records -%}
+
+        UNION ALL 
+
+        SELECT
+
+        {%- for col in source.columns %}
+ 
+        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dtype, 'unknown') }}
+        {% if not loop.last %},{% endif %}
+
+        {% endfor %}
+
+
+
     {% endfor %}
 
 {% endif %}
