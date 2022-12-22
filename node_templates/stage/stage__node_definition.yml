@@ -39,6 +39,11 @@ config:
     attributeName: testsEnabled
     type: toggleButton
     default: true
+
+  - displayName: Generate Ghost Records
+    attributeName: generate_ghost_records
+    type: toggleButton
+    default: true
     
   - displayName: Pre-SQL
     attributeName: preSQL

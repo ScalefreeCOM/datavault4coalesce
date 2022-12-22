@@ -473,10 +473,6 @@
      {% elif datatype == 'BOOLEAN' %}CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
      {% else %}NULL AS {{ column_name }}
       {% endif %}
-{%- else -%}
-    {%- if execute -%}
-     {{ exceptions.raise_compiler_error("Invalid Ghost Record Type. Accepted are 'unknown' and 'error'.") }}
-    {%- endif %}
 {%- endif -%}
 
 {%- endmacro -%}

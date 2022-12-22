@@ -55,14 +55,25 @@
 
         SELECT
 
-        {%- for col in source.columns %}
- 
-        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dtype, 'unknown') }}
+    {% for source in sources %}
+        {% for col in source.columns %}
+        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown') }}
         {% if not loop.last %},{% endif %}
-
         {% endfor %}
+    {% endfor %}
 
+        UNION ALL 
 
+        SELECT
+
+    {% for source in sources %}
+        {% for col in source.columns %}
+        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error') }}
+        {% if not loop.last %},{% endif %}
+        {% endfor %}
+    {% endfor %}
+
+        {%- endif -%}
 
     {% endfor %}
 
