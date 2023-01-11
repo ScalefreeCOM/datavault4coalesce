@@ -1,5 +1,5 @@
-capitalized: "Datavault4Coalesce: Stage"
-short: dv4coalesce_stage
+capitalized: Copy of Stage
+short: STG
 plural: Stages
 tagColor: '#2EB67D'
 
@@ -7,9 +7,8 @@ config:
 - groupName: Options
   items:
   - type: materializationSelector
-    default: table
+    default: view
     options:
-    - table
     - view
     isRequired: true
 
@@ -39,11 +38,6 @@ config:
     attributeName: testsEnabled
     type: toggleButton
     default: true
-
-  - displayName: Generate Ghost Records
-    attributeName: generate_ghost_records
-    type: toggleButton
-    default: true
     
   - displayName: Pre-SQL
     attributeName: preSQL
@@ -56,3 +50,10 @@ config:
     type: textBox
     syntax: sql
     isRequired: false
+
+- groupName: Data Vault
+  items:
+  - displayName: Generate Ghost Records
+    attributeName: generate_ghost_records
+    type: toggleButton
+    default: true

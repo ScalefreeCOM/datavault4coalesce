@@ -25,10 +25,17 @@
     CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
     (
         {% for col in columns %}
-            "{{ col.name }}"
+            {%- if col.is_rsrc_column -%}
+                "{{parameters.datavault4coalesce__rsrc_alias}}"
+            {%- elif col.is_ldts_column -%}
+                "{{parameters.datavault4coalesce__ldts_alias}}"
+            {% else %}
+                "{{ col.name }}"
+            {% endif %}
             {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
             {%- if not loop.last -%}, {% endif %}
         {% endfor %}
+
     )
     {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
     AS
@@ -51,27 +58,27 @@
 
         {%- if config.generate_ghost_records -%}
 
-        UNION ALL 
+            UNION ALL 
 
-        SELECT
+            SELECT
 
-    {% for source in sources %}
-        {% for col in source.columns %}
-        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown') }}
-        {% if not loop.last %},{% endif %}
-        {% endfor %}
-    {% endfor %}
+            {% for source in sources %}
+                {% for col in source.columns %}
+                {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown') }}
+                {% if not loop.last %},{% endif %}
+                {% endfor %}
+            {% endfor %}
 
-        UNION ALL 
+            UNION ALL 
 
-        SELECT
+            SELECT
 
-    {% for source in sources %}
-        {% for col in source.columns %}
-        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error') }}
-        {% if not loop.last %},{% endif %}
-        {% endfor %}
-    {% endfor %}
+            {% for source in sources %}
+                {% for col in source.columns %}
+                {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error') }}
+                {% if not loop.last %},{% endif %}
+                {% endfor %}
+            {% endfor %}
 
         {%- endif -%}
 
