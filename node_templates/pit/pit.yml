@@ -1,0 +1,225 @@
+sources:
+  - name: PIT_ORDERS1
+    columns:
+      - id: 2793
+        name: hk_order_h
+        dataType: STRING
+        description: ""
+        nullable: true
+        defaultValue: ""
+        tests: []
+        is_Hub_hk: true
+        transform: ""
+        sourceColumns:
+          - node:
+              id: "119"
+              name: HUB_ORDERS1
+              nodeType: "Datavault4Coalesce: Hub"
+              location:
+                name: CORE
+              description: ""
+              materializationType: table
+              isMultisource: false
+              override:
+                create:
+                  enabled: false
+                  script: ""
+              tests: []
+            column:
+              id: 2604
+              name: hk_order_h
+              dataType: STRING
+              description: ""
+              nullable: true
+              defaultValue: ""
+              tests: []
+              is_Hub_hk: true
+      - id: 2795
+        name: ldts
+        dataType: DATE
+        description: ""
+        nullable: true
+        defaultValue: ""
+        tests: []
+        transform: ""
+        sourceColumns:
+          - node:
+              id: "119"
+              name: HUB_ORDERS1
+              nodeType: "Datavault4Coalesce: Hub"
+              location:
+                name: CORE
+              description: ""
+              materializationType: table
+              isMultisource: false
+              override:
+                create:
+                  enabled: false
+                  script: ""
+              tests: []
+            column:
+              id: 2607
+              name: ldts
+              dataType: DATE
+              description: ""
+              nullable: true
+              defaultValue: ""
+              tests: []
+              is_Hub_ldts: true
+      - id: 2797
+        name: sdts
+        dataType: TIMESTAMP
+        description: ""
+        nullable: true
+        defaultValue: ""
+        tests: []
+        transform: getdate()
+        sourceColumns:
+          - {}
+        is_system_sdts: true
+    join: FROM {{ ref('CORE', 'HUB_ORDERS1') }} "HUB_ORDERS1"
+    dependencies:
+      - node:
+          id: "119"
+          name: HUB_ORDERS1
+          nodeType: "Datavault4Coalesce: Hub"
+          location:
+            name: CORE
+          description: ""
+          materializationType: table
+          isMultisource: false
+          override:
+            create:
+              enabled: false
+              script: ""
+          tests: []
+        columns:
+          - id: 2604
+            name: hk_order_h
+            dataType: STRING
+            description: ""
+            nullable: true
+            defaultValue: ""
+            tests: []
+            is_Hub_hk: true
+          - id: 2595
+            name: O_ORDERKEY
+            dataType: NUMBER(38,0)
+            description: ""
+            nullable: false
+            defaultValue: ""
+            tests: []
+            is_Hub_bk: true
+          - id: 2607
+            name: ldts
+            dataType: DATE
+            description: ""
+            nullable: true
+            defaultValue: ""
+            tests: []
+            is_Hub_ldts: true
+          - id: 2606
+            name: rsrc
+            dataType: STRING
+            description: ""
+            nullable: true
+            defaultValue: ""
+            tests: []
+            is_Hub_rsrc: true
+    customSQL: ""
+  - name: NEW_SOURCE
+    columns:
+      - id: 2793
+        name: hk_order_h
+        dataType: STRING
+        description: ""
+        nullable: true
+        defaultValue: ""
+        tests: []
+        is_Hub_hk: true
+        transform: ""
+        sourceColumns:
+          - node:
+              id: "133"
+              name: SAT_v1_SAT_ORDERS11
+              nodeType: "Datavault4Coalesce: Satellite v1"
+              location:
+                name: CORE
+              description: ""
+              materializationType: view
+              isMultisource: false
+              override:
+                create:
+                  enabled: false
+                  script: ""
+              tests: []
+            column:
+              id: 2780
+              name: hk_order_h
+              dataType: STRING
+              description: ""
+              nullable: true
+              defaultValue: ""
+              tests: []
+              is_hk: true
+      - id: 2795
+        name: ldts
+        dataType: DATE
+        description: ""
+        nullable: true
+        defaultValue: ""
+        tests: []
+        transform: ""
+        sourceColumns:
+          - node:
+              id: "133"
+              name: SAT_v1_SAT_ORDERS11
+              nodeType: "Datavault4Coalesce: Satellite v1"
+              location:
+                name: CORE
+              description: ""
+              materializationType: view
+              isMultisource: false
+              override:
+                create:
+                  enabled: false
+                  script: ""
+              tests: []
+            column:
+              id: 2790
+              name: ldts
+              dataType: TIMESTAMP
+              description: ""
+              nullable: true
+              defaultValue: ""
+              tests: []
+              is_ldts: true
+      - id: 2797
+        name: sdts
+        dataType: TIMESTAMP
+        description: ""
+        nullable: true
+        defaultValue: ""
+        tests: []
+        transform: getdate()
+        sourceColumns:
+          - {}
+        is_system_sdts: true
+    join: ""
+    dependencies: []
+    customSQL: ""
+node:
+  id: scratch
+  name: PIT_ORDERS1
+  nodeType: "Datavault4Coalesce: PIT"
+  location:
+    name: CORE
+  description: ""
+  materializationType: table
+  isMultisource: true
+  override:
+    create:
+      enabled: false
+      script: ""
+  tests: []
+this: "{{ ref_no_link(node.location.name, node.name) }}"
