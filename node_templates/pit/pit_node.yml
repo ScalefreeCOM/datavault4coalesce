@@ -26,19 +26,6 @@ config:
   - type: multisourceToggle
     default: true
 
-- groupName: Data Vault
-  items:
-
-  - displayName: Hub Hashkey Column
-    type: columnSelector
-    attributeName: is_Hub_hk
-    isRequired: true
-
-  - displayName: Hub Businesskey Column
-    type: columnSelector
-    attributeName: is_Hub_bk
-    isRequired: true
-
 
 systemColumns:
 - displayName: "sdts"

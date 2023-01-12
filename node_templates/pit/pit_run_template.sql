@@ -3,45 +3,41 @@
 	{{ config.preSQL }}
 {% endif %}
 
+{{ stage('Create PIT Table') }}
 
-{% for source in sources %}
-
-    {{ stage('Insert into PIT') }}
-	MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
-	(
-		SELECT DISTINCT
-		{% for col in source.columns %}
-			{{ get_source_transform(col) }} AS "{{ col.name }}"
-			{%- if not loop.last -%}, {% endif %}
-		{% endfor %}
-
-		{{ source.join }}
-
-	)
-	AS "SRC"
-	ON
-	{% for col in sources[0].columns if (col.is_Hub_hk) -%}
-		{% if not loop.first %}
-			AND
+WITH records_to_insert AS (
+	SELECT
+	{% for source in sources %}
+		{% if loop.first %}
+			{% for col in source.columns %}
+				{% if not col.name == "sdts" %}
+					h.{{ col.name }},
+				{% endif %}
+			{% endfor %}
 		{% endif %}
-		"SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+		{% if not loop.first %}
+			{% for col in source.columns %}
+				{% if col.name != "sdts" and col.name != "ldts" %}
+					{% set src = get_source_transform(col).split('.') %}
+					COALESCE( {{ sources[0].dependencies[0].node.name }}."{{ col.name }}", {{ parameters.datavault4coalesce__unknown_value__STRING }} as {{ src[0]|replace('"', '') }}_{{ col.name }} ),
+				{% elif col.name == "ldts" %}
+					{% set src = get_source_transform(col).split('.') %}
+					COALESCE( {{ sources[0].dependencies[0].node.name }}."{{ col.name }}", "{{ parameters.datavault4coalesce__beginning_of_all_times }}" as {{ src[0]|replace('"', '') }}_{{ col.name }} ),
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+		{% if loop.last %}
+			{% for col in source.columns if col.name == "sdts" %}
+				{{ col.name }}
+			{% endfor %}
+		{% endif %}
 	{% endfor %}
-	WHEN NOT MATCHED THEN
-	INSERT
-	(
-		{% for col in columns %}
-			"{{ col.name }}"
-			{%- if not loop.last -%}, {% endif %}
-		{% endfor %}
-	) VALUES
-	(
-		{% for col in columns %}
-			"SRC"."{{ col.name }}"
-			{%- if not loop.last -%}, {% endif %}
-		{% endfor %}
-	)
 
-{% endfor %}
+	FROM "{{ sources[0].dependencies[0].node.location.name }}"."{{ sources[0].dependencies[0].node.name }}" h
+
+	{% for source in sources %}
+
+)
 
 
 {% if config.postSQL %}
