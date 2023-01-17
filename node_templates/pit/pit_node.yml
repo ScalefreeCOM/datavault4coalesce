@@ -26,6 +26,13 @@ config:
   - type: multisourceToggle
     default: true
 
+- groupName: Data Vault
+  items:
+  - displayName: Dimension Key Column
+    type: columnSelector
+    attributeName: is_dimension_key
+    isRequired: true
+
 
 systemColumns:
 - displayName: "sdts"

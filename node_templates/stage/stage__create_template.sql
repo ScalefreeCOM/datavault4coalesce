@@ -64,7 +64,11 @@
 
             {% for source in sources %}
                 {% for col in source.columns %}
-                {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown') }}
+                    {%- if "hashDetails" in col.keys() %}
+                        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true) }}
+                    {%- else -%}
+                        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=false) }}
+                    {%- endif -%}
                 {% if not loop.last %},{% endif %}
                 {% endfor %}
             {% endfor %}
@@ -75,7 +79,11 @@
 
             {% for source in sources %}
                 {% for col in source.columns %}
-                {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error') }}
+                    {%- if "hashDetails" in col.keys() %}
+                        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true) }}
+                    {%- else -%}
+                        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=false) }}
+                    {%- endif -%}
                 {% if not loop.last %},{% endif %}
                 {% endfor %}
             {% endfor %}

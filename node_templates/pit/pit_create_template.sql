@@ -1,21 +1,27 @@
 {{ stage('Create PIT Table') }}
 
+{%- set ns = namespace(sdts_datatype = '') %}
+
 CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
 (
     {% for source in sources %}
-        {% for col in source.columns %}
-            {% if not col.name == "sdts" %}
-                {% set src = get_source_transform(col).split('.') %}
-                {{ src[0]|replace('"', '') }}_{{ col.name }} {{ col.dataType }}
-                {%- if not loop.last -%}, {% endif %}
-            {% endif %}
-		{% endfor %}
-        {%- if loop.last %}
+        {%- if loop.first %}
             {% for col in source.columns %}
-                {%- if col.name == "sdts" %}
-                    {{ col.name }} {{ col.dataType }}
+                {%- if col.name == "sdts" or col.is_dimension_key or col.is_Hub_hk or col.is_Link_hk %}
+                    {%- if col.name == "sdts" %}
+                        {% set ns.sdts_datatype = col.dataType %}
+                    {%- endif %}
+                    {{ col.name }} {{ col.dataType }},
                 {% endif %}
             {% endfor %}
+        {% else %}
+            {% for col in source.columns %}
+                {% if col.is_Hub_hk or col.is_Link_hk %}
+                    {{ source.columns[1].sourceColumns[0].node.name }}_{{ col.name }} {{ col.dataType }},
+                    {{ source.columns[1].sourceColumns[0].node.name }}_{{ parameters.datavault4coalesce__ldts_alias }} {{ ns.sdts_datatype }}
+                {% endif %}
+            {% endfor %}
+            {%- if not loop.last -%}, {% endif %}
         {% endif %}
     {% endfor %}
 )
