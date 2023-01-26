@@ -40,7 +40,7 @@ config:
     - YEAR
     isRequired: true
     enableIf: "{% if not node.daily_snapshots_forever %} true {% else %} false {% endif %}"
-    
+
 - groupName: Weekly Snapshot Logic
   items:
   - displayName: Keep Weekly Snapshots forever
