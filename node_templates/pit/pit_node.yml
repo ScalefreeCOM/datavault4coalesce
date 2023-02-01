@@ -32,11 +32,3 @@ config:
     type: columnSelector
     attributeName: is_dimension_key
     isRequired: true
-
-
-systemColumns:
-- displayName: "sdts"
-  transform: getdate()
-  dataType: TIMESTAMP
-  placement: end
-  attributeName: is_system_sdts

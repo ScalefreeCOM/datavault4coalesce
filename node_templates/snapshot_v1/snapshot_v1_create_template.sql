@@ -63,7 +63,7 @@ WITH latest_row AS (
     SELECT
         "{{ sdts_alias }}"
     FROM {{ ref(sources[0].columns[0].sourceColumns[0].node.location.name, sources[0].columns[0].sourceColumns[0].node.name) }}
-    WHERE DATE("{{ sdts_alias }}") = getdate()
+    WHERE DATE("{{ sdts_alias }}") = DATE(GETDATE())
     ORDER BY "{{ sdts_alias }}" DESC
     LIMIT 1
 
@@ -158,6 +158,7 @@ virtual_logic AS (
     FROM {{ ref(sources[0].columns[0].sourceColumns[0].node.location.name, sources[0].columns[0].sourceColumns[0].node.name) }} c
     LEFT JOIN latest_row l
     ON c."{{ sdts_alias }}" = l."{{ sdts_alias }}"
+    WHERE c."{{ sdts_alias }}" < DATEADD(day, +1, GETDATE())
 ),
 
 active_logic_combined AS (
