@@ -21,8 +21,8 @@ WITH records_to_insert AS (
 			{% for col in source.columns %}
 				{% if col.is_Hub_hk or col.is_Link_hk %}
 					COALESCE( "{{ source.columns[1].sourceColumns[0].node.name }}"."{{ col.name }}", {{ datavault4coalesce__unknown_key() }} ) as {{ source.columns[1].sourceColumns[0].node.name }}_{{ col.name }},
-				{% elif col.name == parameters.datavault4coalesce__ldts_alias %}
-					COALESCE( "{{ source.columns[1].sourceColumns[0].node.name }}"."{{ col.name }}", '{{ parameters.datavault4coalesce__beginning_of_all_times }}' ) as {{ source.columns[1].sourceColumns[0].node.name }}_{{ col.name }},
+				{% elif col.name == datavault4coalesce.config.ldts_alias %}
+					COALESCE( "{{ source.columns[1].sourceColumns[0].node.name }}"."{{ col.name }}", '{{ datavault4coalesce.config.beginning_of_all_times }}' ) as {{ source.columns[1].sourceColumns[0].node.name }}_{{ col.name }},
 				{% endif %}
 			{% endfor %}
 		{% endif %}
@@ -43,7 +43,7 @@ WITH records_to_insert AS (
 			{% for col in columns if col.is_system_sdts %}
 				{{ col.name }}
 			{% endfor %}
-			BETWEEN {{ source.columns[1].sourceColumns[0].node.name }}.{{ parameters.datavault4coalesce__ldts_alias }} AND {{ source.columns[1].sourceColumns[0].node.name }}.{{ parameters.datavault4coalesce__ledts_alias }}
+			BETWEEN {{ source.columns[1].sourceColumns[0].node.name }}.{{ datavault4coalesce.config.ldts_alias }} AND {{ source.columns[1].sourceColumns[0].node.name }}.{{ datavault4coalesce.config.ledts_alias }}
 		{% endif %}
 	{% endfor %}
 )

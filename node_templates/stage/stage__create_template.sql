@@ -26,9 +26,9 @@
     (
         {% for col in columns %}
             {%- if col.is_rsrc_column -%}
-                "{{parameters.datavault4coalesce__rsrc_alias}}"
+                "{{datavault4coalesce.config.rsrc_alias}}"
             {%- elif col.is_ldts_column -%}
-                "{{parameters.datavault4coalesce__ldts_alias}}"
+                "{{datavault4coalesce.config.ldts_alias}}"
             {% else %}
                 "{{ col.name }}"
             {% endif %}

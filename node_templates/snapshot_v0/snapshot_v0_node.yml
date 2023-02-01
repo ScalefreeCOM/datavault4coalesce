@@ -41,3 +41,65 @@ config:
     attributeName: postSQL
     type: textBox
     isRequired: false
+
+
+systemColumns:
+- displayName: sdts
+  transform: ""
+  dataType: TIMESTAMP
+  placement: end
+  attributeName: system_sdts
+
+- displayName: force_active
+  transform: ""
+  dataType: BOOLEAN
+  placement: end
+  attributeName: system_force_active
+
+- displayName: replacement_sdts
+  transform: ""
+  dataType: TIMESTAMP
+  placement: end
+  attributeName: system_replacement_sdts
+
+- displayName: "caption"
+  transform: ""
+  dataType: STRING
+  placement: end
+  attributeName: system_caption
+
+- displayName: "is_hourly"
+  transform: ""
+  dataType: BOOLEAN
+  placement: end
+  attributeName: system_is_hourly
+
+- displayName: "is_daily"
+  transform: ""
+  dataType: BOOLEAN
+  placement: end
+  attributeName: system_is_daily
+
+- displayName: "is_beginning_of_week"
+  transform: ""
+  dataType: BOOLEAN
+  placement: end
+  attributeName: system_is_beginning_of_week
+
+- displayName: "is_beginning_of_month"
+  transform: ""
+  dataType: BOOLEAN
+  placement: end
+  attributeName: system_is_beginning_of_month
+
+- displayName: "is_beginning_of_quarter"
+  transform: ""
+  dataType: BOOLEAN
+  placement: end
+  attributeName: system_is_beginning_of_quarter
+
+- displayName: "is_beginning_of_year"
+  transform: ""
+  dataType: BOOLEAN
+  placement: end
+  attributeName: system_is_beginning_of_year

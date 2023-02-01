@@ -5,32 +5,37 @@ tagColor: 'green'
 
 config:
 
-- groupName: Daily Snapshot Logic
+- groupName: Use Logarithmic Logic
   items:
-  - type: toggleButton
-    displayName: Use Logarithmic Logic
+  - displayName: Use Logarithmic Logic
+    type: toggleButton
     attributeName: use_logarithmic_logic
     enableIf: 'true'
     isRequired: true
     default: true
 
+- groupName: Daily Snapshot Logic
+  enableIf: "{{ config.use_logarithmic_logic }}"
+  items:
   - displayName: Keep Daily Snapshots forever
-    enableIf: "{% if node.use_logarithmic_logic %} true {% else %} false {% endif %}"
     type: toggleButton
     attributeName: daily_snapshots_forever
-    default: false
+    enableIf: "{{ config.use_logarithmic_logic }}"
     isRequired: true
+    default: false
 
   - displayName: Duration
     type: textBox
     attributeName: daily_snapshot_duration
-    default: "30"
-    enableIf: "{% if not node.daily_snapshots_forever %} true {% else %} false {% endif %}"
+    enableIf: "{% if not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
     isRequired: true
+    default: "30"
 
-  - type: dropdownSelector
-    displayName: Time Unit
+  - displayName: Time Unit
+    type: dropdownSelector
     attributeName: daily_snapshot_unit
+    enableIf: "{% if not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+    isRequired: true
     default: DAY
     options:
     - DAY
@@ -38,57 +43,59 @@ config:
     - MONTH
     - QUARTER
     - YEAR
-    isRequired: true
-    enableIf: "{% if not node.daily_snapshots_forever %} true {% else %} false {% endif %}"
-
+    
 - groupName: Weekly Snapshot Logic
+  enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
   items:
   - displayName: Keep Weekly Snapshots forever
-    enableIf: "{% if node.use_logarithmic_logic and not node.daily_snapshots_forever %} true {% else %} false {% endif %}"
     type: toggleButton
     attributeName: weekly_snapshots_forever
-    default: false
+    enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
     isRequired: true
+    default: false
 
   - displayName: Duration
     type: textBox
     attributeName: weekly_snapshot_duration
-    default: "1"
-    enableIf: "{% if not node.weekly_snapshots_forever and not node.daily_snapshots_forever %} true {% else %} false {% endif %}"
+    enableIf: "{% if not config.weekly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
     isRequired: true
+    default: "1"
 
-  - type: dropdownSelector
-    displayName: Time Unit
+  - displayName: Time Unit
+    type: dropdownSelector
     attributeName: weekly_snapshot_unit
+    enableIf: "{% if not config.weekly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}" 
+    isRequired: true
     default: "YEAR"
     options:
     - DAY
     - WEEK
     - MONTH
     - QUARTER
-    - YEAR
-    isRequired: true
-    enableIf: "{% if not node.weekly_snapshots_forever and not node.daily_snapshots_forever %} true {% else %} false {% endif %}"    
+    - YEAR   
 
-- groupName: monthly Snapshot Logic
+- groupName: Monthly Snapshot Logic
+  enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
   items:
   - displayName: Keep Monthly Snapshots forever
-    enableIf: "{% if node.use_logarithmic_logic and not node.daily_snapshots_forever %} true {% else %} false {% endif %}"
     type: toggleButton
     attributeName: monthly_snapshots_forever
-    default: false
+    enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
     isRequired: true
+    default: false
 
   - displayName: Duration
     type: textBox
     attributeName: monthly_snapshot_duration
-    default: "5"
-    enableIf: "{% if not node.monthly_snapshots_forever and not node.daily_snapshots_forever %} true {% else %} false {% endif %}"
+    enableIf: "{% if not config.monthly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
     isRequired: true
+    default: "5"
 
-  - type: dropdownSelector
-    displayName: Time Unit
+  - displayName: Time Unit
+    type: dropdownSelector
     attributeName: monthly_snapshot_unit
+    enableIf: "{% if not config.monthly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+    isRequired: true
     default: YEAR
     options:
     - DAY
@@ -96,28 +103,29 @@ config:
     - MONTH
     - QUARTER
     - YEAR
-    isRequired: true
-    enableIf: "{% if not node.monthly_snapshots_forever and not node.daily_snapshots_forever %} true {% else %} false {% endif %}"
 
 - groupName: Quarterly Snapshot Logic
+  enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever and not config.monthly_snapshots_forever %} true {% else %} false {% endif %}"
   items:
   - displayName: Keep Quarterly Snapshots forever
-    enableIf: "{% if node.use_logarithmic_logic and not node.daily_snapshots_forever and not node.monthly_snapshots_forever %} true {% else %} false {% endif %}"
     type: toggleButton
     attributeName: quarterly_snapshots_forever
-    default: false
+    enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever and not config.monthly_snapshots_forever %} true {% else %} false {% endif %}"
     isRequired: true
+    default: false
 
   - displayName: Duration
     type: textBox
     attributeName: quarterly_snapshot_duration
-    default: "1"
-    enableIf: "{% if not node.quarterly_snapshots_forever and not node.daily_snapshots_forever and not node.monthly_snapshots_forever %} true {% else %} false {% endif %}"
+    enableIf: "{% if not config.quarterly_snapshots_forever and not config.daily_snapshots_forever and not config.monthly_snapshots_forever %} true {% else %} false {% endif %}"
     isRequired: true
+    default: "5"
 
-  - type: dropdownSelector
-    displayName: Time Unit
+  - displayName: Time Unit
+    type: dropdownSelector
     attributeName: quarterly_snapshot_unit
+    enableIf: "{% if not config.quarterly_snapshots_forever and not config.daily_snapshots_forever and not config.monthly_snapshots_forever %} true {% else %} false {% endif %}"
+    isRequired: true
     default: YEAR
     options:
     - DAY
@@ -125,37 +133,36 @@ config:
     - MONTH
     - QUARTER
     - YEAR
-    isRequired: true
-    enableIf: "{% if not node.quarterly_snapshots_forever and not node.daily_snapshots_forever and not node.monthly_snapshots_forever %} true {% else %} false {% endif %}"
     
 - groupName: Yearly Snapshot Logic
+  enableIf: "{% if config.use_logarithmic_logic and not config.quarterly_snapshots_forever and not config.monthly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
   items:
   - displayName: Keep Yearly Snapshots forever
-    enableIf: "{% if node.use_logarithmic_logic %} true {% else %} false {% endif %}"
     type: toggleButton
     attributeName: yearly_snapshots_forever
-    default: false
+    enableIf: "{% if config.use_logarithmic_logic and not config.quarterly_snapshots_forever and not config.monthly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
     isRequired: true
+    default: false
 
   - displayName: Duration
     type: textBox
     attributeName: yearly_snapshot_duration
-    default: "1"
-    enableIf: "{% if not node.yearly_snapshots_forever and not node.daily_snapshots_forever %} true {% else %} false {% endif %}"
+    enableIf: "{% if not config.yearly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
     isRequired: true
+    default: "10"
 
-  - type: dropdownSelector
-    displayName: Time Unit
+  - displayName: Time Unit
+    type: dropdownSelector
     attributeName: yearly_snapshot_unit
+    enableIf: "{% if not config.yearly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}" 
+    isRequired: true
     default: YEAR
     options:
     - DAY
     - WEEK
     - MONTH
     - QUARTER
-    - YEAR
-    isRequired: true
-    enableIf: "{% if not node.yearly_snapshots_forever and not node.daily_snapshots_forever %} true {% else %} false {% endif %}"   
+    - YEAR  
 
 - groupName: Pre/Post SQL
   items:

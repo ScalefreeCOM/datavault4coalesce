@@ -11,6 +11,7 @@ config:
     options:
     - view
     isRequired: true
+    enableIf: "false"
 
   - type: multisourceToggle
     enableIf: "{% if node.materializationType == 'table' %} true {% else %} false {% endif %}" 

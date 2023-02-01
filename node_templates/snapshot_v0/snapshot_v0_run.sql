@@ -1,6 +1,6 @@
 {{ stage('Insert New Rows') }}
 
-{%- set timestamp_format = parameters.datavault4coalesce__timestamp_format -%}
+{%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
 {%- set start_date = config.input_snapshot_start_date -%}
 {%- set end_date = config.input_snapshot_end_date -%}
 {%- set daily_snapshot_time = config.input_daily_snapshot_time -%}
@@ -9,12 +9,18 @@ INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
 WITH "date_base" AS (
     SELECT
-        "sdts" as "{{ parameters.datavault4coalesce__sdts_alias }}",
+        "sdts" as "{{ datavault4coalesce.config.sdts_alias }}",
+        TRUE as "force_active",
+        "sdts" AS "replacement_sdts",
         CONCAT('Snapshot ', DATE("sdts")) AS "caption",
         CASE
             WHEN EXTRACT(MINUTE FROM "sdts") = 0 AND EXTRACT(SECOND FROM "sdts") = 0 THEN TRUE
             ELSE FALSE
         END AS "is_hourly",
+        CASE
+            WHEN EXTRACT(MINUTE FROM "sdts") = 0 AND EXTRACT(SECOND FROM "sdts") = 0 THEN TRUE
+            ELSE FALSE
+        END AS "is_daily",
         CASE
             WHEN EXTRACT(DAYOFWEEK FROM  "sdts") = 2 THEN TRUE
             ELSE FALSE
@@ -52,8 +58,8 @@ WITH "date_base" AS (
         "date_base".*
     FROM "date_base"
     LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} "tgt"
-        ON "date_base"."{{ parameters.datavault4coalesce__sdts_alias }}" = "tgt"."{{ parameters.datavault4coalesce__sdts_alias }}"
-    WHERE "tgt"."{{ parameters.datavault4coalesce__sdts_alias }}" IS NULL
+        ON "date_base"."{{ datavault4coalesce.config.sdts_alias }}" = "tgt"."{{ datavault4coalesce.config.sdts_alias }}"
+    WHERE "tgt"."{{ datavault4coalesce.config.sdts_alias }}" IS NULL
 
 )
 

@@ -1,4 +1,4 @@
-{{ stage('Create Hub Table') }}
+{{ stage('Create Satellite Table') }}
 
 CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
 (

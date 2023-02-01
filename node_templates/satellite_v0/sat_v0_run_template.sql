@@ -13,7 +13,7 @@ WITH latest_entries_in_sat AS (
 		{%- if not loop.last -%}, {% endif %}
 		{%- if loop.last %} 
 			FROM {{ ref_no_link(node.location.name, node.name) }} 
-			QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ parameters.datavault4coalesce__ldts_alias }}" DESC) = 1
+			QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
 		{% endif %}
 	{% endfor %}
 ),
@@ -26,12 +26,12 @@ deduplicated_numbered_source AS (
 		{% for col in source.columns %}
 			{{ get_source_transform(col) }} AS {{ col.name }},
 		{% endfor %}
-        ROW_NUMBER() OVER(PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ parameters.datavault4coalesce__ldts_alias }}") as rn
+        ROW_NUMBER() OVER(PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
         
         {{ source.join }}
         QUALIFY
         CASE
-            WHEN "{{ get_value_by_column_attribute("is_hd") }}" = LAG("{{ get_value_by_column_attribute("is_hd") }}") OVER(PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ parameters.datavault4coalesce__ldts_alias }}" ) THEN FALSE
+            WHEN "{{ get_value_by_column_attribute("is_hd") }}" = LAG("{{ get_value_by_column_attribute("is_hd") }}") OVER(PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
             ELSE TRUE
         END
 
