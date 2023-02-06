@@ -30,32 +30,13 @@
 
 CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
 (
-    "{{ sdts_alias }}",
-    "replacement_sdts",
-    "{{ snapshot_trigger_column }}",
-    "is_latest", 
-    "caption",
-    "is_hourly",
-    "is_daily",
-    "is_beginning_of_week",
-    "is_beginning_of_month",
-    "is_beginning_of_year",
-    "is_current_year",
-    "is_last_year",
-    "is_rolling_year",
-    "is_last_rolling_year"
+    {% for col in columns %}
+		"{{ col.name }}"
+		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+		{%- if not loop.last -%}, {% endif %}
+	{% endfor %}
 )
 	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-
-{#
-{%- if log_logic is not none %}
-    {%- for interval in log_logic.keys() %}
-        {%- if 'forever' not in log_logic[interval].keys() -%}
-            {% do log_logic[interval].update({'forever': 'FALSE'}) %}
-        {%- endif -%}
-    {%- endfor -%}
-{%- endif %}
-#}
 
 AS
 WITH latest_row AS (
@@ -113,6 +94,17 @@ virtual_logic AS (
                 {%- endif -%}
             {% endif -%}
 
+            {%- if 'quaterly' in log_logic.keys() %} OR
+                {%- if log_logic['quaterly']['forever'] is true -%}
+                    {%- set ns.forever_status = 'TRUE' %}
+              (c."is_beginning_of_quarter" = TRUE)
+                {%- else %}
+                    {%- set quaterly_duration = log_logic['quaterly']['duration'] -%}
+                    {%- set quaterly_unit = log_logic['quaterly']['unit'] %}            
+              ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ quaterly_duration }} {{ quaterly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_quarter" = TRUE))
+                {%- endif -%}
+            {% endif -%}
+
             {%- if 'yearly' in log_logic.keys() %} OR 
                 {%- if log_logic['yearly']['forever'] is true -%}
                     {%- set ns.forever_status = 'TRUE' %}
@@ -138,6 +130,7 @@ virtual_logic AS (
         c."is_daily",
         c."is_beginning_of_week",
         c."is_beginning_of_month",
+        c."is_beginning_of_quarter",
         c."is_beginning_of_year",
         CASE
             WHEN EXTRACT(YEAR FROM c."{{ sdts_alias }}") = EXTRACT(YEAR FROM CURRENT_DATE()) THEN TRUE
@@ -158,13 +151,14 @@ virtual_logic AS (
     FROM {{ ref(sources[0].columns[0].sourceColumns[0].node.location.name, sources[0].columns[0].sourceColumns[0].node.name) }} c
     LEFT JOIN latest_row l
     ON c."{{ sdts_alias }}" = l."{{ sdts_alias }}"
-    WHERE c."{{ sdts_alias }}" < DATEADD(day, +1, GETDATE())
+    WHERE c."{{ sdts_alias }}" < GETDATE()
 ),
 
 active_logic_combined AS (
 
     SELECT 
         "{{ sdts_alias }}",
+        "force_active",
         "replacement_sdts",
         CASE
             WHEN "force_active" AND {{ snapshot_trigger_column }} THEN TRUE
@@ -176,13 +170,14 @@ active_logic_combined AS (
         "is_daily",
         "is_beginning_of_week",
         "is_beginning_of_month",
+        "is_beginning_of_quarter",
         "is_beginning_of_year",
         "is_current_year",
         "is_last_year",
         "is_rolling_year",
         "is_last_rolling_year"
     FROM virtual_logic
-
+    ORDER BY "{{ sdts_alias }}" DESC
 )
 
 SELECT * FROM active_logic_combined

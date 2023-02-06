@@ -22,7 +22,7 @@ WITH "date_base" AS (
             ELSE FALSE
         END AS "is_daily",
         CASE
-            WHEN EXTRACT(DAYOFWEEK FROM  "sdts") = 2 THEN TRUE
+            WHEN EXTRACT(DAYOFWEEK FROM  "sdts") = 1 THEN TRUE
             ELSE FALSE
         END AS "is_beginning_of_week",
         CASE
