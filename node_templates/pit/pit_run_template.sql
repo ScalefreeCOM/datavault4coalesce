@@ -8,42 +8,30 @@
 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 WITH records_to_insert AS (
 	SELECT
-	{% for source in sources %}
-		{% if loop.first %}
-			{% for col in source.columns if col.is_dimension_key or col.is_Hub_hk or col.is_Link_hk %}
-				h.{{ col.name }},
-			{% endfor %}
-			{% for col in source.columns if col.is_system_sdts %}
-				{{ get_source_transform(col) }} as {{ col.name }},
-			{% endfor %}
-		{% endif %}
-		{% if not loop.first %}
-			{% for col in source.columns %}
-				{% if col.is_Hub_hk or col.is_Link_hk %}
-					COALESCE( "{{ source.columns[1].sourceColumns[0].node.name }}"."{{ col.name }}", {{ datavault4coalesce__unknown_key() }} ) as {{ source.columns[1].sourceColumns[0].node.name }}_{{ col.name }},
-				{% elif col.name == datavault4coalesce.config.ldts_alias %}
-					COALESCE( "{{ source.columns[1].sourceColumns[0].node.name }}"."{{ col.name }}", '{{ datavault4coalesce.config.beginning_of_all_times }}' ) as {{ source.columns[1].sourceColumns[0].node.name }}_{{ col.name }},
-				{% endif %}
-			{% endfor %}
-		{% endif %}
-		{% if loop.last %}
-			{% for col in source.columns if col.is_system_sdts %}
-				{{ col.name }}
-			{% endfor %}
+	{% for col in sources[0].columns %}
+		{{ col.sourceColumns[0].node.name }}."{{ col.name }}" AS "{{ col.sourceColumns[0].node.name }}_{{ col.name }}"
+        {% if not loop.last %} , {% endif %}
+    {% endfor %}
+
+	FROM "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ sources[0].dependencies[0].node.name }}" {{ sources[0].dependencies[0].node.name }}
+
+	{% for col in sources[0].columns %}
+		{% if col.name == "sdts" %}
+			FULL OUTER JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" {{ col.sourceColumns[0].node.name }}
+			ON {{ col.sourceColumns[0].node.name }}."is_active" = true
 		{% endif %}
 	{% endfor %}
 
-	FROM "{{ sources[0].dependencies[0].node.location.name }}"."{{ sources[0].dependencies[0].node.name }}" h
-
-	{% for source in sources %}
-		{% if not loop.first %}
-			JOIN "{{ source.columns[1].sourceColumns[0].node.location.name }}"."{{ source.columns[1].sourceColumns[0].node.name }}" {{ source.columns[1].sourceColumns[0].node.name }}
-			ON h.{{ sources[0].columns[0].name }} = {{ source.columns[1].sourceColumns[0].node.name }}.{{ source.columns[0].name }}
-			AND 
-			{% for col in columns if col.is_system_sdts %}
-				{{ col.name }}
+	{% for col in sources[0].columns %}
+		{% if col.sourceColumns[0].column.is_hk and not loop.first %}
+			JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" {{ col.sourceColumns[0].node.name }}
+			ON {{ sources[0].dependencies[0].node.name }}."{{ col.name }}" = {{ col.sourceColumns[0].node.name }}."{{ col.name }}"
+			{% for sdts_col in sources[0].columns %}
+				{% if sdts_col.name == "sdts" %}
+					AND {{ sdts_col.sourceColumns[0].node.name }}."{{ sdts_col.name}}"
+					BETWEEN {{ col.sourceColumns[0].node.name }}."ldts" and {{ col.sourceColumns[0].node.name }}."ledts"
+				{% endif %}
 			{% endfor %}
-			BETWEEN {{ source.columns[1].sourceColumns[0].node.name }}.{{ datavault4coalesce.config.ldts_alias }} AND {{ source.columns[1].sourceColumns[0].node.name }}.{{ datavault4coalesce.config.ledts_alias }}
 		{% endif %}
 	{% endfor %}
 )
