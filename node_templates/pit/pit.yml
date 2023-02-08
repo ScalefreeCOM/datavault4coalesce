@@ -1,5 +1,5 @@
 columns:
-  - id: 2976
+  - id: 3074
     name: hk_order_h
     dataType: STRING
     description: ""
@@ -7,28 +7,42 @@ columns:
     defaultValue: ""
     tests: []
     is_dimension_key: true
-  - id: 2978
+  - id: 3076
     name: ldts
-    dataType: DATE
+    dataType: TIMESTAMP
     description: ""
     nullable: true
     defaultValue: ""
     tests: []
-  - id: 2981
+  - id: 3078
     name: sdts
     dataType: TIMESTAMP
     description: ""
     nullable: true
     defaultValue: ""
     tests: []
-  - id: 2980
+  - id: 3079
     name: hk_order_h
     dataType: STRING
     description: ""
     nullable: true
     defaultValue: ""
     tests: []
-  - id: 2982
+  - id: 3080
+    name: ldts
+    dataType: TIMESTAMP
+    description: ""
+    nullable: true
+    defaultValue: ""
+    tests: []
+  - id: 3081
+    name: hk_order_h
+    dataType: STRING
+    description: ""
+    nullable: true
+    defaultValue: ""
+    tests: []
+  - id: 3082
     name: ldts
     dataType: TIMESTAMP
     description: ""
@@ -49,12 +63,13 @@ storageLocations:
     schema: TPCH_SF1
     name: TPCH_SF1
 config:
+  cleanup_pit: true
   preSQL: ""
   postSQL: ""
 sources:
-  - name: PIT_ORDERS1
+  - name: PIT_ORDERS_v2
     columns:
-      - id: 2976
+      - id: 3074
         name: hk_order_h
         dataType: STRING
         description: ""
@@ -65,8 +80,8 @@ sources:
         transform: ""
         sourceColumns:
           - node:
-              id: "119"
-              name: HUB_ORDERS1
+              id: "160"
+              name: HUB_ORDERS_v2
               nodeType: "Datavault4Coalesce: Hub"
               location:
                 name: CORE
@@ -79,7 +94,7 @@ sources:
                   script: ""
               tests: []
             column:
-              id: 2604
+              id: 3069
               name: hk_order_h
               dataType: STRING
               description: ""
@@ -87,9 +102,9 @@ sources:
               defaultValue: ""
               tests: []
               is_Hub_hk: true
-      - id: 2978
+      - id: 3076
         name: ldts
-        dataType: DATE
+        dataType: TIMESTAMP
         description: ""
         nullable: true
         defaultValue: ""
@@ -97,8 +112,8 @@ sources:
         transform: ""
         sourceColumns:
           - node:
-              id: "119"
-              name: HUB_ORDERS1
+              id: "160"
+              name: HUB_ORDERS_v2
               nodeType: "Datavault4Coalesce: Hub"
               location:
                 name: CORE
@@ -111,15 +126,15 @@ sources:
                   script: ""
               tests: []
             column:
-              id: 2607
+              id: 3072
               name: ldts
-              dataType: DATE
+              dataType: TIMESTAMP
               description: ""
               nullable: true
               defaultValue: ""
               tests: []
               is_Hub_ldts: true
-      - id: 2981
+      - id: 3078
         name: sdts
         dataType: TIMESTAMP
         description: ""
@@ -150,7 +165,7 @@ sources:
               nullable: true
               defaultValue: ""
               tests: []
-      - id: 2980
+      - id: 3079
         name: hk_order_h
         dataType: STRING
         description: ""
@@ -160,8 +175,8 @@ sources:
         transform: ""
         sourceColumns:
           - node:
-              id: "147"
-              name: SAT_v1_SAT_ORDERS13
+              id: "159"
+              name: SAT_ORDERS_v1
               nodeType: "Datavault4Coalesce: Satellite v1"
               location:
                 name: CORE
@@ -174,7 +189,7 @@ sources:
                   script: ""
               tests: []
             column:
-              id: 2917
+              id: 3045
               name: hk_order_h
               dataType: STRING
               description: ""
@@ -182,7 +197,7 @@ sources:
               defaultValue: ""
               tests: []
               is_hk: true
-      - id: 2982
+      - id: 3080
         name: ldts
         dataType: TIMESTAMP
         description: ""
@@ -192,8 +207,8 @@ sources:
         transform: ""
         sourceColumns:
           - node:
-              id: "147"
-              name: SAT_v1_SAT_ORDERS13
+              id: "159"
+              name: SAT_ORDERS_v1
               nodeType: "Datavault4Coalesce: Satellite v1"
               location:
                 name: CORE
@@ -206,7 +221,7 @@ sources:
                   script: ""
               tests: []
             column:
-              id: 2927
+              id: 3055
               name: ldts
               dataType: TIMESTAMP
               description: ""
@@ -214,11 +229,75 @@ sources:
               defaultValue: ""
               tests: []
               is_ldts: true
-    join: FROM {{ ref('CORE', 'HUB_ORDERS1') }} "HUB_ORDERS1"
+      - id: 3081
+        name: hk_order_h
+        dataType: STRING
+        description: ""
+        nullable: true
+        defaultValue: ""
+        tests: []
+        transform: ""
+        sourceColumns:
+          - node:
+              id: "156"
+              name: SAT_v1_ORDERS_ref
+              nodeType: "Datavault4Coalesce: Satellite v1"
+              location:
+                name: CORE
+              description: ""
+              materializationType: view
+              isMultisource: false
+              override:
+                create:
+                  enabled: false
+                  script: ""
+              tests: []
+            column:
+              id: 3007
+              name: hk_order_h
+              dataType: STRING
+              description: ""
+              nullable: true
+              defaultValue: ""
+              tests: []
+              is_hk: true
+      - id: 3082
+        name: ldts
+        dataType: TIMESTAMP
+        description: ""
+        nullable: true
+        defaultValue: ""
+        tests: []
+        transform: ""
+        sourceColumns:
+          - node:
+              id: "156"
+              name: SAT_v1_ORDERS_ref
+              nodeType: "Datavault4Coalesce: Satellite v1"
+              location:
+                name: CORE
+              description: ""
+              materializationType: view
+              isMultisource: false
+              override:
+                create:
+                  enabled: false
+                  script: ""
+              tests: []
+            column:
+              id: 3016
+              name: ldts
+              dataType: TIMESTAMP
+              description: ""
+              nullable: true
+              defaultValue: ""
+              tests: []
+              is_ldts: true
+    join: FROM {{ ref('CORE', 'HUB_ORDERS_v2') }} "HUB_ORDERS_v2"
     dependencies:
       - node:
-          id: "119"
-          name: HUB_ORDERS1
+          id: "160"
+          name: HUB_ORDERS_v2
           nodeType: "Datavault4Coalesce: Hub"
           location:
             name: CORE
@@ -231,7 +310,7 @@ sources:
               script: ""
           tests: []
         columns:
-          - id: 2604
+          - id: 3069
             name: hk_order_h
             dataType: STRING
             description: ""
@@ -239,7 +318,7 @@ sources:
             defaultValue: ""
             tests: []
             is_Hub_hk: true
-          - id: 2595
+          - id: 3060
             name: O_ORDERKEY
             dataType: NUMBER(38,0)
             description: ""
@@ -247,26 +326,25 @@ sources:
             defaultValue: ""
             tests: []
             is_Hub_bk: true
-          - id: 2607
+          - id: 3072
             name: ldts
-            dataType: DATE
+            dataType: TIMESTAMP
             description: ""
             nullable: true
             defaultValue: ""
             tests: []
             is_Hub_ldts: true
-          - id: 2606
+          - id: 3071
             name: rsrc
             dataType: STRING
             description: ""
             nullable: true
             defaultValue: ""
             tests: []
-            is_Hub_rsrc: true
     customSQL: ""
 node:
   id: scratch
-  name: PIT_ORDERS1
+  name: PIT_ORDERS_v2
   nodeType: "Datavault4Coalesce: PIT"
   location:
     name: CORE

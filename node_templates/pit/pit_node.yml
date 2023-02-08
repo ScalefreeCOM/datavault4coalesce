@@ -1,7 +1,7 @@
 capitalized: 'DATAVAULT4COALESCE: PIT'
 short: 'PIT'
 tagColor: brown
-plural: 'PITS'
+plural: 'PITs'
 
 config:
 - groupName: Options
@@ -32,3 +32,8 @@ config:
     type: columnSelector
     attributeName: is_dimension_key
     isRequired: true
+
+  - displayName: Clean Up PIT
+    type: toggleButton
+    attributeName: cleanup_pit
+    default: true

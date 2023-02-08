@@ -1,7 +1,7 @@
-capitalized: Copy of LINK
-short: 'LNK'
-plural: 'Links'
+capitalized: 'DATAVAULT4COALESCE: LINK'
+short: 'LINK'
 tagColor: '#CA2287'
+plural: 'DATAVAULT4COALESCE: LINKS'
 
 config:
 - groupName: Options
@@ -22,15 +22,6 @@ config:
     - "UNION ALL"
     isRequired: true
 
-  - displayName: Link Hash Column
-    type: columnSelector
-    attributeName: isLinkHash
-    isRequired: true
-    
-  - type: multisourcetoggle
-  
-- groupName: Pre/Post SQL
-  items:
   - displayName: Pre-SQL
     attributeName: preSQL
     type: textBox
@@ -40,3 +31,17 @@ config:
     attributeName: postSQL
     type: textBox
     isRequired: false
+    
+  - type: multisourcetoggle
+  
+- groupName: Data Vault
+  items:
+  - displayName: Link Hashkey Column
+    type: columnSelector
+    attributeName: is_Link_hk
+    isRequired: true 
+
+  - displayName: Link LoadDateTimestamp Column
+    type: columnSelector
+    attributeName: is_Link_ldts
+    isRequired: true

@@ -94,14 +94,14 @@ virtual_logic AS (
                 {%- endif -%}
             {% endif -%}
 
-            {%- if 'quaterly' in log_logic.keys() %} OR
-                {%- if log_logic['quaterly']['forever'] is true -%}
+            {%- if 'quarterly' in log_logic.keys() %} OR
+                {%- if log_logic['quarterly']['forever'] is true -%}
                     {%- set ns.forever_status = 'TRUE' %}
               (c."is_beginning_of_quarter" = TRUE)
                 {%- else %}
-                    {%- set quaterly_duration = log_logic['quaterly']['duration'] -%}
-                    {%- set quaterly_unit = log_logic['quaterly']['unit'] %}            
-              ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ quaterly_duration }} {{ quaterly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_quarter" = TRUE))
+                    {%- set quarterly_duration = log_logic['quarterly']['duration'] -%}
+                    {%- set quarterly_unit = log_logic['quarterly']['unit'] %}            
+              ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ quarterly_duration }} {{ quarterly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_quarter" = TRUE))
                 {%- endif -%}
             {% endif -%}
 

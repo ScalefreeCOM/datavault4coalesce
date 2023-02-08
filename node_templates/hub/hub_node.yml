@@ -37,3 +37,8 @@ config:
     type: columnSelector
     attributeName: is_Hub_bk
     isRequired: true
+
+  - displayName: Hub LoadDateTimestamp Column
+    type: columnSelector
+    attributeName: is_Hub_ldts
+    isRequired: true
