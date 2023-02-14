@@ -31,7 +31,7 @@ macros:
     id: "1"
     macroString: |-
       {%- set datavault4coalesce = namespace(
-      
+
            config = {
            "ldts_alias": "ldts",
            "rsrc_alias": "rsrc", 
@@ -58,17 +58,17 @@ macros:
            "unknown_value__STRING": "'(unknown)'",
            "unknown_value_alt__STRING": "'u'"
            }
-      
+
       ) -%}
-      
-      
+
+
       {%- macro datavault4coalesce__string_to_timestamp(format, timestamp) -%}
           TO_TIMESTAMP('{{ timestamp }}', '{{ format }}')
       {%- endmacro -%}
-      
-      
+
+
       {%- macro datavault4coalesce__is_expression(obj) -%}
-      
+
            {%- if obj is string -%}
                 {%- if (obj|first == "'" and obj|last == "'") or ("(" in obj and ")" in obj) or "::" in obj or "||" in obj -%}
                      {{ true }}
@@ -78,24 +78,24 @@ macros:
            {%- else -%}
                 {{ false }}
            {%- endif -%}
-      
+
       {%- endmacro -%}
-      
-      
+
+
       {%- macro datavault4coalesce__escape_column_name(column) -%}
-      
+
            {%- set escape_char_left  = '"' -%}
            {%- set escape_char_right = '"' -%}
-      
+
            {%- set escaped_column_name = escape_char_left ~ column|upper|replace(escape_char_left, '')|replace(escape_char_right, '')|trim ~ escape_char_right|indent(4) -%}
-      
+
            {{ escaped_column_name }}
-      
+
       {%- endmacro -%}
-      
-      
+
+
       {%- macro datavault4coalesce__as_constant(column_str) -%}
-      
+
            {%- if column_str is not none and column_str is string and column_str -%}
                 {%- if column_str|first == "!" -%}
                      {{- "'" ~ column_str[1:] ~ "'" -}}
@@ -108,10 +108,10 @@ macros:
                 {%- endif -%}
            {%- endif -%}
       {%- endmacro -%}
-      
-      
+
+
       {%- macro datavault4coalesce__ghost_record_per_datatype(column_name, datatype, ghost_record_type, hash) -%}
-      
+
       {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times -%}
       {%- set end_of_all_times = datavault4coalesce.config.end_of_all_times -%}
       {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
@@ -119,23 +119,23 @@ macros:
       {%- set unknown_value_alt__STRING = datavault4coalesce.config.unknown_value_alt__STRING -%}
       {%- set error_value__STRING = datavault4coalesce.config.error_value__STRING -%}
       {%- set error_value_alt__STRING = datavault4coalesce.config.error_value_alt__STRING -%}
-      
+
       {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
-      
+
       {%- set hash_alg = datavault4coalesce__hash_algorithm() -%}
       {%- set unknown_key = datavault4coalesce__unknown_key() -%}
       {%- set error_key = datavault4coalesce__error_key() -%}
-      
+
       {%- if hash %}
-      
+
            {%- if ghost_record_type == 'unknown' -%}
                 {{ unknown_key }} as {{ column_name }}
            {%- elif ghost_record_type == 'error' -%}
                 {{ error_key }} as {{ column_name }}
            {% endif %}
-      
+
       {% else %}
-      
+
            {%- if ghost_record_type == 'unknown' -%}
            {%- if datatype in ['TIMESTAMP_NTZ','TIMESTAMP', 'DATE'] -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
            {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
@@ -159,20 +159,20 @@ macros:
            {% else %}NULL AS {{ column_name }}
            {% endif %}
            {%- endif -%}
-      
+
       {%- endif -%}
-      
+
       {%- endmacro -%}
-      
-      
+
+
       {%- macro datavault4coalesce__hash_algorithm() -%}
-      
+
            {%- set hash_function = datavault4coalesce.config.hash -%}
            {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
-      
+
            {%- set dict_result = {} -%}
            {%- set hash_alg = '' -%}
-      
+
            {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
                 {%- set hash_alg = 'MD5' -%}
            {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
@@ -188,19 +188,19 @@ macros:
                      {%- set hash_alg = 'SHA2_BINARY' -%}       
                 {%- endif -%}   
            {%- endif -%}
-      
+
            {{ hash_alg }}
-      
+
       {%- endmacro -%}
-      
-      
+
+
       {%- macro datavault4coalesce__unknown_key() -%}
            {%- set hash_function = datavault4coalesce.config.hash -%}
            {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
-      
+
            {%- set dict_result = {} -%}
            {%- set unknown_key = '' -%}
-      
+
            {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
                 {%- set unknown_key = '!00000000000000000000000000000000' -%}
            {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
@@ -216,20 +216,20 @@ macros:
                      {%- set unknown_key = "TO_BINARY('0000000000000000000000000000000000000000000000000000000000000000')" -%}  
                 {%- endif -%}   
            {%- endif -%}
-      
+
            {% set unknown_key = datavault4coalesce__as_constant(unknown_key) %}
            {{ unknown_key }}
-      
+
       {%- endmacro -%}
-      
-      
+
+
       {%- macro datavault4coalesce__error_key() -%}
            {%- set hash_function = datavault4coalesce.config.hash -%}
            {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
-      
+
            {%- set dict_result = {} -%}
            {%- set error_key = '' -%}
-      
+
            {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
                 {%- set error_key = '!ffffffffffffffffffffffffffffffff' -%}
            {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
@@ -245,10 +245,10 @@ macros:
                      {%- set error_key = "TO_BINARY('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')" -%}        
                 {%- endif -%}   
            {%- endif -%}
-      
+
            {% set error_key = datavault4coalesce__as_constant(error_key) %}
            {{ error_key }}
-      
+
       {%- endmacro -%}
 packages:
   COALESCE-DATA_VAULT:
@@ -337,9 +337,9 @@ stepTypes:
         create:
           templateString: |-
             {{ stage('Create PIT Table') }}
-            
+
             {%- set ns = namespace(sdts_datatype = '') %}
-            
+
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
                 {% for col in sources[0].columns %}
@@ -360,9 +360,9 @@ stepTypes:
             	{{ stage('Pre-SQL') }}
             	{{ config.preSQL }}
             {% endif %}
-            
+
             {{ stage('Insert New Rows') }}
-            
+
             INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
             WITH records_to_insert AS (
             	SELECT
@@ -376,19 +376,19 @@ stepTypes:
             		{%- else -%}
             			{{ col.sourceColumns[0].node.name }}."{{ col.name }}" AS "{{ col.sourceColumns[0].node.name }}_{{ col.name }}"
             		{%- endif %}
-            
+
             		{%- if not loop.last -%} , {% endif %}
                 {% endfor %}
-            
+
             	FROM "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ sources[0].dependencies[0].node.name }}" {{ sources[0].dependencies[0].node.name }}
-            
+
             	{% for col in sources[0].columns -%}
             		{%- if col.name == datavault4coalesce.config.sdts_alias -%}
             			JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" {{ col.sourceColumns[0].node.name }}
             			ON {{ col.sourceColumns[0].node.name }}."{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
             		{%- endif -%}
             	{% endfor %}
-            
+
             	{%- for col in sources[0].columns -%}
             		{%- if col.sourceColumns[0].column.is_hk and not loop.first -%}
             			LEFT JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" {{ col.sourceColumns[0].node.name }}
@@ -401,19 +401,19 @@ stepTypes:
             		{% endif %}
             	{% endfor -%}
             )
-            
+
             SELECT * FROM records_to_insert
             WHERE "{{ datavault4coalesce.config.sdts_alias }}" NOT IN 
             (
             	SELECT {{ datavault4coalesce.config.sdts_alias }} FROM 
             	{{ ref_no_link(node.location.name, node.name) }}
             )
-            
-            
+
+
             {% if config.cleanup_pit %}
-            
+
             {{ stage('Clean up PIT') }}
-            
+
             	DELETE FROM {{ ref_no_link(node.location.name, node.name) }}
             	WHERE {{ datavault4coalesce.config.sdts_alias }} NOT IN (
             		SELECT "{{ datavault4coalesce.config.sdts_alias }}" FROM 
@@ -425,7 +425,7 @@ stepTypes:
             		WHERE "{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
             		)
             {% endif %}
-            
+
             {% if config.postSQL %}
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
@@ -564,14 +564,14 @@ stepTypes:
         run:
           templateString: |-
             {{ stage('Insert New Rows') }}
-            
+
             {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
             {%- set start_date = config.input_snapshot_start_date -%}
             {%- set end_date = config.input_snapshot_end_date -%}
             {%- set daily_snapshot_time = config.input_daily_snapshot_time -%}
-            
+
             INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-            
+
             WITH "date_base" AS (
                 SELECT
                     "sdts" as "{{ datavault4coalesce.config.sdts_alias }}",
@@ -616,20 +616,20 @@ stepTypes:
                         "sdts" <= TO_DATE('{{ end_date }}', 'YYYY-MM-DD')
                 ) 
             ),
-            
+
             "records_to_insert" AS (
-            
+
                 SELECT 
                     "date_base".*
                 FROM "date_base"
                 LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} "tgt"
                     ON "date_base"."{{ datavault4coalesce.config.sdts_alias }}" = "tgt"."{{ datavault4coalesce.config.sdts_alias }}"
                 WHERE "tgt"."{{ datavault4coalesce.config.sdts_alias }}" IS NULL
-            
+
             )
-            
+
             SELECT * FROM "records_to_insert"
-            
+
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
     name: "Datavault4Coalesce: Snapshot v0"
     version: 1
@@ -821,7 +821,7 @@ stepTypes:
         create:
           templateString: |-
             {{ stage('Create Snapshot v1 View') }}
-            
+
             {% if config.use_logarithmic_logic %}
                 {%-set log_logic = {
                 'daily':        {'duration': config.daily_snapshot_duration|int,
@@ -844,12 +844,12 @@ stepTypes:
             {% else %}
                 {% set log_logic = none %}
             {% endif %}
-            
+
             {% set sdts_alias = datavault4coalesce.config.sdts_alias %}
             {% set ns = namespace(forever_status=FALSE) %}
             {% set snapshot_trigger_column = 'is_active' %}
-            
-            
+
+
             CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
             (
                 {% for col in columns %}
@@ -859,19 +859,19 @@ stepTypes:
             	{% endfor %}
             )
             	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-            
+
             AS
             WITH latest_row AS (
-            
+
                 SELECT
                     "{{ sdts_alias }}"
                 FROM {{ ref(sources[0].columns[0].sourceColumns[0].node.location.name, sources[0].columns[0].sourceColumns[0].node.name) }}
                 WHERE DATE("{{ sdts_alias }}") = DATE(GETDATE())
                 ORDER BY "{{ sdts_alias }}" DESC
                 LIMIT 1
-            
+
             ), 
-            
+
             virtual_logic AS (
                 
                 SELECT
@@ -893,7 +893,7 @@ stepTypes:
                               (DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ daily_duration }} {{ daily_unit }}' AND CURRENT_DATE())
                             {%- endif -%}   
                         {%- endif %}
-            
+
                         {%- if 'weekly' in log_logic.keys() %} OR 
                             {%- if log_logic['weekly']['forever'] is true -%}
                                 {%- set ns.forever_status = 'TRUE' -%}
@@ -904,7 +904,7 @@ stepTypes:
                           ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ weekly_duration }} {{ weekly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_week" = TRUE))
                             {%- endif -%}
                         {% endif -%}
-            
+
                         {%- if 'monthly' in log_logic.keys() %} OR
                             {%- if log_logic['monthly']['forever'] is true -%}
                                 {%- set ns.forever_status = 'TRUE' %}
@@ -915,7 +915,7 @@ stepTypes:
                           ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ monthly_duration }} {{ monthly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_month" = TRUE))
                             {%- endif -%}
                         {% endif -%}
-            
+
                         {%- if 'quarterly' in log_logic.keys() %} OR
                             {%- if log_logic['quarterly']['forever'] is true -%}
                                 {%- set ns.forever_status = 'TRUE' %}
@@ -926,7 +926,7 @@ stepTypes:
                           ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ quarterly_duration }} {{ quarterly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_quarter" = TRUE))
                             {%- endif -%}
                         {% endif -%}
-            
+
                         {%- if 'yearly' in log_logic.keys() %} OR 
                             {%- if log_logic['yearly']['forever'] is true -%}
                                 {%- set ns.forever_status = 'TRUE' %}
@@ -941,12 +941,12 @@ stepTypes:
                         ELSE FALSE
                     END AS {{ snapshot_trigger_column }},
                     {%- endif %}
-            
+
                     CASE
                         WHEN l."{{ sdts_alias }}" IS NULL THEN FALSE
                         ELSE TRUE
                     END AS "is_latest",
-            
+
                     c."caption",
                     c."is_hourly",
                     c."is_daily",
@@ -975,9 +975,9 @@ stepTypes:
                 ON c."{{ sdts_alias }}" = l."{{ sdts_alias }}"
                 WHERE c."{{ sdts_alias }}" < GETDATE()
             ),
-            
+
             active_logic_combined AS (
-            
+
                 SELECT 
                     "{{ sdts_alias }}",
                     "force_active",
@@ -1001,7 +1001,7 @@ stepTypes:
                 FROM virtual_logic
                 ORDER BY "{{ sdts_alias }}" DESC
             )
-            
+
             SELECT * FROM active_logic_combined
         run:
           templateString: ""
@@ -1521,7 +1521,7 @@ stepTypes:
         create:
           templateString: |-
             {{ stage('Create Hub Table') }}
-            
+
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
             	{% for col in columns %}
@@ -1540,9 +1540,9 @@ stepTypes:
             	{{ stage('Pre-SQL') }}
             	{{ config.preSQL }}
             {% endif %}
-            
+
             {% for source in sources %}
-            
+
             	{{ stage('Merge Hub - ' ~ source.name) }}
             	MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
             	(
@@ -1551,9 +1551,9 @@ stepTypes:
             			{{ get_source_transform(col) }} AS "{{ col.name }}"
             			{%- if not loop.last -%}, {% endif %}
             		{% endfor %}
-            
+
             		{{ source.join }}
-            
+
             	)
             	AS "SRC"
             	ON
@@ -1577,9 +1577,9 @@ stepTypes:
             			{%- if not loop.last -%}, {% endif %}
             		{% endfor %}
             	)
-            
+
             {% endfor %}
-            
+
             {% if config.postSQL %}
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
@@ -4714,49 +4714,13 @@ subgraphs:
   Subgraph-2:
     id: 2
     name: Line Item
-    steps:
-      - "31"
-      - "33"
-      - "34"
-      - "37"
-      - "39"
-      - "44"
-      - "45"
-      - "46"
-      - "51"
-      - "53"
-      - "80"
-      - "84"
-      - "86"
-      - "93"
-      - "94"
-      - "95"
-      - "98"
-      - "101"
-      - "102"
-      - "104"
-      - "106"
-      - "107"
-      - "108"
-      - "109"
+    steps: []
   Subgraph-3:
     id: 3
     name: Orders
-    steps:
-      - "30"
-      - "33"
-      - "38"
-      - "39"
-      - "86"
-      - "93"
-      - "102"
-      - "107"
-      - "113"
-      - "114"
-      - "118"
+    steps: []
   Subgraph-4:
     id: 4
     name: New Sub-Graph
-    steps:
-      - "118"
+    steps: []
 version: 1
