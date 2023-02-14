@@ -1,0 +1,111 @@
+steps:
+  LINK_ORDERS-177:
+    operation:
+      config:
+        insertStrategy: UNION
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Orders data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 3327
+              stepCounter: "177"
+            config:
+              is_Link_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_orders_customer_l
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3282
+                    stepCounter: "174"
+                transform: ""
+          - columnReference:
+              columnCounter: 3326
+              stepCounter: "177"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_customer_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3281
+                    stepCounter: "174"
+                transform: ""
+          - columnReference:
+              columnCounter: 3325
+              stepCounter: "177"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_orders_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3280
+                    stepCounter: "174"
+                transform: ""
+          - columnReference:
+              columnCounter: 3323
+              stepCounter: "177"
+            config:
+              is_Link_ldts: true
+            dataType: TIMESTAMP
+            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3278
+                    stepCounter: "174"
+                transform: ""
+          - columnReference:
+              columnCounter: 3324
+              stepCounter: "177"
+            dataType: STRING
+            description: If available, replace with existing column from source.
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3279
+                    stepCounter: "174"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_ORDERS
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS') }} "STG_ORDERS"
+            name: LINK_ORDERS
+            noLinkRefs: []
+      name: LINK_ORDERS
+      overrideSQL: false
+      schema: ""
+      sqlType: "7"
+      type: sql
+    stepCounter: "177"

@@ -1,0 +1,145 @@
+steps:
+  PIT_CUSTOMER-189:
+    operation:
+      config:
+        cleanup_pit: true
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Customer data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3476
+              stepCounter: "189"
+            config:
+              is_dimension_key: true
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 3471
+                stepCounter: "189"
+              - columnCounter: 3475
+                stepCounter: "189"
+            name: hk_customer_d
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - columnReference:
+              columnCounter: 3475
+              stepCounter: "189"
+            dataType: TIMESTAMP
+            description: ""
+            name: sdts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3377
+                    stepCounter: "182"
+                transform: ""
+          - columnReference:
+              columnCounter: 3471
+              stepCounter: "189"
+            dataType: STRING
+            description: ""
+            name: hk_customer_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3418
+                    stepCounter: "184"
+                transform: ""
+          - columnReference:
+              columnCounter: 3474
+              stepCounter: "189"
+            dataType: STRING
+            description: If available, replace with existing column from source.
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3417
+                    stepCounter: "184"
+                transform: ""
+          - columnReference:
+              columnCounter: 3477
+              stepCounter: "189"
+            dataType: STRING
+            description: ""
+            name: hk_customer_n1_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3438
+                    stepCounter: "186"
+                transform: ""
+          - columnReference:
+              columnCounter: 3478
+              stepCounter: "189"
+            dataType: TIMESTAMP
+            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            name: ldts_customer_n1_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3440
+                    stepCounter: "186"
+                transform: ""
+          - columnReference:
+              columnCounter: 3479
+              stepCounter: "189"
+            dataType: STRING
+            description: ""
+            name: hk_customer_p1_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3463
+                    stepCounter: "188"
+                transform: ""
+          - columnReference:
+              columnCounter: 3481
+              stepCounter: "189"
+            dataType: TIMESTAMP
+            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            name: ldts_customer_p1_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3465
+                    stepCounter: "188"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: HUB_CUSTOMER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'HUB_CUSTOMER') }} "HUB_CUSTOMER"
+            name: PIT_CUSTOMER
+            noLinkRefs: []
+      name: PIT_CUSTOMER
+      overrideSQL: false
+      schema: ""
+      sqlType: "12"
+      type: sql
+    stepCounter: "189"

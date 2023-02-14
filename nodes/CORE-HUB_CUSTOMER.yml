@@ -1,0 +1,94 @@
+steps:
+  HUB_CUSTOMER-184:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Customer data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 3418
+              stepCounter: "184"
+            config:
+              is_Hub_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_customer_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3403
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3408
+              stepCounter: "184"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_CUSTKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3393
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3416
+              stepCounter: "184"
+            dataType: TIMESTAMP
+            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3401
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3417
+              stepCounter: "184"
+            dataType: STRING
+            description: If available, replace with existing column from source.
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3402
+                    stepCounter: "183"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_CUSTOMER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER') }} "STG_CUSTOMER"
+            name: HUB_CUSTOMER
+            noLinkRefs: []
+      name: HUB_CUSTOMER
+      overrideSQL: false
+      schema: ""
+      sqlType: "6"
+      type: sql
+    stepCounter: "184"

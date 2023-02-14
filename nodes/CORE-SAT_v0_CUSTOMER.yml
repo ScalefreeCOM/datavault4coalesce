@@ -1,0 +1,124 @@
+steps:
+  SAT_v0_CUSTOMER-187:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Customer data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 3458
+              stepCounter: "187"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_customer_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3403
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3462
+              stepCounter: "187"
+            config:
+              is_hd: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hd_customer_p_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3407
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3456
+              stepCounter: "187"
+            dataType: TIMESTAMP
+            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3401
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3457
+              stepCounter: "187"
+            dataType: STRING
+            description: If available, replace with existing column from source.
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3402
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3449
+              stepCounter: "187"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3394
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3450
+              stepCounter: "187"
+            dataType: VARCHAR(40)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_ADDRESS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3395
+                    stepCounter: "183"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_CUSTOMER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER') }} "STG_CUSTOMER"
+            name: SAT_v0_CUSTOMER
+            noLinkRefs: []
+      name: SAT_v0_CUSTOMER
+      overrideSQL: false
+      schema: ""
+      sqlType: "8"
+      type: sql
+    stepCounter: "187"

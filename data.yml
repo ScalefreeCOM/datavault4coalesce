@@ -67,6 +67,14 @@ macros:
       {%- endmacro -%}
 
 
+      {%-macro record_source()-%}
+      {#--USAGE:{{record_source()}}#}
+      {#--NOTES:Adds a Record Source (name of qualified previous table/view)#}
+      {% set src = storageLocations | selectattr('name', "equalto", sources[0].dependencies[0].node.location.name) | list | first %} 
+      '"{{src.database}}"."{{src.schema}}"."{{sources[0].dependencies[0].node.name}}"'
+      {%- endmacro -%}
+
+
       {%- macro datavault4coalesce__is_expression(obj) -%}
 
            {%- if obj is string -%}
@@ -342,16 +350,14 @@ stepTypes:
 
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
-                {% for col in sources[0].columns %}
-                    {% if col.sourceColumns[0].column.is_Hub_hk or col.sourceColumns[0].column.is_Hub_hk or col.sourceColumns[0].column.is_Hub_ldts or col.sourceColumns[0].column.is_Link_ldts %}
-                        {{ col.name }} {{ col.dataType }}
-                    {% elif col.name == datavault4coalesce.config.sdts_alias %}
-                        {{ datavault4coalesce.config.sdts_alias }} {{ col.dataType }}
-                    {% else %}
-                        {{ col.sourceColumns[0].node.name }}_{{ col.name }} {{ col.dataType }}
-                    {% endif %}
-                    {% if not loop.last %} , {% endif %}
-                {% endfor %}
+            	{% for col in columns %}
+            		"{{ col.name }}" {{ col.dataType }}
+            		{%- if not col.nullable %} NOT NULL
+            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            		{% endif %}
+            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            		{%- if not loop.last -%}, {% endif %}
+            	{% endfor %}
             )
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
@@ -366,46 +372,57 @@ stepTypes:
             INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
             WITH records_to_insert AS (
             	SELECT
-            	{% for col in sources[0].columns -%}
-            		{%- if col.sourceColumns[0].column.is_hk -%}
-            			COALESCE({{ col.sourceColumns[0].node.name }}."{{ col.name }}", {{ datavault4coalesce.config.unknown_value__STRING }}) AS "{{ col.sourceColumns[0].node.name }}_{{ col.name }}"
-            		{%- elif col.sourceColumns[0].column.is_ldts -%}
-            			COALESCE({{ col.sourceColumns[0].node.name }}."{{ col.name }}", {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}) AS "{{ col.sourceColumns[0].node.name }}_{{ col.name }}"
-            		{%- elif col.name == datavault4coalesce.config.sdts_alias -%}
-            			{{ col.sourceColumns[0].node.name }}."{{ col.name }}" AS "{{ col.name }}"
-            		{%- else -%}
-            			{{ col.sourceColumns[0].node.name }}."{{ col.name }}" AS "{{ col.sourceColumns[0].node.name }}_{{ col.name }}"
-            		{%- endif %}
+            	{% for col in sources[0].columns %}
+            		{% if 'column' in col.sourceColumns[0].keys() -%}
+            			{%- if col.sourceColumns[0].column.is_hub_hk -%}
+            				COALESCE("{{ col.sourceColumns[0].node.name }}"."{{ col.name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ col.name }}"
+            			{%- elif col.sourceColumns[0].column.is_hk -%}
+            				COALESCE("{{ col.sourceColumns[0].node.name }}"."{{ col.sourceColumns[0].column.name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ col.name }}"			
+            			{%- elif col.sourceColumns[0].column.is_ldts -%}
+            				COALESCE("{{ col.sourceColumns[0].node.name }}"."{{ col.sourceColumns[0].column.name }}", {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}) AS "{{ col.name }}"
+            			{%- elif col.name == datavault4coalesce.config.sdts_alias -%}
+            				"{{ col.sourceColumns[0].node.name }}"."{{ col.name }}" AS "{{ col.name }}"
+            			{%- else -%}
+            				"{{ col.sourceColumns[0].node.name }}"."{{ col.name }}" AS "{{ col.name }}"
+            			{%- endif %}
 
             		{%- if not loop.last -%} , {% endif %}
+            		{%- elif col.is_dimension_key -%}
+            			{{ get_source_transform(col) }} AS "{{ col.name }}",
+            		{%- endif %}
+
                 {% endfor %}
 
-            	FROM "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ sources[0].dependencies[0].node.name }}" {{ sources[0].dependencies[0].node.name }}
+            	FROM "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ sources[0].dependencies[0].node.name }}" "{{ sources[0].dependencies[0].node.name }}"
 
             	{% for col in sources[0].columns -%}
             		{%- if col.name == datavault4coalesce.config.sdts_alias -%}
-            			JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" {{ col.sourceColumns[0].node.name }}
-            			ON {{ col.sourceColumns[0].node.name }}."{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
+            			JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" "{{ col.sourceColumns[0].node.name }}"
+            			ON "{{ col.sourceColumns[0].node.name }}"."{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
             		{%- endif -%}
             	{% endfor %}
 
-            	{%- for col in sources[0].columns -%}
-            		{%- if col.sourceColumns[0].column.is_hk and not loop.first -%}
-            			LEFT JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" {{ col.sourceColumns[0].node.name }}
-            			ON {{ sources[0].dependencies[0].node.name }}."{{ col.name }}" = {{ col.sourceColumns[0].node.name }}."{{ col.name }}"
-            			{% for sdts_col in sources[0].columns %}
-            				{%- if sdts_col.name == "sdts" -%}
-            					AND {{ sdts_col.sourceColumns[0].node.name }}."{{ sdts_col.name}}" BETWEEN {{ col.sourceColumns[0].node.name }}."{{ datavault4coalesce.config.ldts_alias }}" and {{ col.sourceColumns[0].node.name }}."{{ datavault4coalesce.config.ledts_alias }}"
-            				{%- endif -%}
-            			{%- endfor -%}
-            		{% endif %}
+            	{%- for col in sources[0].columns %}
+            		
+            		{%- if 'column' in col.sourceColumns[0].keys() %}
+            			{%- if col.sourceColumns[0].column.is_hk and not loop.first %}
+            				LEFT JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" "{{ col.sourceColumns[0].node.name }}"
+            				ON "{{ sources[0].dependencies[0].node.name }}"."{{ col.sourceColumns[0].column.name }}" = "{{ col.sourceColumns[0].node.name }}"."{{ col.sourceColumns[0].column.name }}"
+            				{% for sdts_col in sources[0].columns %}
+            					{%- if sdts_col.name == "sdts" -%}
+            						AND "{{ sdts_col.sourceColumns[0].node.name }}"."{{ sdts_col.name}}" BETWEEN "{{ col.sourceColumns[0].node.name }}"."{{ datavault4coalesce.config.ldts_alias }}" and "{{ col.sourceColumns[0].node.name }}"."{{ datavault4coalesce.config.ledts_alias }}"
+            					{%- endif -%}
+            				{%- endfor -%}
+            			
+            			{% endif %}
+            		{%- endif %}
             	{% endfor -%}
             )
 
             SELECT * FROM records_to_insert
-            WHERE "{{ datavault4coalesce.config.sdts_alias }}" NOT IN 
+            WHERE "{{ get_value_by_column_attribute('is_dimension_key') }}" NOT IN 
             (
-            	SELECT {{ datavault4coalesce.config.sdts_alias }} FROM 
+            	SELECT "{{ get_value_by_column_attribute('is_dimension_key') }}" FROM 
             	{{ ref_no_link(node.location.name, node.name) }}
             )
 
@@ -415,7 +432,7 @@ stepTypes:
             {{ stage('Clean up PIT') }}
 
             	DELETE FROM {{ ref_no_link(node.location.name, node.name) }}
-            	WHERE {{ datavault4coalesce.config.sdts_alias }} NOT IN (
+            	WHERE "{{ datavault4coalesce.config.sdts_alias }}" NOT IN (
             		SELECT "{{ datavault4coalesce.config.sdts_alias }}" FROM 
             			{% for col in sources[0].columns %}
             				{%- if col.name == datavault4coalesce.config.sdts_alias -%}
@@ -731,7 +748,7 @@ stepTypes:
             attributeName: monthly_snapshot_duration
             enableIf: "{% if not config.monthly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
             isRequired: true
-            default: "5"
+            default: "3"
 
           - displayName: Time Unit
             type: dropdownSelector
@@ -817,6 +834,44 @@ stepTypes:
             attributeName: postSQL
             type: textBox
             isRequired: false
+
+
+        systemColumns:
+        - displayName: is_active
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_active
+
+        - displayName: is_latest
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_latest
+
+        - displayName: is_current_year
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_current_year
+
+        - displayName: is_last_year
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_last_year
+
+        - displayName: is_rolling_year
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_rolling_year
+
+        - displayName: is_last_rolling_year
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_last_rolling_year
       templates:
         create:
           templateString: |-
@@ -982,11 +1037,6 @@ stepTypes:
                     "{{ sdts_alias }}",
                     "force_active",
                     "replacement_sdts",
-                    CASE
-                        WHEN "force_active" AND {{ snapshot_trigger_column }} THEN TRUE
-                        WHEN NOT "force_active" OR NOT {{ snapshot_trigger_column }} THEN FALSE
-                    END AS "{{ snapshot_trigger_column }}",
-                    "is_latest", 
                     "caption",
                     "is_hourly",
                     "is_daily",
@@ -994,6 +1044,11 @@ stepTypes:
                     "is_beginning_of_month",
                     "is_beginning_of_quarter",
                     "is_beginning_of_year",
+                    CASE
+                        WHEN "force_active" AND {{ snapshot_trigger_column }} THEN TRUE
+                        WHEN NOT "force_active" OR NOT {{ snapshot_trigger_column }} THEN FALSE
+                    END AS "{{ snapshot_trigger_column }}",
+                    "is_latest",         
                     "is_current_year",
                     "is_last_year",
                     "is_rolling_year",
@@ -1251,11 +1306,6 @@ stepTypes:
             isRequired: true
             enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
 
-          - displayName: Truncate Before
-            attributeName: truncateBefore
-            type: toggleButton
-            default: true
-
           - displayName: Enable Tests
             attributeName: testsEnabled
             type: toggleButton
@@ -1279,6 +1329,20 @@ stepTypes:
             attributeName: generate_ghost_records
             type: toggleButton
             default: true
+
+        systemColumns:
+        - displayName: "ldts"
+          transform: "PLEASE FILL OUT"
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: is_system_ldts    
+          description: "Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used."
+        - displayName: "rsrc"
+          transform: "{{record_source()}}"
+          dataType: STRING
+          placement: end
+          attributeName: is_system_rsrc    
+          description: "If available, replace with existing column from source."  
       templates:
         create:
           templateString: |-
@@ -1508,18 +1572,14 @@ stepTypes:
             attributeName: is_Hub_hk
             isRequired: true
 
-          - displayName: Hub Businesskey Column
-            type: columnSelector
-            attributeName: is_Hub_bk
-            isRequired: true
-
           - displayName: Hub LoadDateTimestamp Column
+            enableIf: 'false'
             type: columnSelector
             attributeName: is_Hub_ldts
-            isRequired: true
+            isRequired: false
       templates:
         create:
-          templateString: |-
+          templateString: |
             {{ stage('Create Hub Table') }}
 
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
@@ -1684,7 +1744,7 @@ stepTypes:
                 )
                 AS "SRC"
                 ON
-                {% for col in sources[0].columns if (col.isLinkHash) -%}
+                {% for col in sources[0].columns if (col.is_Link_hk) -%}
                     {% if not loop.first %}
                         AND
                     {% endif %}
@@ -1873,12 +1933,12 @@ stepTypes:
           - displayName: Hashkey Column
             type: columnSelector
             attributeName: is_hk
-            isRequired: true
+            isRequired: false
 
           - displayName: LDTS Column
             type: columnSelector
             attributeName: is_ldts
-            isRequired: true
+            isRequired: false
 
         - groupName: Pre/Post SQL
           items:
