@@ -1,0 +1,97 @@
+steps:
+  LNK_ORDERS1-141:
+    operation:
+      config:
+        insertStrategy: UNION
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - acceptedValues:
+              strictMatch: false
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2890
+              stepCounter: "141"
+            config:
+              isLinkHash: true
+            dataType: STRING
+            description: ""
+            name: hk_order_l
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2889
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2885
+              stepCounter: "141"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_order_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2590
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2887
+              stepCounter: "141"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2593
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2888
+              stepCounter: "141"
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2594
+                    stepCounter: "118"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_ORDERS1
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS1') }} "STG_ORDERS1"
+            name: LNK_ORDERS1
+            noLinkRefs: []
+      name: LNK_ORDERS1
+      overrideSQL: false
+      schema: ""
+      sqlType: "7"
+      type: sql
+    stepCounter: "141"

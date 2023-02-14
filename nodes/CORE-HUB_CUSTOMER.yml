@@ -85,7 +85,9 @@ steps:
         cteString: ""
         enabledColumnTestIDs: []
         sourceMapping:
-          - customSQL:
+          - aliases:
+              STG_CUSTOMER: "38"
+            customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE

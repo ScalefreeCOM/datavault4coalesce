@@ -1,0 +1,194 @@
+steps:
+  SAT_v0_ORDERS_ref-155:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2992
+              stepCounter: "155"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_order_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2590
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2993
+              stepCounter: "155"
+            config:
+              is_hd: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hd_order_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2591
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2985
+              stepCounter: "155"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERSTATUS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2583
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2986
+              stepCounter: "155"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_TOTALPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2584
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2987
+              stepCounter: "155"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2585
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2988
+              stepCounter: "155"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2586
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2989
+              stepCounter: "155"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_CLERK
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2587
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2990
+              stepCounter: "155"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_SHIPPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2588
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2991
+              stepCounter: "155"
+            dataType: VARCHAR(79)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_COMMENT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2589
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2995
+              stepCounter: "155"
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2594
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2994
+              stepCounter: "155"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2593
+                    stepCounter: "118"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_ORDERS1
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS1') }} "STG_ORDERS1"
+            name: SAT_v0_ORDERS_ref
+            noLinkRefs: []
+      name: SAT_v0_ORDERS_ref
+      overrideSQL: false
+      schema: ""
+      sqlType: "8"
+      type: sql
+    stepCounter: "155"

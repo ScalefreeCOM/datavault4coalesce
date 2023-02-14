@@ -1,0 +1,230 @@
+steps:
+  SAT_ORDERS_v1-159:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 3045
+              stepCounter: "159"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_order_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3040
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3046
+              stepCounter: "159"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hd_order_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3041
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3047
+              stepCounter: "159"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERSTATUS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3033
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3048
+              stepCounter: "159"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_TOTALPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3034
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3049
+              stepCounter: "159"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3035
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3050
+              stepCounter: "159"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3036
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3051
+              stepCounter: "159"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_CLERK
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3037
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3052
+              stepCounter: "159"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_SHIPPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3038
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3053
+              stepCounter: "159"
+            dataType: VARCHAR(79)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_COMMENT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3039
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3054
+              stepCounter: "159"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3042
+                    stepCounter: "158"
+                transform: ""
+          - columnReference:
+              columnCounter: 3055
+              stepCounter: "159"
+            config:
+              is_ldts: true
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3043
+                    stepCounter: "158"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3056
+              stepCounter: "159"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            is_system_ledts: true
+            name: ledts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: COALESCE(LEAD("{{ get_value_by_column_attribute("is_ldts") }}" - INTERVAL '1 MICROSECOND') OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ get_value_by_column_attribute("is_ldts") }}"),{{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3057
+              stepCounter: "159"
+            config: {}
+            dataType: BOOLEAN
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            is_system_current_col: true
+            name: is_current
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: CASE WHEN LEAD("{{ get_value_by_column_attribute("is_ldts") }}" - INTERVAL '1 MICROSECOND') OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ get_value_by_column_attribute("is_ldts") }}") IS NULL THEN TRUE ELSE FALSE END
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: SAT_ORDERS_v0
+            join:
+              joinCondition: FROM {{ ref('CORE', 'SAT_ORDERS_v0') }} "SAT_ORDERS_v0"
+            name: SAT_ORDERS_v1
+            noLinkRefs: []
+      name: SAT_ORDERS_v1
+      overrideSQL: false
+      schema: ""
+      sqlType: "9"
+      type: sql
+    stepCounter: "159"

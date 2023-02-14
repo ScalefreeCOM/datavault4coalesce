@@ -179,7 +179,6 @@ steps:
             dataType: STRING
             defaultValue: ""
             description: ""
-            hashColumns: []
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:

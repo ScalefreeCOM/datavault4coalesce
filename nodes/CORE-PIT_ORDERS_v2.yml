@@ -1,0 +1,127 @@
+steps:
+  PIT_ORDERS_v2-161:
+    operation:
+      config:
+        cleanup_pit: true
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 3074
+              stepCounter: "161"
+            config:
+              is_dimension_key: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_order_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3069
+                    stepCounter: "160"
+                transform: ""
+          - columnReference:
+              columnCounter: 3076
+              stepCounter: "161"
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3072
+                    stepCounter: "160"
+                transform: ""
+          - columnReference:
+              columnCounter: 3078
+              stepCounter: "161"
+            dataType: TIMESTAMP
+            description: ""
+            name: sdts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2961
+                    stepCounter: "152"
+                transform: ""
+          - columnReference:
+              columnCounter: 3079
+              stepCounter: "161"
+            dataType: STRING
+            description: ""
+            name: hk_order_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3045
+                    stepCounter: "159"
+                transform: ""
+          - columnReference:
+              columnCounter: 3080
+              stepCounter: "161"
+            dataType: TIMESTAMP
+            description: ""
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3055
+                    stepCounter: "159"
+                transform: ""
+          - columnReference:
+              columnCounter: 3081
+              stepCounter: "161"
+            dataType: STRING
+            description: ""
+            name: hk_order_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3007
+                    stepCounter: "156"
+                transform: ""
+          - columnReference:
+              columnCounter: 3082
+              stepCounter: "161"
+            dataType: TIMESTAMP
+            description: ""
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3016
+                    stepCounter: "156"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: HUB_ORDERS_v2
+            join:
+              joinCondition: FROM {{ ref('CORE', 'HUB_ORDERS_v2') }} "HUB_ORDERS_v2"
+            name: PIT_ORDERS_v2
+            noLinkRefs: []
+      name: PIT_ORDERS_v2
+      overrideSQL: false
+      schema: ""
+      sqlType: "12"
+      type: sql
+    stepCounter: "161"

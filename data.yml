@@ -30,429 +30,36 @@ macros:
   Macro-1:
     id: "1"
     macroString: |-
-      {%- macro datavault4coalesce__is_list(obj, empty_is_false=false) -%}
-      
-          {%- if obj is iterable and obj is not string and obj is not mapping -%}
-              {%- if obj is none and obj is undefined and not obj and empty_is_false -%}
-                  {%- do return(false) -%}
-              {%- endif -%}
-      
-              {%- do return(true) -%}
-          {%- else -%}
-              {%- do return(false) -%}
-          {%- endif -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__is_nothing(obj) -%}
-      
-          {%- if obj is none or obj is undefined or not obj -%}
-              {%- do return(true) -%}
-          {%- else -%}
-              {%- do return(false) -%}
-          {%- endif -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__is_something(obj) -%}
-      
-          {%- if obj is not none and obj is defined and obj -%}
-              {%- do return(true) -%}
-          {%- else -%}
-              {%- do return(false) -%}
-          {%- endif -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__is_expression(obj) -%}
-      
-          {%- if obj is string -%}
-              {%- if (obj | first == "'" and obj | last == "'") or ("(" in obj and ")" in obj) or "::" in obj -%}
-                  {%- do return(true) -%}
-              {%- else -%}
-                  {%- do return(false) -%}
-              {%- endif -%}
-          {%- else -%}
-              {%- do return(false) -%}
-          {%- endif -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__is_attribute(obj) -%}
-      
-      {%- if obj is not none and obj is string and obj -%}
-      
-              {%- if obj | first == "!" -%}
-              
-                  {{- return(false) -}}
-              
-              {%- else -%}
-              
-                  {%- if datavault4coalesce__is_expression(obj) -%}
-                  
-                      {{- return(false) -}}
-      
-                  {%- else -%}
-      
-                      {{- return(true) -}}
-      
-                  {%- endif -%}
-      
-              {%- endif -%}
-          {%- else -%}
-              {%- if execute -%}
-                  {{ exceptions.raise_compiler_error("Invalid 'obj' object provided to 'is_attribute' check. Must be a string and not null.") }}
-              {%- endif %}
-          {%- endif -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__process_columns_to_select(columns_list=none, exclude_columns_list=none) -%}
-          {% set exclude_columns_list = exclude_columns_list | map('upper') | list %}
-          {% set columns_to_select = [] %}
-      
-          {% if not datavault4coalesce__is_list(columns_list) or not datavault4coalesce__is_list(exclude_columns_list)  %}
-      
-              {{- exceptions.raise_compiler_error("One or both arguments are not of list type.") -}}
-      
-          {%- endif -%}
-      
-          {%- if datavault4coalesce__is_something(columns_list) and datavault4coalesce__is_something(exclude_columns_list) -%}
-              {%- for col in columns_list -%}
-      
-                  {%- if col|lower not in exclude_columns_list | map('lower') -%}
-                      {%- do columns_to_select.append(col) -%}
-                  {%- endif -%}
-      
-              {%- endfor -%}
-          {%- elif datavault4coalesce__is_something(columns_list) and not datavault4coalesce__is_something(exclude_columns_list) %}
-              {% set columns_to_select = columns_list %}
-          {%- endif -%}
-      
-          {%- do return(columns_to_select) -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__extract_column_names(columns_dict=none) -%}
-      
-          {%- set extracted_column_names = [] -%}
-      
-          {%- if columns_dict is mapping -%}
-              {%- for key, value in columns_dict.items() -%}
-                  {%- do extracted_column_names.append(key) -%}
-              {%- endfor -%}
-      
-              {%- do return(extracted_column_names) -%}
-          {%- else -%}
-              {%- do return([]) -%}
-          {%- endif -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__extract_input_columns(columns_dict=none) -%}
-      
-          {%- set extracted_input_columns = [] -%}
-      
-          {%- if columns_dict is mapping -%}
-              {%- for key, value in columns_dict.items() -%}
-                  {%- if value is mapping and 'src_cols_required' in value.keys() -%}
-                      {%- do extracted_input_columns.append(value['src_cols_required']) -%}
-                  {%- elif value is mapping and 'value' in value.keys() and 'src_cols_required' not in value.keys() -%}
-                      {# Do nothing. No source column required. #}    
-                  {%- elif value is mapping and value.is_hashdiff -%}
-                      {%- do extracted_input_columns.append(value['columns']) -%}
-                  {%- elif value is mapping and 'this_column_name' in value.keys() -%}
-                      {%- do extracted_input_columns.append(value['this_column_name']) -%}
-                  {%- else -%}
-                      {%- do extracted_input_columns.append(value) -%}
-                  {%- endif -%}
-              {%- endfor -%}
-      
-              {%- do return(extracted_input_columns) -%}
-          {%- else -%}
-              {%- do return([]) -%}
-          {%- endif -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__process_hash_column_excludes(hash_columns=none, source_columns=none) -%}
-      
-          {%- set processed_hash_columns = {} -%}
-      
-          {%- for col, col_mapping in hash_columns.items() -%}
-              
-              {%- if col_mapping is mapping -%}
-                  {%- if col_mapping.exclude_columns -%}
-      
-                      {%- if col_mapping.columns -%}
-      
-                          {%- set columns_to_hash = datavault4coalesce__process_columns_to_select(source_columns, col_mapping.columns) -%}
-      
-                          {%- do hash_columns[col].pop('exclude_columns') -%}
-                          {%- do hash_columns[col].update({'columns': columns_to_hash}) -%}
-      
-                          {%- do processed_hash_columns.update({col: hash_columns[col]}) -%}
-                      {%- else -%}
-      
-                          {%- do hash_columns[col].pop('exclude_columns') -%}
-                          {%- do hash_columns[col].update({'columns': source_columns}) -%}
-      
-                          {%- do processed_hash_columns.update({col: hash_columns[col]}) -%}
-                      {%- endif -%}
-                  {%- else -%}
-                      {%- do processed_hash_columns.update({col: col_mapping}) -%}
-                  {%- endif -%}
-              {%- else -%}
-                  {%- do processed_hash_columns.update({col: col_mapping}) -%}
-              {%- endif -%}
-      
-          {%- endfor -%}
-      
-          {%- do return(processed_hash_columns) -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__print_list(list_to_print=none, indent=4, src_alias=none) -%}
-      
-          {%- for col_name in list_to_print -%}
-              {%- if src_alias %}
-              {{ (src_alias ~ '.' ~ col_name) | indent(indent) }}{{ "," if not loop.last }}
-              {%- else %}
-              {{ col_name | indent(indent) }}{{ "," if not loop.last }}
-              {%- endif %}
-          {%- endfor -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__as_constant(column_str) -%}
-      
-          {%- if column_str is not none and column_str is string and column_str -%}
-      
-              {%- if column_str | first == "!" -%}
-              
-                  {{- return("'" ~ column_str[1:] ~ "'") -}}
-              
-              {%- else -%}
-              
-                  {{- return(column_str) -}}
-      
-              {%- endif -%}
-          {%- else -%}
-              {%- if execute -%}
-                  {{ exceptions.raise_compiler_error("Invalid columns_str object provided. Must be a string and not null.") }}
-              {%- endif %}
-          {%- endif -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__escape_column_names(columns=none) -%}
-      
-      {# Different platforms use different escape characters, the default below is for Snowflake which uses double quotes #}
-      
-          {%- if datavault4coalesce__is_something(columns) -%}
-      
-              {%- set col_string = '' -%}
-              {%- set col_list = [] -%}
-              {%- set col_mapping = {} -%}
-      
-              {%- if columns is string -%}
-      
-                  {%- set col_string = datavault4coalesce__escape_column_name(columns) -%}
-      
-              {%- elif datavault4coalesce__is_list(columns) -%}
-      
-                  {%- for col in columns -%}
-      
-                      {%- if col is string -%}
-      
-                          {%- set escaped_col = datavault4coalesce__escape_column_name(col) -%}
-      
-                          {%- do col_list.append(escaped_col) -%}
-      
-                      {%- else -%}
-      
-                          {%- if execute -%}
-                              {{- exceptions.raise_compiler_error("Invalid column name(s) provided. Must be a string.") -}}
-                          {%- endif -%}
-      
-                      {%- endif -%}
-      
-                  {%- endfor -%}
-      
-              {%- elif columns is mapping -%}
-      
-                  {%- if columns['source_column'] and columns['alias'] -%}
-      
-                      {%- set escaped_source_col = datavault4coalesce__escape_column_name(columns['source_column']) -%}
-                      {%- set escaped_alias_col = datavault4coalesce__escape_column_name(columns['alias']) -%}
-                      {%- set col_mapping = {"source_column": escaped_source_col, "alias": escaped_alias_col} -%}
-      
-                  {%- else -%}
-      
-                      {%- if execute -%}
-                          {{- exceptions.raise_compiler_error("Invalid column name(s) provided. Must be a string, a list of strings, or a dictionary of hashdiff metadata.") -}}
-                      {%- endif %}
-      
-                  {%- endif -%}
-      
-              {%- else -%}
-      
-                  {%- if execute -%}
-                      {{- exceptions.raise_compiler_error("Invalid column name(s) provided. Must be a string, a list of strings, or a dictionary of hashdiff metadata.") -}}
-                  {%- endif %}
-      
-              {%- endif -%}
-      
-          {%- elif columns == '' -%}
-      
-              {%- if execute -%}
-                  {{- exceptions.raise_compiler_error("Expected a column name or a list of column names, got an empty string") -}}
-              {%- endif -%}
-      
-          {%- endif -%}
-      
-      {%- if columns is none -%}
-      
-          {%- do return(none) -%}
-      
-      {%- elif columns == [] -%}
-      
-          {%- do return([]) -%}
-      
-      {%- elif columns == {} -%}
-      
-          {%- do return({}) -%}
-      
-      {%- elif columns is string -%}
-      
-          {%- do return(col_string) -%}
-      
-      {%- elif datavault4coalesce__is_list(columns) -%}
-      
-          {%- do return(col_list) -%}
-      
-      {%- elif columns is mapping -%}
-      
-          {%- do return(col_mapping) -%}
-      
-      {%- endif -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__expand_column_list(columns=none) -%}
-      
-      {%- if not columns -%}
-          {%- if execute -%}
-               {{- exceptions.raise_compiler_error("Expected a list of columns, got: " ~ columns) -}}
-          {%- endif -%}
-      {%- endif -%}
-      
-      {%- set col_list = [] -%}
-      
-      {%- if datavault4coalesce__is_list(columns) -%}
-      
-          {%- set columns = columns | reject("none") %}
-      
-          {%- for col in columns -%}
-      
-              {%- if col is string -%}
-      
-                  {%- do col_list.append(col) -%}
-      
-              {#- If list of lists -#}
-              {%- elif datavault4coalesce__is_list(col) -%}
-      
-                  {%- for cols in col -%}
-      
-                      {%- do col_list.append(cols) -%}
-      
-                  {%- endfor -%}
-              {%- elif col is mapping -%}
-      
-                  {%- do col_list.append(col) -%}
-      
-              {%- else -%}
-      
-                  {%- if execute -%}
-                      {{- exceptions.raise_compiler_error("Invalid columns object provided. Must be a list of lists, dictionaries or strings.") -}}
-                  {%- endif %}
-      
-              {%- endif -%}
-      
-          {%- endfor -%}
-      {%- else -%}
-      
-          {%- if execute -%}
-              {{- exceptions.raise_compiler_error("Invalid columns object provided. Must be a list.") -}}
-          {%- endif %}
-      
-      {%- endif -%}
-      
-      {%- do return(col_list) -%}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__beginning_of_all_times() %}
-      
-      {%- set global_var = var('datavault4coalesce__beginning_of_all_times', none) -%}
-      {%- set beginning_of_all_times = '' -%}
-      
-      {%- if global_var is mapping -%}
-          {%- if 'snowflake' in global_var.keys()|map('lower') -%}
-              {% set beginning_of_all_times = global_var['snowflake'] %}
-          {%- else -%}
-              {%- if execute -%}
-                  {%- do exceptions.warn("Warning: You have set the global variable 'datavault4coalesce__beginning_of_all_times' to a dictionary, but have not included the adapter you use (snowflake) as a key. Applying the default value.") -%}
-              {% endif %}
-              {%- set beginning_of_all_times = "0001-01-01T00:00:01" -%}
-          {% endif %}
-      {%- elif global_var is not mapping and datavault4coalesce__is_something(global_var) -%}
-          {%- set beginning_of_all_times = global_var -%}
-      {%- else -%}
-          {%- set beginning_of_all_times = "0001-01-01T00:00:01" -%}
-      {%- endif -%}
-      
-      {{ return(beginning_of_all_times) }}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__end_of_all_times() %}
-      
-      {%- set global_var = var('datavault4coalesce__end_of_all_times', none) -%}
-      {%- set end_of_all_times = '' -%}
-      
-      {%- if global_var is mapping -%}
-          {%- if 'snowflake' in global_var.keys()|map('lower') -%}
-              {% set end_of_all_times = global_var['snowflake'] %}
-          {%- else -%}
-              {%- if execute -%}
-                  {%- do exceptions.warn("Warning: You have set the global variable 'datavault4coalesce__end_of_all_times' to a dictionary, but have not included the adapter you use (snowflake) as a key. Applying the default value.") -%}
-              {% endif %}
-              {%- set end_of_all_times = "8888-12-31T23:59:59" -%}
-          {% endif %}
-      {%- elif global_var is not mapping and datavault4coalesce__is_something(global_var) -%}
-          {%- set end_of_all_times = global_var -%}
-      {%- else -%}
-          {%- set end_of_all_times = "8888-12-31T23:59:59" -%}
-      {%- endif -%}
-      
-      {{ return(end_of_all_times) }}
-      
-      {%- endmacro -%}
+      {%- set datavault4coalesce = namespace(
+      
+           config = {
+           "ldts_alias": "ldts",
+           "rsrc_alias": "rsrc", 
+           "ledts_alias": "ledts", 
+           "snapshot_trigger_column": "is_active",
+           "sdts_alias": "sdts", 
+           "stg_alias": "stg", 
+           "is_current_col_alias": "IS_CURRENT", 
+           "hash": "MD5", 
+           "hash_datatype": "STRING", 
+           "hashkey_input_case_sensitive": "FALSE", 
+           "hashdiff_input_case_sensitive": "TRUE",
+           "copy_rsrc_ldts_input_columns": "false",  
+           "beginning_of_all_times": "0001-01-01T00:00:01", 
+           "end_of_all_times": "8888-12-31T23:59:59",
+           "timestamp_format": "YYYY-MM-DDTHH24:MI:SS", 
+           "default_unknown_rsrc": "SYSTEM", 
+           "default_error_rsrc": "ERROR", 
+           "rsrc_default_dtype": "STRING", 
+           "stg_default_dtype": "STRING", 
+           "derived_columns_default_dtype": "STRING",
+           "error_value__STRING": "'(error)'", 
+           "error_value_alt__STRING": "'e'", 
+           "unknown_value__STRING": "'(unknown)'",
+           "unknown_value_alt__STRING": "'u'"
+           }
+      
+      ) -%}
       
       
       {%- macro datavault4coalesce__string_to_timestamp(format, timestamp) -%}
@@ -460,236 +67,188 @@ macros:
       {%- endmacro -%}
       
       
-      {%- macro datavault4coalesce__timestamp_format() %}
+      {%- macro datavault4coalesce__is_expression(obj) -%}
       
-      {%- set global_var = var('datavault4coalesce__timestamp_format', none) -%}
-      {%- set timestamp_format = '' -%}
-      
-      {%- if global_var is mapping -%}
-          {%- if 'snowflake' in global_var.keys()|map('lower') -%}
-              {% set timestamp_format = global_var['snowflake'] %}
-          {%- else -%}
-              {%- if execute -%}
-                  {%- do exceptions.warn("Warning: You have set the global variable 'datavault4coalesce__timestamp_format' to a dictionary, but have not included the adapter you use (snowflake) as a key. Applying the default value.") -%}
-              {% endif %}
-              {%- set timestamp_format = "YYYY-MM-DDTHH24:MI:SS" -%}
-          {% endif %}
-      {%- elif global_var is not mapping and datavault4coalesce__is_something(global_var) -%}
-          {%- set timestamp_format = global_var -%}
-      {%- else -%}
-          {%- set timestamp_format = "YYYY-MM-DDTHH24:MI:SS" -%}
-      {%- endif -%}
-      
-      {{ return(timestamp_format) }}
+           {%- if obj is string -%}
+                {%- if (obj|first == "'" and obj|last == "'") or ("(" in obj and ")" in obj) or "::" in obj or "||" in obj -%}
+                     {{ true }}
+                {%- else -%}
+                     {{ false }}
+                {%- endif -%}
+           {%- else -%}
+                {{ false }}
+           {%- endif -%}
       
       {%- endmacro -%}
       
       
-      {%- macro datavault4coalesce__ghost_record_per_datatype(column_name, datatype, ghost_record_type, col_size) -%}
+      {%- macro datavault4coalesce__escape_column_name(column) -%}
       
-      {%- set beginning_of_all_times = datavault4coalesce__beginning_of_all_times() -%}
-      {%- set end_of_all_times = datavault4coalesce__end_of_all_times() -%}
-      {%- set timestamp_format = datavault4coalesce__timestamp_format() -%}
+           {%- set escape_char_left  = '"' -%}
+           {%- set escape_char_right = '"' -%}
       
-      {%- if ghost_record_type == 'unknown' -%}
-           {%- if datatype in ['TIMESTAMP_NTZ','TIMESTAMP'] %}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
-           {% elif datatype in ['STRING','VARCHAR'] %}'(unknown)' AS {{ column_name }}
-           {% elif datatype in ['NUMBER','INT','FLOAT','DECIMAL'] %}0 AS {{ column_name }}
+           {%- set escaped_column_name = escape_char_left ~ column|upper|replace(escape_char_left, '')|replace(escape_char_right, '')|trim ~ escape_char_right|indent(4) -%}
+      
+           {{ escaped_column_name }}
+      
+      {%- endmacro -%}
+      
+      
+      {%- macro datavault4coalesce__as_constant(column_str) -%}
+      
+           {%- if column_str is not none and column_str is string and column_str -%}
+                {%- if column_str|first == "!" -%}
+                     {{- "'" ~ column_str[1:] ~ "'" -}}
+                {%- else -%}
+                     {%- if datavault4coalesce__is_expression(column_str) -%}
+                          {{- column_str -}}
+                     {%- else -%}
+                          {{- datavault4coalesce__escape_column_names(column_str) -}}
+                     {%- endif -%}
+                {%- endif -%}
+           {%- endif -%}
+      {%- endmacro -%}
+      
+      
+      {%- macro datavault4coalesce__ghost_record_per_datatype(column_name, datatype, ghost_record_type, hash) -%}
+      
+      {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times -%}
+      {%- set end_of_all_times = datavault4coalesce.config.end_of_all_times -%}
+      {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
+      {%- set unknown_value__STRING = datavault4coalesce.config.unknown_value__STRING -%}
+      {%- set unknown_value_alt__STRING = datavault4coalesce.config.unknown_value_alt__STRING -%}
+      {%- set error_value__STRING = datavault4coalesce.config.error_value__STRING -%}
+      {%- set error_value_alt__STRING = datavault4coalesce.config.error_value_alt__STRING -%}
+      
+      {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
+      
+      {%- set hash_alg = datavault4coalesce__hash_algorithm() -%}
+      {%- set unknown_key = datavault4coalesce__unknown_key() -%}
+      {%- set error_key = datavault4coalesce__error_key() -%}
+      
+      {%- if hash %}
+      
+           {%- if ghost_record_type == 'unknown' -%}
+                {{ unknown_key }} as {{ column_name }}
+           {%- elif ghost_record_type == 'error' -%}
+                {{ error_key }} as {{ column_name }}
+           {% endif %}
+      
+      {% else %}
+      
+           {%- if ghost_record_type == 'unknown' -%}
+           {%- if datatype in ['TIMESTAMP_NTZ','TIMESTAMP', 'DATE'] -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
+           {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
+                {%- if datatype.upper().startswith('VARCHAR') and datatype[8:-1]|int >= unknown_value__STRING|length -%} {{unknown_value__STRING}} AS {{ column_name }}
+                {%- elif datatype.upper().startswith('STRING') -%} {{unknown_value__STRING}} AS {{ column_name }}
+                {% else %} {{unknown_value_alt__STRING}} AS {{ column_name }}
+                {% endif %}
+           {% elif datatype in ['NUMBER','INT','FLOAT','DECIMAL'] or datatype.upper().startswith('NUMBER') %}0 AS {{ column_name }}
            {% elif datatype == 'BOOLEAN' %}CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
            {% else %}NULL AS {{ column_name }}
            {% endif %}
-      {%- elif ghost_record_type == 'error' -%}
-           {%- if datatype in ['TIMESTAMP_NTZ','TIMESTAMP'] %}{{ datavault4coalesce__string_to_timestamp(timestamp_format, end_of_all_times) }} AS {{ column_name }}
-           {% elif datatype in ['STRING','VARCHAR'] %}'(error)' AS {{ column_name }}
-           {% elif datatype in ['NUMBER','INT','FLOAT','DECIMAL'] %}-1 AS {{ column_name }}
+           {%- elif ghost_record_type == 'error' -%}
+           {%- if datatype in ['TIMESTAMP_NTZ','TIMESTAMP', 'DATE'] -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, end_of_all_times) }} AS {{ column_name }}
+           {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
+                {%- if datatype.upper().startswith('VARCHAR') and datatype[8:-1]|int >= error_value__STRING|length -%} {{error_value__STRING}} AS {{ column_name }}
+                {%- elif datatype.upper().startswith('STRING') -%} {{error_value__STRING}} AS {{ column_name }}
+                {% else %} {{error_value_alt__STRING}} AS {{ column_name }}
+                {% endif %}
+           {% elif datatype in ['NUMBER','INT','FLOAT','DECIMAL'] or datatype.upper().startswith('NUMBER') %}-1 AS {{ column_name }}
            {% elif datatype == 'BOOLEAN' %}CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
            {% else %}NULL AS {{ column_name }}
-            {% endif %}
-      {%- else -%}
-          {%- if execute -%}
-           {{ exceptions.raise_compiler_error("Invalid Ghost Record Type. Accepted are 'unknown' and 'error'.") }}
-          {%- endif %}
+           {% endif %}
+           {%- endif -%}
+      
       {%- endif -%}
       
       {%- endmacro -%}
       
       
-      {%- macro datavault4coalesce__hash_default_values(hash_function, hash_datatype) -%}
+      {%- macro datavault4coalesce__hash_algorithm() -%}
       
-          {%- set dict_result = {} -%}
+           {%- set hash_function = datavault4coalesce.config.hash -%}
+           {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
       
-          {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
-              {%- set hash_alg = 'MD5' -%}
-              {%- set unknown_key = "00000000000000000000000000000000" -%}
-              {%- set error_key = "ffffffffffffffffffffffffffffffff" -%}
-          {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' -%} 
-              {%- if hash_datatype == 'STRING' -%}
-                  {%- set hash_alg = 'SHA1' -%}
-                  {%- set unknown_key = "0000000000000000000000000000000000000000" -%}
-                  {%- set error_key = "ffffffffffffffffffffffffffffffffffffffff" -%}
-              {%- elif hash_datatype == 'BINARY' -%}
-                  {%- set hash_alg = 'SHA1_BINARY' -%}
-                  {%- set unknown_key = "TO_BINARY(0000000000000000000000000000000000000000)" -%}
-                  {%- set error_key = "TO_BINARY(ffffffffffffffffffffffffffffffffffffffff)" -%}        
-              {%- endif -%}
-          {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' -%}
-              {%- if hash_datatype == 'STRING' -%}
-                  {%- set hash_alg = 'SHA2' -%}
-                  {%- set unknown_key = "0000000000000000000000000000000000000000000000000000000000000000" -%}
-                  {%- set error_key = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" -%}
-              {%- elif hash_datatype == 'BINARY' -%}
-                  {%- set hash_alg = 'SHA2_BINARY' -%}
-                  {%- set unknown_key = "TO_BINARY(0000000000000000000000000000000000000000000000000000000000000000)" -%}
-                  {%- set error_key = "TO_BINARY(ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)" -%}        
-              {%- endif -%}   
-          {%- endif -%}
+           {%- set dict_result = {} -%}
+           {%- set hash_alg = '' -%}
       
-          {%- do dict_result.update({"hash_alg": hash_alg, "unknown_key": unknown_key, "error_key": error_key }) -%}
+           {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
+                {%- set hash_alg = 'MD5' -%}
+           {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set hash_alg = 'SHA1' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set hash_alg = 'SHA1_BINARY' -%}       
+                {%- endif -%}
+           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' -%}
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set hash_alg = 'SHA2' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set hash_alg = 'SHA2_BINARY' -%}       
+                {%- endif -%}   
+           {%- endif -%}
       
-          {{ return(dict_result | tojson ) }}
+           {{ hash_alg }}
       
       {%- endmacro -%}
       
       
-      {%- macro datavault4coalesce__prefix(columns=none, prefix_str=none, alias_target='source') -%}
+      {%- macro datavault4coalesce__unknown_key() -%}
+           {%- set hash_function = datavault4coalesce.config.hash -%}
+           {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
       
-          {%- if columns and prefix_str -%}
+           {%- set dict_result = {} -%}
+           {%- set unknown_key = '' -%}
       
-              {%- for col in columns -%}
+           {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
+                {%- set unknown_key = '!00000000000000000000000000000000' -%}
+           {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set unknown_key = '!0000000000000000000000000000000000000000' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set unknown_key = "TO_BINARY('0000000000000000000000000000000000000000')" -%}     
+                {%- endif -%}
+           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' -%}
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set unknown_key = '!0000000000000000000000000000000000000000000000000000000000000000' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set unknown_key = "TO_BINARY('0000000000000000000000000000000000000000000000000000000000000000')" -%}  
+                {%- endif -%}   
+           {%- endif -%}
       
-                  {%- if col is mapping -%}
-      
-                      {%- if alias_target == 'source' -%}
-      
-                          {{- datavault4coalesce__prefix([col['source_column']], prefix_str) -}}
-      
-                      {%- elif alias_target == 'target' -%}
-      
-                          {{- datavault4coalesce__prefix([col['alias']], prefix_str) -}}
-      
-                      {%- else -%}
-      
-                          {{- datavault4coalesce__prefix([col['source_column']], prefix_str) -}}
-      
-                      {%- endif -%}
-      
-                      {%- if not loop.last -%} , {% endif %}
-      
-                  {%- else -%}
-      
-                      {%- if col is iterable and col is not string -%}
-      
-                          {{- datavault4coalesce__prefix(col, prefix_str) -}}
-      
-                      {%- elif col is not none -%}
-      
-                          {{- prefix_str}}.{{col.strip() -}}
-                      {% else %}
-      
-                          {%- if execute -%}
-                              {{- exceptions.raise_compiler_error("Unexpected or missing configuration for '" ~ this ~ "' Unable to prefix columns.") -}}
-                          {%- endif -%}
-                      {%- endif -%}
-      
-                      {{- ', ' if not loop.last -}}
-      
-                  {%- endif -%}
-      
-              {%- endfor -%}
-      
-          {%- else -%}
-      
-              {%- if execute -%}
-                  {{- exceptions.raise_compiler_error("Invalid parameters provided to prefix macro. Expected: (columns [list/string], prefix_str [string]) got: (" ~ columns ~ ", " ~ prefix_str ~ ")") -}}
-              {%- endif -%}
-          {%- endif -%}
+           {% set unknown_key = datavault4coalesce__as_constant(unknown_key) %}
+           {{ unknown_key }}
       
       {%- endmacro -%}
       
       
-      {%- macro datavault4coalesce__source_columns(source_relation=none) -%}
+      {%- macro datavault4coalesce__error_key() -%}
+           {%- set hash_function = datavault4coalesce.config.hash -%}
+           {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
       
-          {%- if source_relation -%}
-              {%- set source_model_cols = adapter.get_columns_in_relation(source_relation) -%}
+           {%- set dict_result = {} -%}
+           {%- set error_key = '' -%}
       
-              {%- set column_list = [] -%}
+           {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
+                {%- set error_key = '!ffffffffffffffffffffffffffffffff' -%}
+           {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set error_key = '!ffffffffffffffffffffffffffffffffffffffff' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set error_key = "TO_BINARY('ffffffffffffffffffffffffffffffffffffffff')" -%}        
+                {%- endif -%}
+           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' -%}
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set error_key = '!ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set error_key = "TO_BINARY('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')" -%}        
+                {%- endif -%}   
+           {%- endif -%}
       
-              {%- for source_col in source_model_cols -%}
-                  {%- do column_list.append(source_col.column) -%}
-              {%- endfor -%}
+           {% set error_key = datavault4coalesce__as_constant(error_key) %}
+           {{ error_key }}
       
-              {%- do return(column_list) -%}
-          {%- endif %}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__concat_ws(string_list, separator="||") -%}
-      
-          {{  "CONCAT_WS('" ~ separator ~ "', " ~ string_list | join(", ") ~ ")" }}
-      
-      {%- endmacro -%}
-      
-      
-      {%- macro datavault4coalesce__derive_columns(source_relation=none, columns=none) -%}
-      
-      {%- set exclude_columns = [] -%}
-      {%- set include_columns = [] -%}
-      {%- set src_columns = [] -%}
-      {%- set der_columns = [] -%}
-      
-      {%- set source_cols = datavault4coalesce__source_columns(source_relation=source_relation) -%}
-      
-      {%- if columns is mapping and columns is not none -%}
-      
-          {#- Add aliases of derived columns to exclude and full SQL to include -#}
-          {%- for col in columns -%}
-      
-              {%- if datavault4coalesce__is_list(columns[col]['value']) -%}
-                  {%- set column_list = [] -%}
-      
-                  {%- for concat_component in columns[col]['value'] -%}
-                      {%- set column_str = datavault4coalesce__as_constant(concat_component) -%}
-                      {%- do column_list.append(column_str) -%}
-                  {%- endfor -%}
-                  {%- set concat = datavault4coalesce__concat_ws(column_list, "||") -%}
-                  {%- set concat_string = concat ~ " AS " ~ datavault4coalesce__escape_column_names(col) -%}
-      
-                  {%- do der_columns.append(concat_string) -%}
-                  {%- set exclude_columns = exclude_columns + columns[col]['value'] -%}
-              {% else %}
-                  {%- set column_str = datavault4coalesce__as_constant(columns[col]['value']) -%}
-                  {%- do der_columns.append(column_str ~ " AS " ~ datavault4coalesce__escape_column_names(col)) -%}
-                  {%- do exclude_columns.append(col) -%}
-              {% endif %}
-      
-          {%- endfor -%}
-      
-          {#- Add all columns from source_model relation -#}
-          {%- if source_relation is defined and source_relation is not none -%}
-      
-              {%- for col in source_cols -%}
-                  {%- if col not in exclude_columns -%}
-                      {%- do src_columns.append(datavault4coalesce__escape_column_names(col)) -%}
-                  {%- endif -%}
-              {%- endfor -%}
-      
-          {%- endif -%}
-      
-          {#- Makes sure the columns are appended in a logical order. Source columns then derived columns -#}
-          {%- set include_columns = src_columns + der_columns -%}
-      
-              {#- Print out all columns in includes -#}
-              {%- for col in include_columns -%}
-                  {{- col | indent(4) -}}{{ ",\n" if not loop.last }}
-              {%- endfor -%}
-          {%- else -%}
-              {%- if execute -%}
-                  {{ exceptions.raise_compiler_error("Invalid column configuration:
-                  expected format: {'source_relation': Relation, 'columns': {column_name: column_value}}
-                  got: {'source_relation': " ~ source_relation ~ ", 'columns': " ~ columns ~ "}") }}
-              {%- endif %}
-          {%- endif %}
       {%- endmacro -%}
 packages:
   COALESCE-DATA_VAULT:
@@ -728,507 +287,728 @@ packages:
       commit: fcb60873d720b0641e2d837fece6af7043d76ea4
 projects: {}
 stepTypes:
-  StepType-1:
-    id: "1"
+  StepType-12:
+    id: "12"
     isDisabled: false
     metadata:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: New Type
-        short: NEW
-        tagColor: gray
-        plural: New Types
-      templates:
-        create:
-          templateString: ""
-        run:
-          templateString: ""
-    name: New Type
-    version: 1
-  StepType-2:
-    id: "2"
-    isDisabled: false
-    metadata:
-      defaultStorageLocation: null
-      error: null
-      nodeMetadataSpec: |-
-        capitalized: New Type
-        short: NEW
-        tagColor: gray
-        plural: New Types
-      templates:
-        create:
-          templateString: ""
-        run:
-          templateString: ""
-    name: New Type
-    version: 1
-  StepType-3:
-    id: "3"
-    isDisabled: false
-    metadata:
-      defaultStorageLocation: null
-      error: null
-      nodeMetadataSpec: |-
-        capitalized: New Type
-        short: NEW
-        tagColor: gray
-        plural: New Types
+        capitalized: 'DATAVAULT4COALESCE: PIT'
+        short: 'PIT'
+        tagColor: brown
+        plural: 'PITs'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'true'
+            options: 
+            - table
+            default: table
+         
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+          - type: multisourceToggle
+            default: true
+
+        - groupName: Data Vault
+          items:
+          - displayName: Dimension Key Column
+            type: columnSelector
+            attributeName: is_dimension_key
+            isRequired: true
+
+          - displayName: Clean Up PIT
+            type: toggleButton
+            attributeName: cleanup_pit
+            default: true
       templates:
         create:
           templateString: |-
-            {% if node.materializationType == 'view' %}
-            CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }} AS (
-
-            {% if (source_model is none) and execute %}
-
-                {%- set error_message -%}
-                Staging error: Missing source_model configuration. A source model name must be provided.
-                e.g.
-                [REF STYLE]
-                source_model: model_name
-                OR
-                [SOURCES STYLE]
-                source_model:
-                    source_name: source_table_name
-                {%- endset -%}
-
-                {{- exceptions.raise_compiler_error(error_message) -}}
-            {%- endif -%}
-
-            {#- Check for source format or ref format and create relation object from source_model -#}
-            {% if source_model is mapping and source_model is not none -%}
-
-                {%- set source_name = source_model | first -%}
-                {%- set source_table_name = source_model[source_name] -%}
-
-                {%- set source_relation = source(source_name, source_table_name) -%}
-                {%- set all_source_columns = datavault4dbt.source_columns(source_relation=source_relation) -%}
-
-            {%- elif source_model is not mapping and source_model is not none -%}
-
-                {%- set source_relation = ref(source_model) -%}
-                {%- set all_source_columns = datavault4dbt.source_columns(source_relation=source_relation) -%}
-            {%- else -%}
-                {%- set all_source_columns = [] -%}
-            {%- endif -%}
-
-
-            {# Setting the column name for load date timestamp and record source to the alias coming from the attributes #}
-            {%- set ldts_alias = var('datavault4dbt.ldts_alias', 'ldts') -%}
-            {%- set rsrc_alias = var('datavault4dbt.rsrc_alias', 'rsrc') -%}
-            {%- set copy_input_columns = var('datavault4dbt.copy_rsrc_ldts_input_columns', false) -%}
-            {%- set load_datetime_col_name = ldts_alias -%}
-            {%- set record_source_col_name = rsrc_alias -%}
-
-            {%- set ldts_rsrc_input_column_names = [] -%}
-            {%- if datavault4dbt.is_attribute(ldts) -%}
-              {%- if not copy_input_columns -%}
-                  {%- set ldts_rsrc_input_column_names = ldts_rsrc_input_column_names + [ldts]  -%}
-              {%- else -%}
-                
-                {%- if ldts|lower == ldts_alias|lower -%}
-                  {%- set ldts_rsrc_input_column_names = ldts_rsrc_input_column_names + [ldts]  -%}
-                {%- endif -%}
-
-              {%- endif %}
-
-            {%- endif -%}
-
-            {%- if datavault4dbt.is_attribute(rsrc) -%}
-
-              {%- if not copy_input_columns -%}
-                {%- set ldts_rsrc_input_column_names = ldts_rsrc_input_column_names + [rsrc] -%}
-              {%- else -%}
-              
-                {%- if rsrc|lower == rsrc_alias|lower -%}
-                  {%- set ldts_rsrc_input_column_names = ldts_rsrc_input_column_names + [rsrc] -%}
-                {%- endif -%}
-
-              {%- endif -%}
-
-            {%- endif %}
-
-            {%- if sequence is not none -%}
-              {%- set ldts_rsrc_input_column_names = ldts_rsrc_input_column_names + [sequence] -%}
-            {%- endif -%}
-
-            {%- set ldts = datavault4dbt.as_constant(ldts) -%}
-            {%- set rsrc = datavault4dbt.as_constant(rsrc) -%}
-
-            {# Getting the column names for all additional columns #}
-            {%- set derived_column_names = datavault4dbt.extract_column_names(derived_columns) -%}
-            {%- set hashed_column_names = datavault4dbt.extract_column_names(hashed_columns) -%}
-            {%- set prejoined_column_names = datavault4dbt.extract_column_names(prejoined_columns) -%}
-            {%- set missing_column_names = datavault4dbt.extract_column_names(missing_columns) -%}
-            {%- set exclude_column_names = derived_column_names + hashed_column_names + prejoined_column_names + missing_column_names + ldts_rsrc_input_column_names %}
-            {%- set source_and_derived_column_names = (all_source_columns + derived_column_names) | unique | list -%}
-            {%- set all_columns = adapter.get_columns_in_relation( source_relation ) -%}
-
-            {%- set columns_without_excluded_columns = [] -%}
-            {%- set final_columns_to_select = [] -%}
-
-
-            {%- if include_source_columns -%}
-              {%- set source_columns_to_select = datavault4dbt.process_columns_to_select(all_source_columns, exclude_column_names) | list -%}
-
-              {%- for column in all_columns -%}
-
-                {%- if column.name|lower not in exclude_column_names|map('lower') %}
-                  {%- do columns_without_excluded_columns.append(column) -%}
-                {%- endif -%}
-
-              {%- endfor -%}
-            {%- else -%}
-              
-              {# Include from the source only the input columns needed #}
-              {# Getting the input columns for the additional columns #}
-              {%- set derived_input_columns = datavault4dbt.extract_input_columns(derived_columns) -%}
-              {%- set hashed_input_columns = datavault4dbt.expand_column_list(datavault4dbt.extract_input_columns(hashed_columns)) -%}
-              {%- set hashed_input_columns = datavault4dbt.process_columns_to_select(hashed_input_columns, derived_column_names) -%}
-              {%- set hashed_input_columns = datavault4dbt.process_columns_to_select(hashed_input_columns, prejoined_column_names) -%}
-              {%- set hashed_input_columns = datavault4dbt.process_columns_to_select(hashed_input_columns, missing_column_names) -%}  {# Excluding the names of the missing columns. #}
-              {%- set prejoined_input_columns = datavault4dbt.extract_input_columns(prejoined_columns) -%}
-              {%- set only_include_from_source = (derived_input_columns + hashed_input_columns + prejoined_input_columns) | unique | list -%}
-              {%- set source_columns_to_select = only_include_from_source -%}
-
-            {%- endif-%}
-
-            {%- set final_columns_to_select = final_columns_to_select + source_columns_to_select -%}
-            {%- set derived_columns_to_select = datavault4dbt.process_columns_to_select(source_and_derived_column_names, hashed_column_names) | unique | list -%}
-
-            {%- if datavault4dbt.is_something(derived_columns) %}
-              {#- Getting Data types for derived columns with detection from source relation -#}
-              {%- set derived_columns_with_datatypes = datavault4dbt.derived_columns_datatypes(derived_columns, source_relation) -%}
-              {%- set derived_columns_with_datatypes_DICT = fromjson(derived_columns_with_datatypes) -%}
-            {%- endif -%}
-            {#- Select hashing algorithm -#}
-
-            {#- Setting unknown and error keys with default values for the selected hash algorithm -#}
-            {%- set hash = var('datavault4dbt.hash', 'MD5') -%}
-            {%- set hash_dtype = var('datavault4dbt.hash_datatype', 'STRING') -%}
-            {%- set hash_default_values = fromjson(datavault4dbt.hash_default_values(hash_function=hash,hash_datatype=hash_dtype)) -%}
-            {%- set hash_alg = hash_default_values['hash_alg'] -%}
-            {%- set unknown_key = hash_default_values['unknown_key'] -%}
-            {%- set error_key = hash_default_values['error_key'] -%}
-
-            {# Select timestamp and format variables #}
-            {%- set beginning_of_all_times = datavault4dbt.beginning_of_all_times() -%}
-            {%- set end_of_all_times = datavault4dbt.end_of_all_times() -%}
-            {%- set timestamp_format = datavault4dbt.timestamp_format() -%}
-
-            {# Setting the error/unknown value for the record source  for the ghost records#}
-            {% set error_value_rsrc = var('datavault4dbt.default_error_rsrc', 'ERROR') %}
-            {% set unknown_value_rsrc = var('datavault4dbt.default_unknown_rsrc', 'SYSTEM') %}
-
-            {# Setting the rsrc default datatype and length #}
-            {% set rsrc_default_dtype = var('datavault4dbt.rsrc_default_dtype', 'STRING') %}
-
-            WITH
-
-            {# Selecting everything that we need from the source relation. #}
-            source_data AS (
-                SELECT
-
-                {{- "\n\n    " ~ datavault4dbt.print_list(datavault4dbt.escape_column_names(all_source_columns)) if all_source_columns else " *" }}
-
-              FROM {{ source_relation }}
-
-              {% set last_cte = "source_data" -%}
-            ),
-
-
-            {% set alias_columns = [load_datetime_col_name, record_source_col_name] %}
-
-            {# Selecting all columns from the source data, renaming load date and record source to global aliases #}
-            ldts_rsrc_data AS (
-
-              SELECT
-                {{ ldts }} AS {{ load_datetime_col_name}},
-                CAST( {{ rsrc }} as {{ rsrc_default_dtype }} ) AS {{ record_source_col_name }}
-                {%- if sequence is not none %},
-                  {{ sequence }} AS edwSequence
-                  {%- set alias_columns = alias_columns + ['edwSequence'] -%}
-                {% endif -%}
-
-                {%- if source_columns_to_select is not none and source_columns_to_select | length > 0 %},
-                  {{ datavault4dbt.print_list(datavault4dbt.escape_column_names(source_columns_to_select)) }}
-                {% endif -%}
-                {{"\n"}}
-              FROM {{ last_cte }}
-
-              {%- set last_cte = "ldts_rsrc_data" -%}
-              {%- set final_columns_to_select = alias_columns + final_columns_to_select  %}
-            ),
-
-            {%- if datavault4dbt.is_something(missing_columns) %}
-
-            {# Filling missing columns with NULL values for schema changes #}
-            missing_columns AS (
-
-              SELECT
-
-              {% if final_columns_to_select | length > 0 -%}
-                {{ datavault4dbt.print_list(datavault4dbt.escape_column_names(final_columns_to_select)) }},
-              {%- endif %}
-              {%- for col, dtype in missing_columns.items() %}
-                CAST(NULL as {{ dtype }}) as {{ col }}{% if not loop.last %},{% endif -%}
-
-              {% endfor %}
-
-              FROM {{ last_cte }}
-              {%- set last_cte = "missing_columns" -%}
-              {%- set final_columns_to_select = final_columns_to_select + missing_column_names %}
-            ),
-            {%- endif -%}
-
-            {%- if datavault4dbt.is_something(prejoined_columns) %}
-            {# Prejoining Business Keys of other source objects for Link purposes #}
-            prejoined_columns AS (
-
-              SELECT
-              {% if final_columns_to_select | length > 0 -%}
-                {{ datavault4dbt.print_list(datavault4dbt.prefix(columns=datavault4dbt.escape_column_names(final_columns_to_select), prefix_str='lcte').split(',')) }}
-              {% endif %}
-              {%- for col, vals in prejoined_columns.items() -%}
-                ,pj_{{loop.index}}.{{ vals['bk'] }} AS {{ col }}
-              {% endfor -%}
-
-              FROM {{ last_cte }} lcte
-
-              {%- for col, vals in prejoined_columns.items() %}
-                left join {{ source(vals['src_name']|string, vals['src_table']) }} as pj_{{loop.index}} on lcte.{{ vals['this_column_name'] }} = pj_{{loop.index}}.{{ vals['ref_column_name'] }}
-              {% endfor %}
-
-              {% set last_cte = "prejoined_columns" -%}
-              {%- set final_columns_to_select = final_columns_to_select + prejoined_column_names %}
-            ),
-            {%- endif -%}
-
-
-            {%- if datavault4dbt.is_something(derived_columns) %}
-            {# Adding derived columns to the selection #}
-            derived_columns AS (
-
-              SELECT
-              {% if final_columns_to_select | length > 0 -%}
-                {{ datavault4dbt.print_list(datavault4dbt.escape_column_names(final_columns_to_select)) }},
-              {% endif %}
-              {{ datavault4dbt.derive_columns(columns=derived_columns) | indent(4) }}
-
-              FROM {{ last_cte }}
-              {%- set last_cte = "derived_columns" -%}
-              {%- set final_columns_to_select = final_columns_to_select + derived_column_names %}
-            ),
-            {%- endif -%}
-
-            {%- if datavault4dbt.is_something(hashed_columns) and hashed_columns is mapping %}
-            {# Generating Hashed Columns (hashkeys and hashdiffs for Hubs/Links/Satellites) #}
-            {% if datavault4dbt.is_something(multi_active_config) %}
-
-            hashed_columns AS (
-
-                SELECT
-
-                {{ datavault4dbt.print_list(datavault4dbt.escape_column_names(final_columns_to_select)) }},
-
-                {% set processed_hash_columns = datavault4dbt.process_hash_column_excludes(hashed_columns) -%}
-                {{- datavault4dbt.hash_columns(columns=processed_hash_columns, multi_active_key=multi_active_config['multi_active_key'], main_hashkey_column=multi_active_config['main_hashkey_column']) | indent(4) }}
-
-                FROM {{ last_cte }}
-                {%- set last_cte = "hashed_columns" -%}
-                {%- set final_columns_to_select = final_columns_to_select + hashed_column_names %}
-
-            ),
-
-            {% else %}
-
-            {# Hash calculation for single-active source data. #}
-            hashed_columns AS (
-
-                SELECT
-
-                {% if final_columns_to_select | length > 0 -%}
-                  {{ datavault4dbt.print_list(datavault4dbt.escape_column_names(final_columns_to_select)) }},
-                {% endif %}
-
-                {%- set processed_hash_columns = datavault4dbt.process_hash_column_excludes(hashed_columns) -%}
-                {{ datavault4dbt.hash_columns(columns=processed_hash_columns) | indent(4) }}
-
-                FROM {{ last_cte }}
-                {%- set last_cte = "hashed_columns" -%}
-                {%- set final_columns_to_select = final_columns_to_select + hashed_column_names %}
-              
-            ),
-
-            {%- endif -%}
-            {%- endif -%}
-
-            {# Creating Ghost Record for unknown case, based on datatype #}
-            unknown_values AS (
-              
-                SELECT
-
-                {{ datavault4dbt.string_to_timestamp(timestamp_format, beginning_of_all_times) }} as {{ load_datetime_col_name }},
-                '{{ unknown_value_rsrc }}' as {{ record_source_col_name }}
-
-                {%- if columns_without_excluded_columns is defined and columns_without_excluded_columns| length > 0 -%},
-                {# Generating Ghost Records for all source columns, except the ldts, rsrc & edwSequence column #}
-                  {%- for column in columns_without_excluded_columns %}
-                    {{ datavault4dbt.ghost_record_per_datatype(column_name=column.name, datatype=column.dtype, ghost_record_type='unknown') }}
-                    {%- if not loop.last %},{% endif -%}
-                  {%- endfor -%}
-
-                {%- endif -%}
-
-                {%- if datavault4dbt.is_something(missing_columns) -%},
-                {# Additionally generating ghost record for missing columns #}
-                  {%- for col, dtype in missing_columns.items() %}
-                    {{ datavault4dbt.ghost_record_per_datatype(column_name=col, datatype=dtype, ghost_record_type='unknown') }}
-                    {%- if not loop.last %},{% endif -%}
-                  {%- endfor -%}
-                {%- endif -%}
-
-                {%- if datavault4dbt.is_something(prejoined_columns) -%},
-                {# Additionally generating ghost records for the prejoined attributes#}
-                  {% for col, vals in prejoined_columns.items() %}
-
-                    {%- set pj_relation_columns = adapter.get_columns_in_relation( source(vals['src_name']|string, vals['src_table']) ) -%}
-
-                      {% for column in pj_relation_columns -%}
-
-                        {% if column.name|lower == vals['bk']|lower -%}
-                          {{ datavault4dbt.ghost_record_per_datatype(column_name=col, datatype=column.dtype, ghost_record_type='unknown') }}
-                        {%- endif -%}
-
-                      {%- endfor -%}
-                      {%- if not loop.last %},{% endif %}
-                    {% endfor -%}
-                {%- endif %}
-
-                {%- if datavault4dbt.is_something(derived_columns) -%},
-                {# Additionally generating Ghost Records for Derived Columns #}
-                  {%- for column_name, properties in derived_columns_with_datatypes_DICT.items() %}
-                    {{ datavault4dbt.ghost_record_per_datatype(column_name=column_name, datatype=properties.datatype, ghost_record_type='unknown') }}
-                    {%- if not loop.last %},{% endif -%}
-                  {%- endfor -%}
-
-                {%- endif -%}
-
-                {%- if datavault4dbt.is_something(processed_hash_columns) -%},
-
-                  {%- for hash_column in processed_hash_columns %}
-                    CAST('{{ unknown_key }}' as {{ hash_dtype }}) as {{ hash_column }}
-                    {%- if not loop.last %},{% endif %}
-                  {%- endfor -%}
-
-                {%- endif -%}
-                {{-"\n"-}}
-            ),
-
-            {# Creating Ghost Record for error case, based on datatype #}
-            error_values AS (
-
-                SELECT
-
-                {{ datavault4dbt.string_to_timestamp(timestamp_format , end_of_all_times) }} as {{ load_datetime_col_name }},
-                '{{ error_value_rsrc }}' as {{ record_source_col_name }}
-
-                {%- if columns_without_excluded_columns is defined and columns_without_excluded_columns| length > 0 -%},
-                {# Generating Ghost Records for Source Columns #}
-                  {%- for column in columns_without_excluded_columns %}
-                    {{ datavault4dbt.ghost_record_per_datatype(column_name=column.name, datatype=column.dtype, ghost_record_type='error') }}
-                    {%- if not loop.last %},{% endif -%}
-                  {%- endfor -%}
-
-                {%- endif -%}
-
-                {%- if datavault4dbt.is_something(missing_columns) -%},
-                {# Additionally generating ghost record for Missing columns #}
-                  {%- for col, dtype in missing_columns.items() %}
-                    {{ datavault4dbt.ghost_record_per_datatype(column_name=col, datatype=dtype, ghost_record_type='error') }}
-                    {%- if not loop.last %},{% endif -%}
-                  {%- endfor -%}
-                {%- endif -%}
-
-                {%- if datavault4dbt.is_something(prejoined_columns) -%},
-                {# Additionally generating ghost records for the prejoined attributes #}
-                  {%- for col, vals in prejoined_columns.items() %}
-
-                    {%- set pj_relation_columns = adapter.get_columns_in_relation( source(vals['src_name']|string, vals['src_table']) ) -%}
-
-                    {% for column in pj_relation_columns -%}
-                      {% if column.name|lower == vals['bk']|lower -%}
-                        {{ datavault4dbt.ghost_record_per_datatype(column_name=col, datatype=column.dtype, ghost_record_type='error') -}}
-                      {%- endif -%}
-                    {%- endfor -%}
-                      {%- if not loop.last -%},{%- endif %}
-                  {% endfor -%}
-
-                {%- endif -%}
-
-                {%- if datavault4dbt.is_something(derived_columns) %},
-                {# Additionally generating Ghost Records for Derived Columns #}
-                  {%- for column_name, properties in derived_columns_with_datatypes_DICT.items() %}
-                    {{ datavault4dbt.ghost_record_per_datatype(column_name=column_name, datatype=properties.datatype, ghost_record_type='error') }}
-                    {%- if not loop.last %},{% endif %}
-                  {%- endfor -%}
-
-                {%- endif -%}
-
-                {%- if datavault4dbt.is_something(processed_hash_columns) -%},
-
-                  {%- for hash_column in processed_hash_columns %}
-                    CAST('{{ error_key }}' as {{ hash_dtype }}) as {{ hash_column }}
-                    {%- if not loop.last %},{% endif %}
-                  {%- endfor -%}
-
-                {%- endif -%}
-                {{- "\n" -}}
-            ),
-
-            {# Combining all previous ghost record calculations to two rows with the same width as regular entries #}
-            ghost_records AS (
-                SELECT * FROM unknown_values
-                UNION ALL
-                SELECT * FROM error_values
-            ),
-
-            {%- if not include_source_columns -%}
-              {% set final_columns_to_select = datavault4dbt.process_columns_to_select(columns_list=final_columns_to_select, exclude_columns_list=source_columns_to_select) %}
-            {%- endif -%}
-
-            {# Combining the two ghost records with the regular data #}
-            columns_to_select AS (
-
-                SELECT
-
-                {{ datavault4dbt.print_list(datavault4dbt.escape_column_names(final_columns_to_select)) }}
-
-                FROM {{ last_cte }}
-
-                UNION ALL
-                
-                SELECT
-
-                {{ datavault4dbt.print_list(datavault4dbt.escape_column_names(final_columns_to_select)) }}
-
-                FROM ghost_records
+            {{ stage('Create PIT Table') }}
+            
+            {%- set ns = namespace(sdts_datatype = '') %}
+            
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in sources[0].columns %}
+                    {% if col.sourceColumns[0].column.is_Hub_hk or col.sourceColumns[0].column.is_Hub_hk or col.sourceColumns[0].column.is_Hub_ldts or col.sourceColumns[0].column.is_Link_ldts %}
+                        {{ col.name }} {{ col.dataType }}
+                    {% elif col.name == datavault4coalesce.config.sdts_alias %}
+                        {{ datavault4coalesce.config.sdts_alias }} {{ col.dataType }}
+                    {% else %}
+                        {{ col.sourceColumns[0].node.name }}_{{ col.name }} {{ col.dataType }}
+                    {% endif %}
+                    {% if not loop.last %} , {% endif %}
+                {% endfor %}
             )
-
-            SELECT * FROM columns_to_select
-
-            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+            	{{ stage('Pre-SQL') }}
+            	{{ config.preSQL }}
             {% endif %}
+            
+            {{ stage('Insert New Rows') }}
+            
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            WITH records_to_insert AS (
+            	SELECT
+            	{% for col in sources[0].columns -%}
+            		{%- if col.sourceColumns[0].column.is_hk -%}
+            			COALESCE({{ col.sourceColumns[0].node.name }}."{{ col.name }}", {{ datavault4coalesce.config.unknown_value__STRING }}) AS "{{ col.sourceColumns[0].node.name }}_{{ col.name }}"
+            		{%- elif col.sourceColumns[0].column.is_ldts -%}
+            			COALESCE({{ col.sourceColumns[0].node.name }}."{{ col.name }}", {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}) AS "{{ col.sourceColumns[0].node.name }}_{{ col.name }}"
+            		{%- elif col.name == datavault4coalesce.config.sdts_alias -%}
+            			{{ col.sourceColumns[0].node.name }}."{{ col.name }}" AS "{{ col.name }}"
+            		{%- else -%}
+            			{{ col.sourceColumns[0].node.name }}."{{ col.name }}" AS "{{ col.sourceColumns[0].node.name }}_{{ col.name }}"
+            		{%- endif %}
+            
+            		{%- if not loop.last -%} , {% endif %}
+                {% endfor %}
+            
+            	FROM "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ sources[0].dependencies[0].node.name }}" {{ sources[0].dependencies[0].node.name }}
+            
+            	{% for col in sources[0].columns -%}
+            		{%- if col.name == datavault4coalesce.config.sdts_alias -%}
+            			JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" {{ col.sourceColumns[0].node.name }}
+            			ON {{ col.sourceColumns[0].node.name }}."{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
+            		{%- endif -%}
+            	{% endfor %}
+            
+            	{%- for col in sources[0].columns -%}
+            		{%- if col.sourceColumns[0].column.is_hk and not loop.first -%}
+            			LEFT JOIN "{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}" {{ col.sourceColumns[0].node.name }}
+            			ON {{ sources[0].dependencies[0].node.name }}."{{ col.name }}" = {{ col.sourceColumns[0].node.name }}."{{ col.name }}"
+            			{% for sdts_col in sources[0].columns %}
+            				{%- if sdts_col.name == "sdts" -%}
+            					AND {{ sdts_col.sourceColumns[0].node.name }}."{{ sdts_col.name}}" BETWEEN {{ col.sourceColumns[0].node.name }}."{{ datavault4coalesce.config.ldts_alias }}" and {{ col.sourceColumns[0].node.name }}."{{ datavault4coalesce.config.ledts_alias }}"
+            				{%- endif -%}
+            			{%- endfor -%}
+            		{% endif %}
+            	{% endfor -%}
+            )
+            
+            SELECT * FROM records_to_insert
+            WHERE "{{ datavault4coalesce.config.sdts_alias }}" NOT IN 
+            (
+            	SELECT {{ datavault4coalesce.config.sdts_alias }} FROM 
+            	{{ ref_no_link(node.location.name, node.name) }}
+            )
+            
+            
+            {% if config.cleanup_pit %}
+            
+            {{ stage('Clean up PIT') }}
+            
+            	DELETE FROM {{ ref_no_link(node.location.name, node.name) }}
+            	WHERE {{ datavault4coalesce.config.sdts_alias }} NOT IN (
+            		SELECT "{{ datavault4coalesce.config.sdts_alias }}" FROM 
+            			{% for col in sources[0].columns %}
+            				{%- if col.name == datavault4coalesce.config.sdts_alias -%}
+            					"{{ storageLocations[0].database }}"."{{ sources[0].dependencies[0].node.location.name }}"."{{ col.sourceColumns[0].node.name }}"
+            				{%- endif -%}
+            			{%- endfor %}
+            		WHERE "{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
+            		)
+            {% endif %}
+            
+            {% if config.postSQL %}
+            	{{ stage('Post-SQL') }}
+            	{{ config.postSQL }}
+            {% endif %}
+    name: "Datavault4Coalesce: PIT"
+    version: 1
+  StepType-13:
+    id: "13"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Snapshot v0
+        short: 'Snapshot_v0'
+        plural: 'Snapshots'
+        tagColor: 'green'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+        - groupName: Data Vault
+          items:
+          - displayName: Snapshot Start Date (yyyy-mm-dd)
+            type: textBox
+            attributeName: input_snapshot_start_date
+            isRequired: true
+
+          - displayName: Snapshot End Date (yyyy-mm-dd)
+            type: textBox
+            attributeName: input_snapshot_end_date
+            isRequired: true
+
+          - displayName: Daily Snapshot Time (hh:mm:ss)
+            type: textBox
+            attributeName: input_daily_snapshot_time
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+
+        systemColumns:
+        - displayName: sdts
+          transform: ""
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: system_sdts
+
+        - displayName: force_active
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_force_active
+
+        - displayName: replacement_sdts
+          transform: ""
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: system_replacement_sdts
+
+        - displayName: "caption"
+          transform: ""
+          dataType: STRING
+          placement: end
+          attributeName: system_caption
+
+        - displayName: "is_hourly"
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_hourly
+
+        - displayName: "is_daily"
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_daily
+
+        - displayName: "is_beginning_of_week"
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_beginning_of_week
+
+        - displayName: "is_beginning_of_month"
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_beginning_of_month
+
+        - displayName: "is_beginning_of_quarter"
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_beginning_of_quarter
+
+        - displayName: "is_beginning_of_year"
+          transform: ""
+          dataType: BOOLEAN
+          placement: end
+          attributeName: system_is_beginning_of_year
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Snapshot v0 Table') }}
+
+            	CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            	(
+            		{% for col in columns %}
+            			"{{ col.name }}" {{ col.dataType }}
+            			{%- if not col.nullable %} NOT NULL
+            				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            			{% endif %}
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            	)
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
           templateString: |-
-            {% if node.materializationType == 'view' %}
-            CREATE OR REPLACE VIEW 
-    name: Datavault4Coalesce - Stage
+            {{ stage('Insert New Rows') }}
+            
+            {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
+            {%- set start_date = config.input_snapshot_start_date -%}
+            {%- set end_date = config.input_snapshot_end_date -%}
+            {%- set daily_snapshot_time = config.input_daily_snapshot_time -%}
+            
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            
+            WITH "date_base" AS (
+                SELECT
+                    "sdts" as "{{ datavault4coalesce.config.sdts_alias }}",
+                    TRUE as "force_active",
+                    "sdts" AS "replacement_sdts",
+                    CONCAT('Snapshot ', DATE("sdts")) AS "caption",
+                    CASE
+                        WHEN EXTRACT(MINUTE FROM "sdts") = 0 AND EXTRACT(SECOND FROM "sdts") = 0 THEN TRUE
+                        ELSE FALSE
+                    END AS "is_hourly",
+                    CASE
+                        WHEN EXTRACT(MINUTE FROM "sdts") = 0 AND EXTRACT(SECOND FROM "sdts") = 0 THEN TRUE
+                        ELSE FALSE
+                    END AS "is_daily",
+                    CASE
+                        WHEN EXTRACT(DAYOFWEEK FROM  "sdts") = 1 THEN TRUE
+                        ELSE FALSE
+                    END AS "is_beginning_of_week",
+                    CASE
+                        WHEN EXTRACT(DAY FROM "sdts") = 1 THEN TRUE
+                        ELSE FALSE
+                    END AS "is_beginning_of_month",
+                    CASE
+                        WHEN EXTRACT(DAY FROM "sdts") = 1 AND EXTRACT(MONTH FROM "sdts") in (1, 4, 7, 10) THEN TRUE
+                        ELSE FALSE
+                    END AS "is_beginning_of_quarter",  
+                    CASE
+                        WHEN EXTRACT(DAY FROM "sdts") = 1 AND EXTRACT(MONTH FROM "sdts") = 1 THEN TRUE
+                        ELSE FALSE
+                    END AS "is_beginning_of_year"
+                FROM 
+                (
+                    SELECT
+                        DATEADD(DAY, SEQ4(), 
+                        TIMESTAMPADD(SECOND, EXTRACT(SECOND FROM TO_TIME('{{ daily_snapshot_time }}')), 
+                        TIMESTAMPADD(MINUTE, EXTRACT(MINUTE FROM TO_TIME('{{ daily_snapshot_time }}')), 
+                        TIMESTAMPADD(HOUR, EXTRACT(HOUR FROM TO_TIME('{{ daily_snapshot_time }}')), TO_DATE('{{ start_date }}', 'YYYY-MM-DD')))
+                        ))::TIMESTAMP AS "sdts"
+                    FROM 
+                        TABLE(GENERATOR(ROWCOUNT => 100000))
+                    WHERE 
+                        "sdts" <= TO_DATE('{{ end_date }}', 'YYYY-MM-DD')
+                ) 
+            ),
+            
+            "records_to_insert" AS (
+            
+                SELECT 
+                    "date_base".*
+                FROM "date_base"
+                LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} "tgt"
+                    ON "date_base"."{{ datavault4coalesce.config.sdts_alias }}" = "tgt"."{{ datavault4coalesce.config.sdts_alias }}"
+                WHERE "tgt"."{{ datavault4coalesce.config.sdts_alias }}" IS NULL
+            
+            )
+            
+            SELECT * FROM "records_to_insert"
+            
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+    name: "Datavault4Coalesce: Snapshot v0"
     version: 1
-  StepType-4:
-    id: "4"
+  StepType-14:
+    id: "14"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Snapshot v1
+        short: 'Snapshot_v1'
+        plural: 'Snapshots'
+        tagColor: 'green'
+
+        config:
+
+        - groupName: Use Logarithmic Logic
+          items:
+          - displayName: Use Logarithmic Logic
+            type: toggleButton
+            attributeName: use_logarithmic_logic
+            enableIf: 'true'
+            isRequired: true
+            default: true
+
+        - groupName: Daily Snapshot Logic
+          enableIf: "{{ config.use_logarithmic_logic }}"
+          items:
+          - displayName: Keep Daily Snapshots forever
+            type: toggleButton
+            attributeName: daily_snapshots_forever
+            enableIf: "{{ config.use_logarithmic_logic }}"
+            isRequired: true
+            default: false
+
+          - displayName: Duration
+            type: textBox
+            attributeName: daily_snapshot_duration
+            enableIf: "{% if not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: "30"
+
+          - displayName: Time Unit
+            type: dropdownSelector
+            attributeName: daily_snapshot_unit
+            enableIf: "{% if not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: DAY
+            options:
+            - DAY
+            - WEEK
+            - MONTH
+            - QUARTER
+            - YEAR
+            
+        - groupName: Weekly Snapshot Logic
+          enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+          items:
+          - displayName: Keep Weekly Snapshots forever
+            type: toggleButton
+            attributeName: weekly_snapshots_forever
+            enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: false
+
+          - displayName: Duration
+            type: textBox
+            attributeName: weekly_snapshot_duration
+            enableIf: "{% if not config.weekly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: "1"
+
+          - displayName: Time Unit
+            type: dropdownSelector
+            attributeName: weekly_snapshot_unit
+            enableIf: "{% if not config.weekly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}" 
+            isRequired: true
+            default: "YEAR"
+            options:
+            - DAY
+            - WEEK
+            - MONTH
+            - QUARTER
+            - YEAR   
+
+        - groupName: Monthly Snapshot Logic
+          enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+          items:
+          - displayName: Keep Monthly Snapshots forever
+            type: toggleButton
+            attributeName: monthly_snapshots_forever
+            enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: false
+
+          - displayName: Duration
+            type: textBox
+            attributeName: monthly_snapshot_duration
+            enableIf: "{% if not config.monthly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: "5"
+
+          - displayName: Time Unit
+            type: dropdownSelector
+            attributeName: monthly_snapshot_unit
+            enableIf: "{% if not config.monthly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: YEAR
+            options:
+            - DAY
+            - WEEK
+            - MONTH
+            - QUARTER
+            - YEAR
+
+        - groupName: Quarterly Snapshot Logic
+          enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever and not config.monthly_snapshots_forever %} true {% else %} false {% endif %}"
+          items:
+          - displayName: Keep Quarterly Snapshots forever
+            type: toggleButton
+            attributeName: quarterly_snapshots_forever
+            enableIf: "{% if config.use_logarithmic_logic and not config.daily_snapshots_forever and not config.monthly_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: false
+
+          - displayName: Duration
+            type: textBox
+            attributeName: quarterly_snapshot_duration
+            enableIf: "{% if not config.quarterly_snapshots_forever and not config.daily_snapshots_forever and not config.monthly_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: "5"
+
+          - displayName: Time Unit
+            type: dropdownSelector
+            attributeName: quarterly_snapshot_unit
+            enableIf: "{% if not config.quarterly_snapshots_forever and not config.daily_snapshots_forever and not config.monthly_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: YEAR
+            options:
+            - DAY
+            - WEEK
+            - MONTH
+            - QUARTER
+            - YEAR
+            
+        - groupName: Yearly Snapshot Logic
+          enableIf: "{% if config.use_logarithmic_logic and not config.quarterly_snapshots_forever and not config.monthly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+          items:
+          - displayName: Keep Yearly Snapshots forever
+            type: toggleButton
+            attributeName: yearly_snapshots_forever
+            enableIf: "{% if config.use_logarithmic_logic and not config.quarterly_snapshots_forever and not config.monthly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: false
+
+          - displayName: Duration
+            type: textBox
+            attributeName: yearly_snapshot_duration
+            enableIf: "{% if not config.yearly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}"
+            isRequired: true
+            default: "10"
+
+          - displayName: Time Unit
+            type: dropdownSelector
+            attributeName: yearly_snapshot_unit
+            enableIf: "{% if not config.yearly_snapshots_forever and not config.daily_snapshots_forever %} true {% else %} false {% endif %}" 
+            isRequired: true
+            default: YEAR
+            options:
+            - DAY
+            - WEEK
+            - MONTH
+            - QUARTER
+            - YEAR  
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Snapshot v1 View') }}
+            
+            {% if config.use_logarithmic_logic %}
+                {%-set log_logic = {
+                'daily':        {'duration': config.daily_snapshot_duration|int,
+                                'unit': '{{config.daily_snapshot_unit}}',
+                                'forever': '{{config.daily_snapshots_forever}}'},
+                'weekly':       {'duration': config.weekly_snapshot_duration|int,
+                                'unit': '{{config.weekly_snapshot_unit}}',
+                                'forever': '{{config.weekly_snapshots_forever}}'},
+                'monthly':      {'duration': config.monthly_snapshot_duration|int,
+                                'unit': '{{config.monthly_snapshot_unit}}',
+                                'forever': '{{config.monthly_snapshots_forever}}'},
+                'quarterly':    {'duration': config.quarterly_snapshot_duration|int,
+                                'unit': '{{config.quarterly_snapshot_unit}}',
+                                'forever': '{{config.quarterly_snapshots_forever}}'},
+                'yearly':       {'duration': config.yearly_snapshot_duration|int,
+                                'unit': '{{config.yearly_snapshot_unit}}',
+                                'forever': '{{config.yearly_snapshots_forever}}'},
+                    } 
+                %}
+            {% else %}
+                {% set log_logic = none %}
+            {% endif %}
+            
+            {% set sdts_alias = datavault4coalesce.config.sdts_alias %}
+            {% set ns = namespace(forever_status=FALSE) %}
+            {% set snapshot_trigger_column = 'is_active' %}
+            
+            
+            CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+            		"{{ col.name }}"
+            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            		{%- if not loop.last -%}, {% endif %}
+            	{% endfor %}
+            )
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            
+            AS
+            WITH latest_row AS (
+            
+                SELECT
+                    "{{ sdts_alias }}"
+                FROM {{ ref(sources[0].columns[0].sourceColumns[0].node.location.name, sources[0].columns[0].sourceColumns[0].node.name) }}
+                WHERE DATE("{{ sdts_alias }}") = DATE(GETDATE())
+                ORDER BY "{{ sdts_alias }}" DESC
+                LIMIT 1
+            
+            ), 
+            
+            virtual_logic AS (
+                
+                SELECT
+                    c."{{ sdts_alias }}",
+                    c."replacement_sdts",
+                    c."force_active",
+                    {%- if log_logic is none %}
+                    TRUE AS {{ snapshot_trigger_column }},
+                    {%- else %}
+                    CASE 
+                        WHEN
+                        {% if 'daily' in log_logic.keys() %}
+                            {%- if log_logic['daily']['forever'] is true -%}
+                                {%- set ns.forever_status = 'TRUE' -%}
+                              (1=1)
+                            {%- else %}
+                                {%- set daily_duration = log_logic['daily']['duration'] -%}
+                                {%- set daily_unit = log_logic['daily']['unit'] -%}
+                              (DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ daily_duration }} {{ daily_unit }}' AND CURRENT_DATE())
+                            {%- endif -%}   
+                        {%- endif %}
+            
+                        {%- if 'weekly' in log_logic.keys() %} OR 
+                            {%- if log_logic['weekly']['forever'] is true -%}
+                                {%- set ns.forever_status = 'TRUE' -%}
+                          (c."is_beginning_of_week" = TRUE)
+                            {%- else %} 
+                                {%- set weekly_duration = log_logic['weekly']['duration'] -%}
+                                {%- set weekly_unit = log_logic['weekly']['unit'] %}            
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ weekly_duration }} {{ weekly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_week" = TRUE))
+                            {%- endif -%}
+                        {% endif -%}
+            
+                        {%- if 'monthly' in log_logic.keys() %} OR
+                            {%- if log_logic['monthly']['forever'] is true -%}
+                                {%- set ns.forever_status = 'TRUE' %}
+                          (c."is_beginning_of_month" = TRUE)
+                            {%- else %}
+                                {%- set monthly_duration = log_logic['monthly']['duration'] -%}
+                                {%- set monthly_unit = log_logic['monthly']['unit'] %}            
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ monthly_duration }} {{ monthly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_month" = TRUE))
+                            {%- endif -%}
+                        {% endif -%}
+            
+                        {%- if 'quarterly' in log_logic.keys() %} OR
+                            {%- if log_logic['quarterly']['forever'] is true -%}
+                                {%- set ns.forever_status = 'TRUE' %}
+                          (c."is_beginning_of_quarter" = TRUE)
+                            {%- else %}
+                                {%- set quarterly_duration = log_logic['quarterly']['duration'] -%}
+                                {%- set quarterly_unit = log_logic['quarterly']['unit'] %}            
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ quarterly_duration }} {{ quarterly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_quarter" = TRUE))
+                            {%- endif -%}
+                        {% endif -%}
+            
+                        {%- if 'yearly' in log_logic.keys() %} OR 
+                            {%- if log_logic['yearly']['forever'] is true -%}
+                                {%- set ns.forever_status = 'TRUE' %}
+                          (c."is_beginning_of_year" = TRUE)
+                            {%- else %}
+                                {%- set yearly_duration = log_logic['yearly']['duration'] -%}
+                                {%- set yearly_unit = log_logic['yearly']['unit'] %}                    
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ yearly_duration }} {{ yearly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_year" = TRUE))
+                            {%- endif -%}
+                        {% endif %}
+                        THEN TRUE
+                        ELSE FALSE
+                    END AS {{ snapshot_trigger_column }},
+                    {%- endif %}
+            
+                    CASE
+                        WHEN l."{{ sdts_alias }}" IS NULL THEN FALSE
+                        ELSE TRUE
+                    END AS "is_latest",
+            
+                    c."caption",
+                    c."is_hourly",
+                    c."is_daily",
+                    c."is_beginning_of_week",
+                    c."is_beginning_of_month",
+                    c."is_beginning_of_quarter",
+                    c."is_beginning_of_year",
+                    CASE
+                        WHEN EXTRACT(YEAR FROM c."{{ sdts_alias }}") = EXTRACT(YEAR FROM CURRENT_DATE()) THEN TRUE
+                        ELSE FALSE
+                    END AS "is_current_year",
+                    CASE
+                        WHEN EXTRACT(YEAR FROM c."{{ sdts_alias }}") = EXTRACT(YEAR FROM CURRENT_DATE())-1 THEN TRUE
+                        ELSE FALSE
+                    END AS "is_last_year",
+                    CASE
+                        WHEN DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN (CURRENT_DATE() - INTERVAL '1 YEAR') AND CURRENT_DATE() THEN TRUE
+                        ELSE FALSE
+                    END AS "is_rolling_year",
+                    CASE
+                        WHEN DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN (CURRENT_DATE() - INTERVAL '2 YEAR') AND (CURRENT_DATE() - INTERVAL '1 YEAR') THEN TRUE
+                        ELSE FALSE
+                    END AS "is_last_rolling_year"
+                FROM {{ ref(sources[0].columns[0].sourceColumns[0].node.location.name, sources[0].columns[0].sourceColumns[0].node.name) }} c
+                LEFT JOIN latest_row l
+                ON c."{{ sdts_alias }}" = l."{{ sdts_alias }}"
+                WHERE c."{{ sdts_alias }}" < GETDATE()
+            ),
+            
+            active_logic_combined AS (
+            
+                SELECT 
+                    "{{ sdts_alias }}",
+                    "force_active",
+                    "replacement_sdts",
+                    CASE
+                        WHEN "force_active" AND {{ snapshot_trigger_column }} THEN TRUE
+                        WHEN NOT "force_active" OR NOT {{ snapshot_trigger_column }} THEN FALSE
+                    END AS "{{ snapshot_trigger_column }}",
+                    "is_latest", 
+                    "caption",
+                    "is_hourly",
+                    "is_daily",
+                    "is_beginning_of_week",
+                    "is_beginning_of_month",
+                    "is_beginning_of_quarter",
+                    "is_beginning_of_year",
+                    "is_current_year",
+                    "is_last_year",
+                    "is_rolling_year",
+                    "is_last_rolling_year"
+                FROM virtual_logic
+                ORDER BY "{{ sdts_alias }}" DESC
+            )
+            
+            SELECT * FROM active_logic_combined
+        run:
+          templateString: ""
+    name: "Datavault4Coalesce: Snapshot v1"
+    version: 1
+  StepType-15:
+    id: "15"
     isDisabled: false
     metadata:
       defaultStorageLocation: null
@@ -1304,11 +1084,11 @@ stepTypes:
             			{%- if not col.nullable %} NOT NULL
             				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
             			{% endif %}
-            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             			{%- if not loop.last -%}, {% endif %}
             		{% endfor %}
             	)
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
 
 
             {% elif node.materializationType == 'view' %}
@@ -1318,11 +1098,11 @@ stepTypes:
                 (
                     {% for col in columns %}
                         "{{ col.name }}"
-                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
                         {%- if not loop.last -%}, {% endif %}
                     {% endfor %}
                 )
-                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
                 AS
                 {% for source in sources %}
                     SELECT
@@ -1430,7 +1210,726 @@ stepTypes:
             		{% endfor %}
             	{% endfor %}
             {% endif %}
+    name: Copy of Stage
+    version: 1
+  StepType-4:
+    id: "4"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Copy of Stage
+        short: STG
+        plural: Stages
+        tagColor: '#2EB67D'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            default: view
+            options:
+            - view
+            isRequired: true
+            enableIf: "false"
+
+          - type: multisourceToggle
+            enableIf: "{% if node.materializationType == 'table' %} true {% else %} false {% endif %}" 
+
+          - type: overrideSQLToggle
+            enableIf: "{% if node.materializationType == 'view' %} true {% else %} false {% endif %}"
+            
+          - displayName: Multi Source Strategy
+            attributeName: insertStrategy
+            type: dropdownSelector
+            default: INSERT
+            options:
+            - "INSERT"
+            - "UNION"
+            - "UNION ALL"
+            isRequired: true
+            enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
+
+          - displayName: Truncate Before
+            attributeName: truncateBefore
+            type: toggleButton
+            default: true
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+            
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            syntax: sql
+            isRequired: false
+
+        - groupName: Data Vault
+          items:
+          - displayName: Generate Ghost Records
+            attributeName: generate_ghost_records
+            type: toggleButton
+            default: true
+      templates:
+        create:
+          templateString: |-
+            {% if node.override.create.enabled %}
+            	
+            	{{ node.override.create.script }}
+
+            {% elif node.materializationType == 'table' %}
+            	{{ stage('Create Stage Table') }}
+
+            	CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            	(
+            		{% for col in columns %}
+            			"{{ col.name }}" {{ col.dataType }}
+            			{%- if not col.nullable %} NOT NULL
+            				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            			{% endif %}
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            	)
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+
+            {% elif node.materializationType == 'view' %}
+                {{ stage('Create Stage View') }}
+
+                CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+                (
+                    {% for col in columns %}
+                        {%- if col.is_rsrc_column -%}
+                            "{{datavault4coalesce.config.rsrc_alias}}"
+                        {%- elif col.is_ldts_column -%}
+                            "{{datavault4coalesce.config.ldts_alias}}"
+                        {% else %}
+                            "{{ col.name }}"
+                        {% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                )
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                AS
+                {% for source in sources %}
+                    SELECT
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+
+                    {% if not loop.last %}
+                        {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
+                            {{ config.insertStrategy }}
+                        {% else %}
+                            UNION
+                        {% endif %}
+                    {% endif %}
+
+                    {%- if config.generate_ghost_records -%}
+
+                        UNION ALL 
+
+                        SELECT
+
+                        {% for source in sources %}
+                            {% for col in source.columns %}
+                                {%- if "hashDetails" in col.keys() %}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true) }}
+                                {%- else -%}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=false) }}
+                                {%- endif -%}
+                            {% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        {% endfor %}
+
+                        UNION ALL 
+
+                        SELECT
+
+                        {% for source in sources %}
+                            {% for col in source.columns %}
+                                {%- if "hashDetails" in col.keys() %}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true) }}
+                                {%- else -%}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=false) }}
+                                {%- endif -%}
+                            {% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        {% endfor %}
+
+                    {%- endif -%}
+
+                {% endfor %}
+
+            {% endif %}
+        run:
+          templateString: |2
+
+                {% for test in node.tests if config.testsEnabled %}
+                    {% if test.runOrder == 'Before' %}
+                        {{ test_stage(test.name, test.continueOnFailure) }}
+                        {{ test.templateString }}
+                    {% endif %}
+                {% endfor %}
+
+            {% if node.materializationType == 'table' %}
+            	{% if config.preSQL %}
+            		{{ stage('Pre-SQL') }}
+            		{{ config.preSQL }}
+            	{% endif %}
+            	
+            	
+            	
+            		{% if config.truncateBefore %}
+            	
+            			{{ stage('Truncate Stage Table') }}
+            			TRUNCATE IF EXISTS {{ ref_no_link(node.location.name, node.name) }}
+            	
+            		{% endif %}
+            	
+            	
+            		{% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
+            			{{ stage( config.insertStrategy + ' Sources' | string ) }}
+            			INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            				(
+            					{% for col in columns %}
+            						"{{ col.name }}"
+            						{%- if not loop.last -%},{% endif %}
+            					{% endfor %}
+            				)
+            		{% endif %}
+            	
+            	
+            		{% for source in sources %}
+            	
+            			{% if config.insertStrategy == 'INSERT' %}
+            				{{ stage('Insert ' + source.name | string ) }}
+            	
+            				INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            				(
+            					{% for col in source.columns %}
+            						"{{ col.name }}"
+            						{%- if not loop.last -%},{% endif %}
+            					{% endfor %}
+            				)
+            			{% endif %}
+            	
+            			SELECT
+            			{% for col in source.columns %}
+                            {{ get_source_transform(col) }} AS "{{ col.name }}"
+            				{%- if not loop.last -%}, {% endif %}
+            			{% endfor %}
+            	
+            			{{ source.join }}
+            	
+            			{% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+            				{{config.insertStrategy}}
+            			{% endif %}
+            	
+            		{% endfor %}
+            	
+            	{% if config.postSQL %}
+            		{{ stage('Post-SQL') }}
+            		{{ config.postSQL }}
+            	{% endif %}
+            {% endif %}
+
+            {% if config.testsEnabled %}
+            	{% for test in node.tests %}
+            		{% if test.runOrder == 'After' %}
+            			{{ test_stage(test.name, test.continueOnFailure) }}
+            			{{ test.templateString }}
+                    {% endif %}
+            	{% endfor %}
+
+            	{% for column in columns %}
+            		{% for test in column.tests %}
+            			{{ test_stage(column.name + ": " + test.name) }}
+            			{{ test.templateString }}
+            		{% endfor %}
+            	{% endfor %}
+            {% endif %}
     name: "Datavault4Coalesce: Stage"
+    version: 1
+  StepType-6:
+    id: "6"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT4COALESCE: HUB'
+        short: 'HUB'
+        tagColor: purple
+        plural: 'DATAVAULT4COALESCE: HUBS'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'true'
+            options: 
+            - table
+            default: table
+         
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+          - type: multisourceToggle
+
+        - groupName: Data Vault
+          items:
+
+          - displayName: Hub Hashkey Column
+            type: columnSelector
+            attributeName: is_Hub_hk
+            isRequired: true
+
+          - displayName: Hub Businesskey Column
+            type: columnSelector
+            attributeName: is_Hub_bk
+            isRequired: true
+
+          - displayName: Hub LoadDateTimestamp Column
+            type: columnSelector
+            attributeName: is_Hub_ldts
+            isRequired: true
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Hub Table') }}
+            
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+            	{% for col in columns %}
+            		"{{ col.name }}" {{ col.dataType }}
+            		{%- if not col.nullable %} NOT NULL
+            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            		{% endif %}
+            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            		{%- if not loop.last -%}, {% endif %}
+            	{% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+            	{{ stage('Pre-SQL') }}
+            	{{ config.preSQL }}
+            {% endif %}
+            
+            {% for source in sources %}
+            
+            	{{ stage('Merge Hub - ' ~ source.name) }}
+            	MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
+            	(
+            		SELECT DISTINCT
+            		{% for col in source.columns %}
+            			{{ get_source_transform(col) }} AS "{{ col.name }}"
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            
+            		{{ source.join }}
+            
+            	)
+            	AS "SRC"
+            	ON
+            	{% for col in sources[0].columns if (col.is_Hub_hk) -%}
+            		{% if not loop.first %}
+            			AND
+            		{% endif %}
+            		"SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+            	{% endfor %}
+            	WHEN NOT MATCHED THEN
+            	INSERT
+            	(
+            		{% for col in columns %}
+            			"{{ col.name }}"
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            	) VALUES
+            	(
+            		{% for col in columns %}
+            			"SRC"."{{ col.name }}"
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+            	)
+            
+            {% endfor %}
+            
+            {% if config.postSQL %}
+            	{{ stage('Post-SQL') }}
+            	{{ config.postSQL }}
+            {% endif %}
+    name: "Datavault4Coalesce: Hub"
+    version: 1
+  StepType-7:
+    id: "7"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT4COALESCE: LINK'
+        short: 'LINK'
+        tagColor: '#CA2287'
+        plural: 'DATAVAULT4COALESCE: LINKS'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Insert Strategy
+            attributeName: insertStrategy
+            type: dropdownSelector
+            default: UNION
+            options:
+            - "UNION"
+            - "UNION ALL"
+            isRequired: true
+
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+            
+          - type: multisourcetoggle
+          
+        - groupName: Data Vault
+          items:
+          - displayName: Link Hashkey Column
+            type: columnSelector
+            attributeName: is_Link_hk
+            isRequired: true 
+
+          - displayName: Link LoadDateTimestamp Column
+            type: columnSelector
+            attributeName: is_Link_ldts
+            isRequired: true
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Link Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                    "{{ col.name }}" {{ col.dataType }}
+                    {%- if not col.nullable %} NOT NULL
+                        {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                    {% endif %}
+                    {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+
+            {% endif %}
+
+            {% for source in sources %}
+                        
+                {{ stage('Merge Link - ' ~ source.name) }}
+                MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
+                (
+                    SELECT DISTINCT
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+
+                    {% if not loop.last %}
+                        {{ config.insertStrategy }}
+                    {% endif %}
+                )
+                AS "SRC"
+                ON
+                {% for col in sources[0].columns if (col.isLinkHash) -%}
+                    {% if not loop.first %}
+                        AND
+                    {% endif %}
+                    "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+                {% endfor %}
+                WHEN NOT MATCHED THEN
+                INSERT
+                (
+                    {% for col in columns %}
+                        "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+                ) VALUES
+                (
+                    {% for col in columns %}
+                        "SRC"."{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+                )
+
+            {% endfor %}
+
+            {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}    
+            {% endif %}
+    name: "Datavault4Coalesce: Link"
+    version: 1
+  StepType-8:
+    id: "8"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Satellite v0
+        short: 'SAT_v0'
+        plural: 'Satellites'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+        - groupName: Data Vault
+          items:
+          - displayName: Hashkey Column
+            type: columnSelector
+            attributeName: is_hk
+            isRequired: true
+
+          - displayName: Hashdiff Column
+            type: columnSelector
+            attributeName: is_hd
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+      templates:
+        create:
+          templateString: |
+            {{ stage('Create Satellite Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+            	{% for col in columns %}
+            		"{{ col.name }}" {{ col.dataType }}
+            		{%- if not col.nullable %} NOT NULL
+            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+            		{% endif %}
+            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            		{%- if not loop.last -%}, {% endif %}
+            	{% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+            	{{ stage('Pre-SQL') }}
+            	{{ config.preSQL }}
+            {% endif %}
+
+            {{ stage('Insert New Rows') }}
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            WITH latest_entries_in_sat AS (
+            	/* get current rows from satellite */
+            	{% for col in columns if col.is_hk or col.is_hd %}
+            		{%- if loop.first -%}SELECT {% endif %} 
+            		"{{col.name}}"
+            		{%- if not loop.last -%}, {% endif %}
+            		{%- if loop.last %} 
+            			FROM {{ ref_no_link(node.location.name, node.name) }} 
+            			QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
+            		{% endif %}
+            	{% endfor %}
+            ),
+
+            deduplicated_numbered_source AS (
+                
+                {% for source in sources %}
+
+                    SELECT
+            		{% for col in source.columns %}
+            			{{ get_source_transform(col) }} AS {{ col.name }},
+            		{% endfor %}
+                    ROW_NUMBER() OVER(PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
+                    
+                    {{ source.join }}
+                    QUALIFY
+                    CASE
+                        WHEN "{{ get_value_by_column_attribute("is_hd") }}" = LAG("{{ get_value_by_column_attribute("is_hd") }}") OVER(PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
+                        ELSE TRUE
+                    END
+
+                {% endfor %}
+
+            )
+
+            	{% for source in sources %}
+            		SELECT DISTINCT
+            		{% for col in source.columns %}
+            			{{ col.name }}
+            			{%- if not loop.last -%}, {% endif %}
+            		{% endfor %}
+
+            		FROM deduplicated_numbered_source
+            	WHERE NOT EXISTS (
+            		SELECT 1 FROM latest_entries_in_sat
+            		WHERE 
+            		{% for col in source.columns if col.is_hk or col.is_hd %}
+            			{% if not loop.first %}
+            				AND
+            			{% endif %}
+            			deduplicated_numbered_source.{{ col.name }} = latest_entries_in_sat."{{ col.name }}"
+            		{% endfor %}
+                    AND deduplicated_numbered_source.rn = 1
+            	)
+
+            	{% endfor %}
+
+            {% if config.postSQL %}
+            	{{ stage('Post-SQL') }}
+            	{{ config.postSQL }}
+            {% endif %}
+    name: "Datavault4Coalesce: Satellite v0"
+    version: 1
+  StepType-9:
+    id: "9"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Satellite v1
+        short: 'SAT_v1'
+        plural: 'Satellites'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'true'
+            default: view
+            options:
+            - view
+
+        - groupName: Data Vault
+          items:
+          - displayName: Hashkey Column
+            type: columnSelector
+            attributeName: is_hk
+            isRequired: true
+
+          - displayName: LDTS Column
+            type: columnSelector
+            attributeName: is_ldts
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "ledts"
+          transform: COALESCE(LEAD("{{ get_value_by_column_attribute("is_ldts") }}" - INTERVAL '1 MICROSECOND') OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ get_value_by_column_attribute("is_ldts") }}"),{{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: is_system_ledts
+        - displayName: "is_current"
+          transform: CASE WHEN LEAD("{{ get_value_by_column_attribute("is_ldts") }}" - INTERVAL '1 MICROSECOND') OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ get_value_by_column_attribute("is_ldts") }}") IS NULL THEN TRUE ELSE FALSE END
+          dataType: BOOLEAN
+          placement: end
+          attributeName: is_system_current_col
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Satellite View') }}
+
+            CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                   "{{ col.name }}"
+            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+            )
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+            AS
+            {% for source in sources %}
+                SELECT
+                {% for col in source.columns %}
+                    {{ get_source_transform(col) }} AS "{{ col.name }}"
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+                {{ source.join }}
+            {% endfor %}
+        run:
+          templateString: ""
+    name: "Datavault4Coalesce: Satellite v1"
     version: 1
   StepType-COALESCE-DATA_VAULT::1:
     id: COALESCE-DATA_VAULT::1
@@ -1523,13 +2022,10 @@ stepTypes:
 
             		{{ source.join }}
 
-            		{% if not loop.last %}
-            			{{ config.insertStrategy }}
-            		{% endif %}
             	)
             	AS "SRC"
             	ON
-            	{% for col in sources[0].columns if (col.isHubHash) -%}
+            	{% for col in sources[0].columns if (col.is_Hub_hk) -%}
             		{% if not loop.first %}
             			AND
             		{% endif %}
@@ -2385,11 +2881,11 @@ stepTypes:
             			{%- if not col.nullable %} NOT NULL
             				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
             			{% endif %}
-            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             			{%- if not loop.last -%}, {% endif %}
             		{% endfor %}
             	)
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
 
 
             {% elif node.materializationType == 'view' %}
@@ -2399,11 +2895,11 @@ stepTypes:
             	(
             		{% for col in columns %}
             			"{{ col.name }}"
-            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             			{%- if not loop.last -%},{% endif %}
             		{% endfor %}
             	)
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
             	AS
             	{% for source in sources %}
 
@@ -2790,11 +3286,11 @@ stepTypes:
                             {%- if not col.nullable %} NOT NULL
                                 {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
                             {% endif %}
-                            {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                            {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
                             {%- if not loop.last -%}, {% endif %}
                         {% endfor %}
                     )
-                    {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                    {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
                 
                 
                 {% elif node.materializationType == 'view' %}
@@ -2804,11 +3300,11 @@ stepTypes:
                     (
                         {% for col in columns %}
                             "{{ col.name }}"
-                            {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                            {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
                             {%- if not loop.last -%},{% endif %}
                         {% endfor %}
                     )
-                    {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                    {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
                     AS
                     {% for source in sources %}
                 
@@ -3016,11 +3512,11 @@ stepTypes:
             						{%- if not col.nullable %} NOT NULL
             							{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
             						{% endif %}
-            						{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            						{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             						{%- if not loop.last -%}, {% endif %}
             					{% endfor %}
             				)
-            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
             			
             			{% endif %}
         run:
@@ -3182,11 +3678,11 @@ stepTypes:
             						{%- if not col.nullable %} NOT NULL
             							{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
             						{% endif %}
-            						{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            						{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             						{%- if not loop.last -%}, {% endif %}
             					{% endfor %}
             				)
-            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
             			
             			{% endif %}
         run:
@@ -3347,11 +3843,11 @@ stepTypes:
             						{%- if not col.nullable %} NOT NULL
             							{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
             						{% endif %}
-            						{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            						{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             						{%- if not loop.last -%}, {% endif %}
             					{% endfor %}
             				)
-            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
             			
             			{% endif %}
         run:
@@ -3537,11 +4033,11 @@ stepTypes:
             			{%- if not col.nullable %} NOT NULL
             				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
             			{% endif %}
-            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            			{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             			{%- if not loop.last -%}, {% endif %}
             		{% endfor %}
             	)
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
 
 
             {% elif node.materializationType == 'view' %}
@@ -3551,11 +4047,11 @@ stepTypes:
                 (
                     {% for col in columns %}
                         "{{ col.name }}"
-                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
                         {%- if not loop.last -%}, {% endif %}
                     {% endfor %}
                 )
-                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
                 AS
                 {% for source in sources %}
                     SELECT
@@ -3717,11 +4213,11 @@ stepTypes:
                 (
                     {% for col in columns %}
                         "{{ col.name }}"
-                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
                         {%- if not loop.last -%}, {% endif %}
                     {% endfor %}
                 )
-                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
                 AS
                 {% for source in sources %}
                     SELECT {% if config.selectDistinct %} DISTINCT {% endif %}
@@ -3852,11 +4348,11 @@ stepTypes:
                         {%- if not col.nullable %} NOT NULL
                             {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
                         {% endif %}
-                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
                         {%- if not loop.last -%}, {% endif %}
                     {% endfor %}
                 )
-                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
 
 
             {% elif node.materializationType == 'view' %}
@@ -3866,11 +4362,11 @@ stepTypes:
                 (
                     {% for col in columns %}
                         "{{ col.name }}"
-                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
                         {%- if not loop.last -%},{% endif %}
                     {% endfor %}
                 )
-                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
                 AS
                 {% for source in sources %}
 
@@ -4257,4 +4753,10 @@ subgraphs:
       - "107"
       - "113"
       - "114"
+      - "118"
+  Subgraph-4:
+    id: 4
+    name: New Sub-Graph
+    steps:
+      - "118"
 version: 1

@@ -1,0 +1,194 @@
+steps:
+  SAT_ORDERS_v0-158:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 3040
+              stepCounter: "158"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_order_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2590
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3041
+              stepCounter: "158"
+            config:
+              is_hd: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hd_order_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2591
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3033
+              stepCounter: "158"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERSTATUS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2583
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3034
+              stepCounter: "158"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_TOTALPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2584
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3035
+              stepCounter: "158"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2585
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3036
+              stepCounter: "158"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2586
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3037
+              stepCounter: "158"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_CLERK
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2587
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3038
+              stepCounter: "158"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_SHIPPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2588
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3039
+              stepCounter: "158"
+            dataType: VARCHAR(79)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_COMMENT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2589
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3042
+              stepCounter: "158"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2593
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 3043
+              stepCounter: "158"
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2594
+                    stepCounter: "118"
+                transform: TO_TIMESTAMP('2015-02-01T00:00:00', 'YYYY-MM-DDTHH24:MI:SS')
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_ORDERS1
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS1') }} "STG_ORDERS1"
+            name: SAT_ORDERS_v0
+            noLinkRefs: []
+      name: SAT_ORDERS_v0
+      overrideSQL: false
+      schema: ""
+      sqlType: "8"
+      type: sql
+    stepCounter: "158"

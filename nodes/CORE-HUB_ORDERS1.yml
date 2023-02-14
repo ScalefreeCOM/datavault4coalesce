@@ -1,0 +1,100 @@
+steps:
+  HUB_ORDERS1-119:
+    operation:
+      config:
+        is_incrementalLoading: true
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 2604
+              stepCounter: "119"
+            config:
+              is_Hub_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_order_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2590
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2595
+              stepCounter: "119"
+            config:
+              is_Hub_bk: true
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2581
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2607
+              stepCounter: "119"
+            config:
+              is_Hub_ldts: true
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2594
+                    stepCounter: "118"
+                transform: ""
+          - columnReference:
+              columnCounter: 2606
+              stepCounter: "119"
+            config:
+              is_Hub_rsrc: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 2593
+                    stepCounter: "118"
+                transform: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_ORDERS1
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS1') }} "STG_ORDERS1"
+            name: HUB_ORDERS1
+            noLinkRefs: []
+      name: HUB_ORDERS1
+      overrideSQL: false
+      schema: ""
+      sqlType: "6"
+      type: sql
+    stepCounter: "119"

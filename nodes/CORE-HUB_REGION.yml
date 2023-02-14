@@ -9,7 +9,7 @@ steps:
       deployEnabled: true
       description: ""
       isDataVault: false
-      isMultisource: false
+      isMultisource: true
       locationID: ""
       locationName: CORE
       materializationType: table
@@ -32,6 +32,8 @@ steps:
                   - columnCounter: 2183
                     stepCounter: "64"
                 transform: ""
+              - columnReferences: []
+                transform: ""
           - columnReference:
               columnCounter: 2334
               stepCounter: "96"
@@ -45,6 +47,10 @@ steps:
               - columnReferences:
                   - columnCounter: 2180
                     stepCounter: "64"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 2564
+                    stepCounter: "115"
                 transform: ""
           - acceptedValues:
               strictMatch: true
@@ -62,6 +68,8 @@ steps:
             name: LOAD_DATE
             nullable: true
             sourceColumnReferences:
+              - columnReferences: []
+                transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
               - columnReferences: []
                 transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
           - acceptedValues:
@@ -82,7 +90,8 @@ steps:
             sourceColumnReferences:
               - columnReferences: []
                 transform: "'SAMPLE_DATA.REGION'"
-        cteString: ""
+              - columnReferences: []
+                transform: "'SAMPLE_DATA.REGION'"
         enabledColumnTestIDs: []
         sourceMapping:
           - customSQL:
@@ -93,6 +102,13 @@ steps:
             join:
               joinCondition: FROM {{ ref('CORE', 'STG_REGION') }} "STG_REGION"
             name: HUB_REGION
+            noLinkRefs: []
+          - customSQL:
+              customSQL: ""
+            dependencies: []
+            join:
+              joinCondition: ""
+            name: NEW_SOURCE
             noLinkRefs: []
       name: HUB_REGION
       overrideSQL: false

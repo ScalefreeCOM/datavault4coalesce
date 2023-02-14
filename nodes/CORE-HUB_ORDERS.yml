@@ -9,7 +9,7 @@ steps:
       deployEnabled: true
       description: ""
       isDataVault: false
-      isMultisource: false
+      isMultisource: true
       locationID: ""
       locationName: CORE
       materializationType: table
@@ -27,11 +27,7 @@ steps:
             hashDetails: null
             name: hk_h_order
             nullable: true
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 2078
-                    stepCounter: "39"
-                transform: ""
+            sourceColumnReferences: []
           - columnReference:
               columnCounter: 2293
               stepCounter: "93"
@@ -41,11 +37,7 @@ steps:
             hashDetails: null
             name: O_ORDERKEY
             nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 2069
-                    stepCounter: "39"
-                transform: ""
+            sourceColumnReferences: []
           - acceptedValues:
               strictMatch: true
               values: []
@@ -61,9 +53,7 @@ steps:
             isSystemCreateDate: true
             name: LOAD_DATE
             nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+            sourceColumnReferences: []
           - acceptedValues:
               strictMatch: true
               values: []
@@ -79,21 +69,9 @@ steps:
             isSystemRecordSource: true
             name: RECORD_SOURCE
             nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: "'SAMPLE_DATA.ORDERS'"
-        cteString: ""
+            sourceColumnReferences: []
         enabledColumnTestIDs: []
-        sourceMapping:
-          - customSQL:
-              customSQL: ""
-            dependencies:
-              - locationName: CORE
-                nodeName: STG_ORDERS
-            join:
-              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS') }} "STG_ORDERS"
-            name: HUB_ORDERS
-            noLinkRefs: []
+        sourceMapping: []
       name: HUB_ORDERS
       overrideSQL: false
       schema: ""

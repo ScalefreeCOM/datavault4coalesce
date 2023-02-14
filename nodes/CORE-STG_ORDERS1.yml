@@ -1,8 +1,14 @@
 steps:
-  STG_ORDERS-39:
+  STG_ORDERS1-118:
     operation:
       config:
+        generate_ghost_records: true
         insertStrategy: INSERT
+        ldts: "8888-12-31T23:59:59"
+        m_ldts_cs_tb: ColumnSelector
+        m_ldts_tb: ""
+        m_rsrc_cs_tb: ColumnSelector
+        m_rsrc_tb: ""
         postSQL: ""
         preSQL: ""
         testsEnabled: true
@@ -20,8 +26,9 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 2069
-              stepCounter: "39"
+              columnCounter: 2581
+              stepCounter: "118"
+            config: {}
             dataType: NUMBER(38,0)
             description: ""
             name: O_ORDERKEY
@@ -32,8 +39,9 @@ steps:
                     stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 2070
-              stepCounter: "39"
+              columnCounter: 2582
+              stepCounter: "118"
+            config: {}
             dataType: NUMBER(38,0)
             description: ""
             name: O_CUSTKEY
@@ -44,8 +52,9 @@ steps:
                     stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 2071
-              stepCounter: "39"
+              columnCounter: 2583
+              stepCounter: "118"
+            config: {}
             dataType: VARCHAR(1)
             description: ""
             name: O_ORDERSTATUS
@@ -56,8 +65,9 @@ steps:
                     stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 2072
-              stepCounter: "39"
+              columnCounter: 2584
+              stepCounter: "118"
+            config: {}
             dataType: NUMBER(12,2)
             description: ""
             name: O_TOTALPRICE
@@ -68,8 +78,8 @@ steps:
                     stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 2073
-              stepCounter: "39"
+              columnCounter: 2585
+              stepCounter: "118"
             dataType: DATE
             description: ""
             name: O_ORDERDATE
@@ -80,8 +90,8 @@ steps:
                     stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 2074
-              stepCounter: "39"
+              columnCounter: 2586
+              stepCounter: "118"
             dataType: VARCHAR(15)
             description: ""
             name: O_ORDERPRIORITY
@@ -92,8 +102,8 @@ steps:
                     stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 2075
-              stepCounter: "39"
+              columnCounter: 2587
+              stepCounter: "118"
             dataType: VARCHAR(15)
             description: ""
             name: O_CLERK
@@ -104,8 +114,8 @@ steps:
                     stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 2076
-              stepCounter: "39"
+              columnCounter: 2588
+              stepCounter: "118"
             dataType: NUMBER(38,0)
             description: ""
             name: O_SHIPPRIORITY
@@ -116,8 +126,9 @@ steps:
                     stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 2077
-              stepCounter: "39"
+              columnCounter: 2589
+              stepCounter: "118"
+            config: {}
             dataType: VARCHAR(79)
             description: ""
             name: O_COMMENT
@@ -132,8 +143,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 2078
-              stepCounter: "39"
+              columnCounter: 2590
+              stepCounter: "118"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -141,9 +152,9 @@ steps:
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 2069
-                stepCounter: "39"
-            name: hk_h_order
+              - columnCounter: 2581
+                stepCounter: "118"
+            name: hk_order_h
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -153,8 +164,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 2081
-              stepCounter: "39"
+              columnCounter: 2591
+              stepCounter: "118"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -162,21 +173,21 @@ steps:
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 2071
-                stepCounter: "39"
-              - columnCounter: 2072
-                stepCounter: "39"
-              - columnCounter: 2073
-                stepCounter: "39"
-              - columnCounter: 2074
-                stepCounter: "39"
-              - columnCounter: 2075
-                stepCounter: "39"
-              - columnCounter: 2076
-                stepCounter: "39"
-              - columnCounter: 2077
-                stepCounter: "39"
-            name: hd_order_n_s
+              - columnCounter: 2583
+                stepCounter: "118"
+              - columnCounter: 2584
+                stepCounter: "118"
+              - columnCounter: 2585
+                stepCounter: "118"
+              - columnCounter: 2586
+                stepCounter: "118"
+              - columnCounter: 2587
+                stepCounter: "118"
+              - columnCounter: 2588
+                stepCounter: "118"
+              - columnCounter: 2589
+                stepCounter: "118"
+            name: hd_order_s
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -186,31 +197,53 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 2547
-              stepCounter: "39"
-            config: {}
+              columnCounter: 2593
+              stepCounter: "118"
+            config:
+              is_rsrc_column: true
+              rsrc: true
             dataType: STRING
             defaultValue: ""
             description: ""
-            hashDetails:
-              hashAlgorithm: SHA1
-            hashedColumns:
-              - columnCounter: 2069
-                stepCounter: "39"
-              - columnCounter: 2070
-                stepCounter: "39"
-            name: hk_l_orders_customers
+            keyColumnType: None
+            name: rsrc
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
-                transform: ""
+                transform: "'TEST_SOURCE'"
+            systemColumnType: None
+            transform: ""
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 2548
-              stepCounter: "39"
+              columnCounter: 2594
+              stepCounter: "118"
+            config:
+              is_ldts_column: true
+              is_ldts_columns: true
+              ldts: true
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 0
+                    stepCounter: "0"
+                transform: GETDATE()
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 2889
+              stepCounter: "118"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -218,9 +251,11 @@ steps:
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 2070
-                stepCounter: "39"
-            name: hk_h_customer
+              - columnCounter: 2581
+                stepCounter: "118"
+              - columnCounter: 2582
+                stepCounter: "118"
+            name: hk_order_l
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -237,11 +272,11 @@ steps:
                 nodeName: ORDERS
             join:
               joinCondition: FROM {{ ref('TPCH_SF1', 'ORDERS') }} "ORDERS"
-            name: STG_ORDERS
+            name: STG_ORDERS1
             noLinkRefs: []
-      name: STG_ORDERS
+      name: STG_ORDERS1
       overrideSQL: false
       schema: ""
-      sqlType: Stage
+      sqlType: "4"
       type: sql
-    stepCounter: "39"
+    stepCounter: "118"
