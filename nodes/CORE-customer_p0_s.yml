@@ -1,5 +1,5 @@
 steps:
-  HUB_CUSTOMER-184:
+  customer_p0_s-187:
     operation:
       config:
         postSQL: ""
@@ -17,10 +17,10 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3418
-              stepCounter: "184"
+              columnCounter: 3458
+              stepCounter: "187"
             config:
-              is_Hub_hk: true
+              is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
@@ -33,22 +33,24 @@ steps:
                     stepCounter: "183"
                 transform: ""
           - columnReference:
-              columnCounter: 3408
-              stepCounter: "184"
-            dataType: NUMBER(38,0)
+              columnCounter: 3462
+              stepCounter: "187"
+            config:
+              is_hd: true
+            dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_CUSTKEY
-            nullable: false
+            name: hd_customer_p_s
+            nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3393
+                  - columnCounter: 3407
                     stepCounter: "183"
                 transform: ""
           - columnReference:
-              columnCounter: 3416
-              stepCounter: "184"
+              columnCounter: 3456
+              stepCounter: "187"
             dataType: TIMESTAMP
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
             hashColumns: []
@@ -61,8 +63,8 @@ steps:
                     stepCounter: "183"
                 transform: ""
           - columnReference:
-              columnCounter: 3417
-              stepCounter: "184"
+              columnCounter: 3457
+              stepCounter: "187"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
@@ -72,6 +74,34 @@ steps:
             sourceColumnReferences:
               - columnReferences:
                   - columnCounter: 3402
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3449
+              stepCounter: "187"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3394
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3450
+              stepCounter: "187"
+            dataType: VARCHAR(40)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_ADDRESS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3395
                     stepCounter: "183"
                 transform: ""
         cteString: ""
@@ -84,11 +114,11 @@ steps:
                 nodeName: STG_CUSTOMER
             join:
               joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER') }} "STG_CUSTOMER"
-            name: HUB_CUSTOMER
+            name: customer_p0_s
             noLinkRefs: []
-      name: HUB_CUSTOMER
+      name: customer_p0_s
       overrideSQL: false
       schema: ""
-      sqlType: "6"
+      sqlType: "8"
       type: sql
-    stepCounter: "184"
+    stepCounter: "187"

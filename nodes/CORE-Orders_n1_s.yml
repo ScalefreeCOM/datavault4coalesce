@@ -1,5 +1,5 @@
 steps:
-  customer_p1_s-197:
+  Orders_n1_s-179:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: Orders data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,38 +17,38 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3575
-              stepCounter: "197"
+              columnCounter: 3344
+              stepCounter: "179"
             config:
               is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hk_customer_h
+            name: hk_orders_h
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3458
-                    stepCounter: "187"
+                  - columnCounter: 3340
+                    stepCounter: "178"
                 transform: ""
           - columnReference:
-              columnCounter: 3576
-              stepCounter: "197"
+              columnCounter: 3345
+              stepCounter: "179"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hd_customer_p_s
+            name: hd_orders_n_s
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3462
-                    stepCounter: "187"
+                  - columnCounter: 3343
+                    stepCounter: "178"
                 transform: ""
           - columnReference:
-              columnCounter: 3577
-              stepCounter: "197"
+              columnCounter: 3346
+              stepCounter: "179"
             config:
               is_ldts: true
             dataType: TIMESTAMP
@@ -59,12 +59,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3456
-                    stepCounter: "187"
+                  - columnCounter: 3338
+                    stepCounter: "178"
                 transform: ""
           - columnReference:
-              columnCounter: 3578
-              stepCounter: "197"
+              columnCounter: 3347
+              stepCounter: "179"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
@@ -73,44 +73,114 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3457
-                    stepCounter: "187"
+                  - columnCounter: 3339
+                    stepCounter: "178"
                 transform: ""
           - columnReference:
-              columnCounter: 3579
-              stepCounter: "197"
-            dataType: VARCHAR(25)
+              columnCounter: 3348
+              stepCounter: "179"
+            dataType: NUMBER(12,2)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_NAME
+            name: O_TOTALPRICE
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3449
-                    stepCounter: "187"
+                  - columnCounter: 3332
+                    stepCounter: "178"
                 transform: ""
           - columnReference:
-              columnCounter: 3580
-              stepCounter: "197"
-            dataType: VARCHAR(40)
+              columnCounter: 3349
+              stepCounter: "179"
+            dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_ADDRESS
+            name: O_SHIPPRIORITY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3450
-                    stepCounter: "187"
+                  - columnCounter: 3336
+                    stepCounter: "178"
+                transform: ""
+          - columnReference:
+              columnCounter: 3350
+              stepCounter: "179"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERSTATUS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3331
+                    stepCounter: "178"
+                transform: ""
+          - columnReference:
+              columnCounter: 3351
+              stepCounter: "179"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3333
+                    stepCounter: "178"
+                transform: ""
+          - columnReference:
+              columnCounter: 3352
+              stepCounter: "179"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3334
+                    stepCounter: "178"
+                transform: ""
+          - columnReference:
+              columnCounter: 3353
+              stepCounter: "179"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_CLERK
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3335
+                    stepCounter: "178"
+                transform: ""
+          - columnReference:
+              columnCounter: 3354
+              stepCounter: "179"
+            dataType: VARCHAR(79)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_COMMENT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3337
+                    stepCounter: "178"
                 transform: ""
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3581
-              stepCounter: "197"
+              columnCounter: 3355
+              stepCounter: "179"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
@@ -127,8 +197,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3582
-              stepCounter: "197"
+              columnCounter: 3356
+              stepCounter: "179"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
@@ -147,14 +217,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: customer_p0_s
+                nodeName: Orders_n0_s
             join:
-              joinCondition: FROM {{ ref('CORE', 'customer_p0_s') }} "customer_p0_s"
-            name: customer_p1_s
+              joinCondition: FROM {{ ref('CORE', 'Orders_n0_s') }} "Orders_n0_s"
+            name: Orders_n1_s
             noLinkRefs: []
-      name: customer_p1_s
+      name: Orders_n1_s
       overrideSQL: false
       schema: ""
       sqlType: "9"
       type: sql
-    stepCounter: "197"
+    stepCounter: "179"

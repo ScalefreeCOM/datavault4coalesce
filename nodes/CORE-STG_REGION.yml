@@ -1,0 +1,163 @@
+steps:
+  STG_REGION-206:
+    operation:
+      config:
+        generate_ghost_records: true
+        insertStrategy: INSERT
+        postSQL: ""
+        preSQL: ""
+        testsEnabled: true
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Region data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 3702
+              stepCounter: "206"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: R_REGIONKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3134
+                    stepCounter: "168"
+                transform: ""
+          - columnReference:
+              columnCounter: 3703
+              stepCounter: "206"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: R_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3135
+                    stepCounter: "168"
+                transform: ""
+          - columnReference:
+              columnCounter: 3704
+              stepCounter: "206"
+            dataType: VARCHAR(152)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: R_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3136
+                    stepCounter: "168"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3705
+              stepCounter: "206"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            hashColumns: []
+            is_system_ldts: true
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: GETDATE()
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3706
+              stepCounter: "206"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: If available, replace with existing column from source.
+            hashColumns: []
+            is_system_rsrc: true
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: "{{record_source()}}"
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3707
+              stepCounter: "206"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 3702
+                stepCounter: "206"
+            name: hk_region_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3708
+              stepCounter: "206"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 3703
+                stepCounter: "206"
+              - columnCounter: 3704
+                stepCounter: "206"
+            name: hd_region_n_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: TPCH_SF1
+                nodeName: REGION
+            join:
+              joinCondition: FROM {{ ref('TPCH_SF1', 'REGION') }} "REGION"
+            name: STG_REGION
+            noLinkRefs: []
+      name: STG_REGION
+      overrideSQL: false
+      schema: ""
+      sqlType: "4"
+      type: sql
+    stepCounter: "206"

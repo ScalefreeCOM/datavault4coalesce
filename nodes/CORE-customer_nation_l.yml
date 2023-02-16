@@ -1,0 +1,111 @@
+steps:
+  customer_nation_l-199:
+    operation:
+      config:
+        insertStrategy: UNION
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Customer data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 3633
+              stepCounter: "199"
+            config:
+              is_Link_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_customer_nation_l
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3404
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3632
+              stepCounter: "199"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_customer_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3403
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3634
+              stepCounter: "199"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_nation_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3405
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3630
+              stepCounter: "199"
+            config:
+              is_Link_ldts: true
+            dataType: TIMESTAMP
+            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3401
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 3631
+              stepCounter: "199"
+            dataType: STRING
+            description: If available, replace with existing column from source.
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3402
+                    stepCounter: "183"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_CUSTOMER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER') }} "STG_CUSTOMER"
+            name: customer_nation_l
+            noLinkRefs: []
+      name: customer_nation_l
+      overrideSQL: false
+      schema: ""
+      sqlType: "7"
+      type: sql
+    stepCounter: "199"

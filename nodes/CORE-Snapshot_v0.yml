@@ -1,5 +1,5 @@
 steps:
-  Snapshot_v0_NODE-180:
+  Snapshot_v0-180:
     operation:
       config:
         input_daily_snapshot_time: "07:00:00"
@@ -207,9 +207,9 @@ steps:
             dependencies: []
             join:
               joinCondition: ""
-            name: Snapshot_v0_NODE
+            name: Snapshot_v0
             noLinkRefs: []
-      name: Snapshot_v0_NODE
+      name: Snapshot_v0
       overrideSQL: false
       schema: ""
       sqlType: "13"

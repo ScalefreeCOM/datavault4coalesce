@@ -1,5 +1,5 @@
 steps:
-  SAT_v0_CUSTOMER-187:
+  region_n0_s-208:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: Region data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,40 +17,40 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3458
-              stepCounter: "187"
+              columnCounter: 3721
+              stepCounter: "208"
             config:
               is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hk_customer_h
+            name: hk_region_h
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3403
-                    stepCounter: "183"
+                  - columnCounter: 3707
+                    stepCounter: "206"
                 transform: ""
           - columnReference:
-              columnCounter: 3462
-              stepCounter: "187"
+              columnCounter: 3722
+              stepCounter: "208"
             config:
               is_hd: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hd_customer_p_s
+            name: hd_region_n_s
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3407
-                    stepCounter: "183"
+                  - columnCounter: 3708
+                    stepCounter: "206"
                 transform: ""
           - columnReference:
-              columnCounter: 3456
-              stepCounter: "187"
+              columnCounter: 3719
+              stepCounter: "208"
             dataType: TIMESTAMP
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
             hashColumns: []
@@ -59,12 +59,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3401
-                    stepCounter: "183"
+                  - columnCounter: 3705
+                    stepCounter: "206"
                 transform: ""
           - columnReference:
-              columnCounter: 3457
-              stepCounter: "187"
+              columnCounter: 3720
+              stepCounter: "208"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
@@ -73,36 +73,36 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3402
-                    stepCounter: "183"
+                  - columnCounter: 3706
+                    stepCounter: "206"
                 transform: ""
           - columnReference:
-              columnCounter: 3449
-              stepCounter: "187"
+              columnCounter: 3717
+              stepCounter: "208"
             dataType: VARCHAR(25)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_NAME
+            name: R_NAME
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3394
-                    stepCounter: "183"
+                  - columnCounter: 3703
+                    stepCounter: "206"
                 transform: ""
           - columnReference:
-              columnCounter: 3450
-              stepCounter: "187"
-            dataType: VARCHAR(40)
+              columnCounter: 3718
+              stepCounter: "208"
+            dataType: VARCHAR(152)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_ADDRESS
-            nullable: false
+            name: R_COMMENT
+            nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3395
-                    stepCounter: "183"
+                  - columnCounter: 3704
+                    stepCounter: "206"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
@@ -111,14 +111,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_CUSTOMER
+                nodeName: STG_REGION
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER') }} "STG_CUSTOMER"
-            name: SAT_v0_CUSTOMER
+              joinCondition: FROM {{ ref('CORE', 'STG_REGION') }} "STG_REGION"
+            name: region_n0_s
             noLinkRefs: []
-      name: SAT_v0_CUSTOMER
+      name: region_n0_s
       overrideSQL: false
       schema: ""
       sqlType: "8"
       type: sql
-    stepCounter: "187"
+    stepCounter: "208"

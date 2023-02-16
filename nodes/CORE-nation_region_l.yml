@@ -1,0 +1,113 @@
+steps:
+  nation_region_l-202:
+    operation:
+      config:
+        insertStrategy: UNION
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Nation data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - acceptedValues:
+              strictMatch: false
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3666
+              stepCounter: "202"
+            config:
+              is_Link_hk: true
+            dataType: STRING
+            description: ""
+            name: hk_nation_region_l
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3665
+                    stepCounter: "200"
+                transform: ""
+          - columnReference:
+              columnCounter: 3662
+              stepCounter: "202"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_nation_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3643
+                    stepCounter: "200"
+                transform: ""
+          - columnReference:
+              columnCounter: 3663
+              stepCounter: "202"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: hk_region_h
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3644
+                    stepCounter: "200"
+                transform: ""
+          - columnReference:
+              columnCounter: 3660
+              stepCounter: "202"
+            config:
+              is_Link_ldts: true
+            dataType: TIMESTAMP
+            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            hashColumns: []
+            hashDetails: null
+            name: ldts
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3641
+                    stepCounter: "200"
+                transform: ""
+          - columnReference:
+              columnCounter: 3661
+              stepCounter: "202"
+            dataType: STRING
+            description: If available, replace with existing column from source.
+            hashColumns: []
+            hashDetails: null
+            name: rsrc
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3642
+                    stepCounter: "200"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_NATION
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_NATION') }} "STG_NATION"
+            name: nation_region_l
+            noLinkRefs: []
+      name: nation_region_l
+      overrideSQL: false
+      schema: ""
+      sqlType: "7"
+      type: sql
+    stepCounter: "202"

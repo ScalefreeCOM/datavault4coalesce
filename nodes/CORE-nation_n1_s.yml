@@ -1,5 +1,5 @@
 steps:
-  customer_p1_s-197:
+  nation_n1_s-204:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: Nation data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,38 +17,38 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3575
-              stepCounter: "197"
+              columnCounter: 3678
+              stepCounter: "204"
             config:
               is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hk_customer_h
+            name: hk_nation_h
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3458
-                    stepCounter: "187"
+                  - columnCounter: 3674
+                    stepCounter: "203"
                 transform: ""
           - columnReference:
-              columnCounter: 3576
-              stepCounter: "197"
+              columnCounter: 3679
+              stepCounter: "204"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hd_customer_p_s
+            name: hd_nation_n_s
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3462
-                    stepCounter: "187"
+                  - columnCounter: 3676
+                    stepCounter: "203"
                 transform: ""
           - columnReference:
-              columnCounter: 3577
-              stepCounter: "197"
+              columnCounter: 3680
+              stepCounter: "204"
             config:
               is_ldts: true
             dataType: TIMESTAMP
@@ -59,12 +59,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3456
-                    stepCounter: "187"
+                  - columnCounter: 3672
+                    stepCounter: "203"
                 transform: ""
           - columnReference:
-              columnCounter: 3578
-              stepCounter: "197"
+              columnCounter: 3681
+              stepCounter: "204"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
@@ -73,44 +73,44 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3457
-                    stepCounter: "187"
+                  - columnCounter: 3673
+                    stepCounter: "203"
                 transform: ""
           - columnReference:
-              columnCounter: 3579
-              stepCounter: "197"
+              columnCounter: 3682
+              stepCounter: "204"
             dataType: VARCHAR(25)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_NAME
+            name: N_NAME
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3449
-                    stepCounter: "187"
+                  - columnCounter: 3669
+                    stepCounter: "203"
                 transform: ""
           - columnReference:
-              columnCounter: 3580
-              stepCounter: "197"
-            dataType: VARCHAR(40)
+              columnCounter: 3683
+              stepCounter: "204"
+            dataType: VARCHAR(152)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_ADDRESS
-            nullable: false
+            name: N_COMMENT
+            nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3450
-                    stepCounter: "187"
+                  - columnCounter: 3671
+                    stepCounter: "203"
                 transform: ""
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3581
-              stepCounter: "197"
+              columnCounter: 3684
+              stepCounter: "204"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
@@ -127,8 +127,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3582
-              stepCounter: "197"
+              columnCounter: 3685
+              stepCounter: "204"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
@@ -147,14 +147,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: customer_p0_s
+                nodeName: nation_n0_s
             join:
-              joinCondition: FROM {{ ref('CORE', 'customer_p0_s') }} "customer_p0_s"
-            name: customer_p1_s
+              joinCondition: FROM {{ ref('CORE', 'nation_n0_s') }} "nation_n0_s"
+            name: nation_n1_s
             noLinkRefs: []
-      name: customer_p1_s
+      name: nation_n1_s
       overrideSQL: false
       schema: ""
       sqlType: "9"
       type: sql
-    stepCounter: "197"
+    stepCounter: "204"

@@ -1,8 +1,7 @@
 steps:
-  LINK_ORDERS-177:
+  orders_h-175:
     operation:
       config:
-        insertStrategy: UNION
         postSQL: ""
         preSQL: ""
       database: ""
@@ -18,38 +17,10 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3327
-              stepCounter: "177"
+              columnCounter: 3295
+              stepCounter: "175"
             config:
-              is_Link_hk: true
-            dataType: STRING
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: hk_orders_customer_l
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3282
-                    stepCounter: "174"
-                transform: ""
-          - columnReference:
-              columnCounter: 3326
-              stepCounter: "177"
-            dataType: STRING
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: hk_customer_h
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3281
-                    stepCounter: "174"
-                transform: ""
-          - columnReference:
-              columnCounter: 3325
-              stepCounter: "177"
+              is_Hub_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
@@ -62,10 +33,26 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3323
-              stepCounter: "177"
+              columnCounter: 3284
+              stepCounter: "175"
             config:
-              is_Link_ldts: true
+              is_Hub_bk: true
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3269
+                    stepCounter: "174"
+                transform: ""
+          - columnReference:
+              columnCounter: 3293
+              stepCounter: "175"
+            config:
+              is_Hub_ldts: true
             dataType: TIMESTAMP
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
             hashColumns: []
@@ -78,8 +65,8 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3324
-              stepCounter: "177"
+              columnCounter: 3294
+              stepCounter: "175"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
@@ -101,11 +88,11 @@ steps:
                 nodeName: STG_ORDERS
             join:
               joinCondition: FROM {{ ref('CORE', 'STG_ORDERS') }} "STG_ORDERS"
-            name: LINK_ORDERS
+            name: orders_h
             noLinkRefs: []
-      name: LINK_ORDERS
+      name: orders_h
       overrideSQL: false
       schema: ""
-      sqlType: "7"
+      sqlType: "6"
       type: sql
-    stepCounter: "177"
+    stepCounter: "175"

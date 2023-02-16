@@ -1,5 +1,5 @@
 steps:
-  PIT_CUSTOMER-189:
+  customer_bp-198:
     operation:
       config:
         cleanup_pit: true
@@ -8,7 +8,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: ""
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,45 +17,21 @@ steps:
       metadata:
         appliedNodeTests: []
         columns:
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 3476
-              stepCounter: "189"
-            config:
-              is_dimension_key: true
-            dataType: STRING
-            defaultValue: ""
-            description: ""
-            hashDetails:
-              hashAlgorithm: SHA1
-            hashedColumns:
-              - columnCounter: 3471
-                stepCounter: "189"
-              - columnCounter: 3475
-                stepCounter: "189"
-            name: hk_customer_d
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: ""
           - columnReference:
-              columnCounter: 3475
-              stepCounter: "189"
+              columnCounter: 3583
+              stepCounter: "198"
             dataType: TIMESTAMP
             description: ""
             name: sdts
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3377
-                    stepCounter: "182"
+                  - columnCounter: 3686
+                    stepCounter: "205"
                 transform: ""
           - columnReference:
-              columnCounter: 3471
-              stepCounter: "189"
+              columnCounter: 3599
+              stepCounter: "198"
             dataType: STRING
             description: ""
             name: hk_customer_h
@@ -65,24 +41,36 @@ steps:
                   - columnCounter: 3418
                     stepCounter: "184"
                 transform: ""
-          - columnReference:
-              columnCounter: 3474
-              stepCounter: "189"
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3621
+              stepCounter: "198"
+            config:
+              is_dimension_key: true
             dataType: STRING
-            description: If available, replace with existing column from source.
-            name: rsrc
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 3583
+                stepCounter: "198"
+              - columnCounter: 3599
+                stepCounter: "198"
+            name: hk_customer_d
             nullable: true
             sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3417
-                    stepCounter: "184"
+              - columnReferences: []
                 transform: ""
           - columnReference:
-              columnCounter: 3477
-              stepCounter: "189"
+              columnCounter: 3603
+              stepCounter: "198"
             dataType: STRING
             description: ""
-            name: hk_customer_n1_s
+            name: hk_customer_n_s
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -90,11 +78,11 @@ steps:
                     stepCounter: "186"
                 transform: ""
           - columnReference:
-              columnCounter: 3478
-              stepCounter: "189"
+              columnCounter: 3605
+              stepCounter: "198"
             dataType: TIMESTAMP
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
-            name: ldts_customer_n1_s
+            name: ldts_customer_n_s
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -102,28 +90,28 @@ steps:
                     stepCounter: "186"
                 transform: ""
           - columnReference:
-              columnCounter: 3479
-              stepCounter: "189"
+              columnCounter: 3613
+              stepCounter: "198"
             dataType: STRING
             description: ""
-            name: hk_customer_p1_s
+            name: hk_customer_p_s
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3463
-                    stepCounter: "188"
+                  - columnCounter: 3575
+                    stepCounter: "197"
                 transform: ""
           - columnReference:
-              columnCounter: 3481
-              stepCounter: "189"
+              columnCounter: 3615
+              stepCounter: "198"
             dataType: TIMESTAMP
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
-            name: ldts_customer_p1_s
+            name: ldts_customer_p_s
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3465
-                    stepCounter: "188"
+                  - columnCounter: 3577
+                    stepCounter: "197"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
@@ -132,14 +120,27 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: HUB_CUSTOMER
+                nodeName: Snapshot_v1_Snapshot_v0_NODE
+              - locationName: CORE
+                nodeName: customer_h
+              - locationName: CORE
+                nodeName: customer_n1_s
+              - locationName: CORE
+                nodeName: customer_p1_s
             join:
-              joinCondition: FROM {{ ref('CORE', 'HUB_CUSTOMER') }} "HUB_CUSTOMER"
-            name: PIT_CUSTOMER
+              joinCondition: |-
+                FROM {{ ref('CORE', 'Snapshot_v1_Snapshot_v0_NODE') }} "Snapshot_v1_Snapshot_v0_NODE"
+                INNER JOIN {{ ref('CORE', 'customer_h') }} "customer_h"
+                ON "Snapshot_v1_Snapshot_v0_NODE"./*COLUMN*/ = "customer_h"./*COLUMN*/
+                INNER JOIN {{ ref('CORE', 'customer_n1_s') }} "customer_n1_s"
+                ON "Snapshot_v1_Snapshot_v0_NODE"./*COLUMN*/ = "customer_n1_s"./*COLUMN*/
+                INNER JOIN {{ ref('CORE', 'customer_p1_s') }} "customer_p1_s"
+                ON "Snapshot_v1_Snapshot_v0_NODE"./*COLUMN*/ = "customer_p1_s"./*COLUMN*/
+            name: customer_bp
             noLinkRefs: []
-      name: PIT_CUSTOMER
+      name: customer_bp
       overrideSQL: false
       schema: ""
       sqlType: "12"
       type: sql
-    stepCounter: "189"
+    stepCounter: "198"

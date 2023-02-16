@@ -1,5 +1,5 @@
 steps:
-  STG_CUSTOMER-183:
+  STG_NATION-200:
     operation:
       config:
         generate_ghost_records: true
@@ -10,7 +10,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: Nation data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -20,108 +20,60 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3393
-              stepCounter: "183"
+              columnCounter: 3637
+              stepCounter: "200"
             dataType: NUMBER(38,0)
             description: ""
-            name: C_CUSTKEY
+            name: N_NATIONKEY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3083
-                    stepCounter: "162"
+                  - columnCounter: 3107
+                    stepCounter: "164"
                 transform: ""
           - columnReference:
-              columnCounter: 3394
-              stepCounter: "183"
+              columnCounter: 3638
+              stepCounter: "200"
             dataType: VARCHAR(25)
             description: ""
-            name: C_NAME
+            name: N_NAME
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3084
-                    stepCounter: "162"
+                  - columnCounter: 3108
+                    stepCounter: "164"
                 transform: ""
           - columnReference:
-              columnCounter: 3395
-              stepCounter: "183"
-            dataType: VARCHAR(40)
-            description: ""
-            name: C_ADDRESS
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3085
-                    stepCounter: "162"
-                transform: ""
-          - columnReference:
-              columnCounter: 3396
-              stepCounter: "183"
+              columnCounter: 3639
+              stepCounter: "200"
             dataType: NUMBER(38,0)
             description: ""
-            name: C_NATIONKEY
+            name: N_REGIONKEY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3086
-                    stepCounter: "162"
+                  - columnCounter: 3109
+                    stepCounter: "164"
                 transform: ""
           - columnReference:
-              columnCounter: 3397
-              stepCounter: "183"
-            dataType: VARCHAR(15)
+              columnCounter: 3640
+              stepCounter: "200"
+            dataType: VARCHAR(152)
             description: ""
-            name: C_PHONE
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3087
-                    stepCounter: "162"
-                transform: ""
-          - columnReference:
-              columnCounter: 3398
-              stepCounter: "183"
-            dataType: NUMBER(12,2)
-            description: ""
-            name: C_ACCTBAL
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3088
-                    stepCounter: "162"
-                transform: ""
-          - columnReference:
-              columnCounter: 3399
-              stepCounter: "183"
-            dataType: VARCHAR(10)
-            description: ""
-            name: C_MKTSEGMENT
+            name: N_COMMENT
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3089
-                    stepCounter: "162"
-                transform: ""
-          - columnReference:
-              columnCounter: 3400
-              stepCounter: "183"
-            dataType: VARCHAR(117)
-            description: ""
-            name: C_COMMENT
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3090
-                    stepCounter: "162"
+                  - columnCounter: 3110
+                    stepCounter: "164"
                 transform: ""
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3401
-              stepCounter: "183"
+              columnCounter: 3641
+              stepCounter: "200"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
@@ -137,8 +89,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3402
-              stepCounter: "183"
+              columnCounter: 3642
+              stepCounter: "200"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -154,8 +106,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3403
-              stepCounter: "183"
+              columnCounter: 3643
+              stepCounter: "200"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -163,52 +115,8 @@ steps:
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 3393
-                stepCounter: "183"
-            name: hk_customer_h
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: ""
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 3404
-              stepCounter: "183"
-            config: {}
-            dataType: STRING
-            defaultValue: ""
-            description: ""
-            hashDetails:
-              hashAlgorithm: SHA1
-            hashedColumns:
-              - columnCounter: 3393
-                stepCounter: "183"
-              - columnCounter: 3396
-                stepCounter: "183"
-            name: hk_customer_nation_l
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: ""
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 3405
-              stepCounter: "183"
-            config: {}
-            dataType: STRING
-            defaultValue: ""
-            description: ""
-            hashDetails:
-              hashAlgorithm: SHA1
-            hashedColumns:
-              - columnCounter: 3396
-                stepCounter: "183"
+              - columnCounter: 3637
+                stepCounter: "200"
             name: hk_nation_h
             nullable: true
             sourceColumnReferences:
@@ -219,8 +127,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3406
-              stepCounter: "183"
+              columnCounter: 3644
+              stepCounter: "200"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -228,15 +136,9 @@ steps:
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 3397
-                stepCounter: "183"
-              - columnCounter: 3398
-                stepCounter: "183"
-              - columnCounter: 3399
-                stepCounter: "183"
-              - columnCounter: 3400
-                stepCounter: "183"
-            name: hd_customer_n_s
+              - columnCounter: 3639
+                stepCounter: "200"
+            name: hk_region_h
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -246,8 +148,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3407
-              stepCounter: "183"
+              columnCounter: 3645
+              stepCounter: "200"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -255,11 +157,34 @@ steps:
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 3394
-                stepCounter: "183"
-              - columnCounter: 3395
-                stepCounter: "183"
-            name: hd_customer_p_s
+              - columnCounter: 3638
+                stepCounter: "200"
+              - columnCounter: 3640
+                stepCounter: "200"
+            name: hd_nation_n_s
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 3665
+              stepCounter: "200"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 3637
+                stepCounter: "200"
+              - columnCounter: 3639
+                stepCounter: "200"
+            name: hk_nation_region_l
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -271,14 +196,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: TPCH_SF1
-                nodeName: CUSTOMER
+                nodeName: NATION
             join:
-              joinCondition: FROM {{ ref('TPCH_SF1', 'CUSTOMER') }} "CUSTOMER"
-            name: STG_CUSTOMER
+              joinCondition: FROM {{ ref('TPCH_SF1', 'NATION') }} "NATION"
+            name: STG_NATION
             noLinkRefs: []
-      name: STG_CUSTOMER
+      name: STG_NATION
       overrideSQL: false
       schema: ""
       sqlType: "4"
       type: sql
-    stepCounter: "183"
+    stepCounter: "200"
