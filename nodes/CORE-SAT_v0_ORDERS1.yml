@@ -1,0 +1,194 @@
+steps:
+  SAT_v0_ORDERS1-255:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Orders data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4358
+              stepCounter: "255"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_ORDER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4313
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4360
+              stepCounter: "255"
+            config:
+              is_hd: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HD_ORDERS_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4315
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4356
+              stepCounter: "255"
+            dataType: TIMESTAMP
+            description: Search for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4311
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4357
+              stepCounter: "255"
+            dataType: STRING
+            description: If available, replace with existing column from source.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4312
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4349
+              stepCounter: "255"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERSTATUS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4304
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4350
+              stepCounter: "255"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_TOTALPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4305
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4351
+              stepCounter: "255"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4306
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4352
+              stepCounter: "255"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_ORDERPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4307
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4353
+              stepCounter: "255"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_CLERK
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4308
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4354
+              stepCounter: "255"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_SHIPPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4309
+                    stepCounter: "252"
+                transform: ""
+          - columnReference:
+              columnCounter: 4355
+              stepCounter: "255"
+            dataType: VARCHAR(79)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_COMMENT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4310
+                    stepCounter: "252"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_ORDERS1
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS1') }} "STG_ORDERS1"
+            name: SAT_v0_ORDERS1
+            noLinkRefs: []
+      name: SAT_v0_ORDERS1
+      overrideSQL: false
+      schema: ""
+      sqlType: "8"
+      type: sql
+    stepCounter: "255"

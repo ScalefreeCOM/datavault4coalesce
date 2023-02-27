@@ -1,5 +1,5 @@
 steps:
-  Snapshot_v1-205:
+  Snapshot_v1_SNAPSHOT_V0-239:
     operation:
       config:
         daily_snapshot_duration: "30"
@@ -33,13 +33,13 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3686
-              stepCounter: "205"
+              columnCounter: 4147
+              stepCounter: "239"
             dataType: TIMESTAMP
             description: ""
             hashColumns: []
             hashDetails: null
-            name: sdts
+            name: SDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -47,13 +47,13 @@ steps:
                     stepCounter: "180"
                 transform: ""
           - columnReference:
-              columnCounter: 3687
-              stepCounter: "205"
+              columnCounter: 4148
+              stepCounter: "239"
             dataType: BOOLEAN
             description: ""
             hashColumns: []
             hashDetails: null
-            name: force_active
+            name: FORCE_ACTIVE
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -61,13 +61,13 @@ steps:
                     stepCounter: "180"
                 transform: ""
           - columnReference:
-              columnCounter: 3688
-              stepCounter: "205"
+              columnCounter: 4149
+              stepCounter: "239"
             dataType: TIMESTAMP
             description: ""
             hashColumns: []
             hashDetails: null
-            name: replacement_sdts
+            name: REPLACEMENT_SDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -75,13 +75,13 @@ steps:
                     stepCounter: "180"
                 transform: ""
           - columnReference:
-              columnCounter: 3689
-              stepCounter: "205"
+              columnCounter: 4150
+              stepCounter: "239"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: caption
+            name: CAPTION
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -89,13 +89,13 @@ steps:
                     stepCounter: "180"
                 transform: ""
           - columnReference:
-              columnCounter: 3690
-              stepCounter: "205"
+              columnCounter: 4151
+              stepCounter: "239"
             dataType: BOOLEAN
             description: ""
             hashColumns: []
             hashDetails: null
-            name: is_hourly
+            name: IS_HOURLY
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -103,13 +103,13 @@ steps:
                     stepCounter: "180"
                 transform: ""
           - columnReference:
-              columnCounter: 3691
-              stepCounter: "205"
+              columnCounter: 4152
+              stepCounter: "239"
             dataType: BOOLEAN
             description: ""
             hashColumns: []
             hashDetails: null
-            name: is_daily
+            name: IS_DAILY
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -117,13 +117,13 @@ steps:
                     stepCounter: "180"
                 transform: ""
           - columnReference:
-              columnCounter: 3692
-              stepCounter: "205"
+              columnCounter: 4153
+              stepCounter: "239"
             dataType: BOOLEAN
             description: ""
             hashColumns: []
             hashDetails: null
-            name: is_beginning_of_week
+            name: IS_BEGINNING_OF_WEEK
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -131,13 +131,13 @@ steps:
                     stepCounter: "180"
                 transform: ""
           - columnReference:
-              columnCounter: 3693
-              stepCounter: "205"
+              columnCounter: 4154
+              stepCounter: "239"
             dataType: BOOLEAN
             description: ""
             hashColumns: []
             hashDetails: null
-            name: is_beginning_of_month
+            name: IS_BEGINNING_OF_MONTH
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -145,13 +145,13 @@ steps:
                     stepCounter: "180"
                 transform: ""
           - columnReference:
-              columnCounter: 3694
-              stepCounter: "205"
+              columnCounter: 4155
+              stepCounter: "239"
             dataType: BOOLEAN
             description: ""
             hashColumns: []
             hashDetails: null
-            name: is_beginning_of_quarter
+            name: IS_BEGINNING_OF_QUARTER
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -159,13 +159,13 @@ steps:
                     stepCounter: "180"
                 transform: ""
           - columnReference:
-              columnCounter: 3695
-              stepCounter: "205"
+              columnCounter: 4156
+              stepCounter: "239"
             dataType: BOOLEAN
             description: ""
             hashColumns: []
             hashDetails: null
-            name: is_beginning_of_year
+            name: IS_BEGINNING_OF_YEAR
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -177,14 +177,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3696
-              stepCounter: "205"
+              columnCounter: 4157
+              stepCounter: "239"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_active
+            name: IS_ACTIVE
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -195,14 +195,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3697
-              stepCounter: "205"
+              columnCounter: 4158
+              stepCounter: "239"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_latest
+            name: IS_LATEST
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -213,14 +213,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3698
-              stepCounter: "205"
+              columnCounter: 4159
+              stepCounter: "239"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_current_year
+            name: IS_CURRENT_YEAR
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -231,14 +231,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3699
-              stepCounter: "205"
+              columnCounter: 4160
+              stepCounter: "239"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_last_year
+            name: IS_LAST_YEAR
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -249,14 +249,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3700
-              stepCounter: "205"
+              columnCounter: 4161
+              stepCounter: "239"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_rolling_year
+            name: IS_ROLLING_YEAR
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -267,14 +267,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3701
-              stepCounter: "205"
+              columnCounter: 4162
+              stepCounter: "239"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_last_rolling_year
+            name: IS_LAST_ROLLING_YEAR
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -287,14 +287,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: Snapshot_v0
+                nodeName: SNAPSHOT_V0
             join:
-              joinCondition: FROM {{ ref('CORE', 'Snapshot_v0') }} "Snapshot_v0"
-            name: Snapshot_v1
+              joinCondition: FROM {{ ref('CORE', 'SNAPSHOT_V0') }} "SNAPSHOT_V0"
+            name: Snapshot_v1_SNAPSHOT_V0
             noLinkRefs: []
-      name: Snapshot_v1
+      name: Snapshot_v1_SNAPSHOT_V0
       overrideSQL: false
       schema: ""
       sqlType: "14"
       type: sql
-    stepCounter: "205"
+    stepCounter: "239"

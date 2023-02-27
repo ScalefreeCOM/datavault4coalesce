@@ -33,12 +33,12 @@ macros:
       {%- set datavault4coalesce = namespace(
 
            config = {
-           "ldts_alias": "ldts",
-           "rsrc_alias": "rsrc", 
-           "ledts_alias": "ledts", 
-           "snapshot_trigger_column": "is_active",
-           "sdts_alias": "sdts", 
-           "stg_alias": "stg", 
+           "ldts_alias": "LDTS",
+           "rsrc_alias": "RSRC", 
+           "ledts_alias": "LEDTS", 
+           "snapshot_trigger_column": "IS_ACTIVE",
+           "sdts_alias": "SDTS", 
+           "stg_alias": "STG", 
            "is_current_col_alias": "IS_CURRENT", 
            "hash": "MD5", 
            "hash_datatype": "STRING", 
@@ -391,7 +391,7 @@ stepTypes:
             				COALESCE("{{ source_node_name }}"."{{ target_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"
             			{%- elif col.sourceColumns[0].column.is_hk -%}
             				COALESCE("{{ source_node_name }}"."{{ source_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"			
-            			{%- elif col.sourceColumns[0].column.is_ldts -%}
+            			{%- elif source_column_name == datavault4coalesce.config.ldts_alias -%}
             				COALESCE("{{ source_node_name }}"."{{ source_column_name }}", {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}) AS "{{ target_column_name }}"
             			{%- elif col.name == datavault4coalesce.config.sdts_alias -%}
             				"{{ source_node_name }}"."{{ target_column_name }}" AS "{{ target_column_name }}"
@@ -399,7 +399,7 @@ stepTypes:
                             {%- set ns.sdts_node_name = col.sourceColumns[0].node.name -%}
 
             			{%- else -%}
-            				"{{ source_node_name }}"."{{ target_column_name }}" AS "{{ target_column_name }}"
+            				"{{ source_node_name }}"."{{ source_column_name }}" AS "{{ target_column_name }}"
             			{%- endif %}
 
             		{%- if not loop.last -%} , {% endif %}
@@ -531,61 +531,61 @@ stepTypes:
 
 
         systemColumns:
-        - displayName: sdts
+        - displayName: "SDTS"
           transform: ""
           dataType: TIMESTAMP
           placement: end
           attributeName: system_sdts
 
-        - displayName: force_active
+        - displayName: "FORCE_ACTIVE"
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_force_active
 
-        - displayName: replacement_sdts
+        - displayName: "REPLACEMENT_SDTS"
           transform: ""
           dataType: TIMESTAMP
           placement: end
           attributeName: system_replacement_sdts
 
-        - displayName: "caption"
+        - displayName: "CAPTION"
           transform: ""
           dataType: STRING
           placement: end
           attributeName: system_caption
 
-        - displayName: "is_hourly"
+        - displayName: "IS_HOURLY"
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_hourly
 
-        - displayName: "is_daily"
+        - displayName: "IS_DAILY"
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_daily
 
-        - displayName: "is_beginning_of_week"
+        - displayName: "IS_BEGINNING_OF_WEEK"
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_beginning_of_week
 
-        - displayName: "is_beginning_of_month"
+        - displayName: "IS_BEGINNING_OF_MONTH"
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_beginning_of_month
 
-        - displayName: "is_beginning_of_quarter"
+        - displayName: "IS_BEGINNING_OF_QUARTER"
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_beginning_of_quarter
 
-        - displayName: "is_beginning_of_year"
+        - displayName: "IS_BEGINNING_OF_YEAR"
           transform: ""
           dataType: BOOLEAN
           placement: end
@@ -866,37 +866,37 @@ stepTypes:
 
 
         systemColumns:
-        - displayName: is_active
+        - displayName: IS_ACTIVE
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_active
 
-        - displayName: is_latest
+        - displayName: IS_LATEST
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_latest
 
-        - displayName: is_current_year
+        - displayName: IS_CURRENT_YEAR
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_current_year
 
-        - displayName: is_last_year
+        - displayName: IS_LAST_YEAR
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_last_year
 
-        - displayName: is_rolling_year
+        - displayName: IS_ROLLING_YEAR
           transform: ""
           dataType: BOOLEAN
           placement: end
           attributeName: system_is_rolling_year
 
-        - displayName: is_last_rolling_year
+        - displayName: IS_LAST_ROLLING_YEAR
           transform: ""
           dataType: BOOLEAN
           placement: end
@@ -931,7 +931,7 @@ stepTypes:
 
             {% set sdts_alias = datavault4coalesce.config.sdts_alias %}
             {% set ns = namespace(forever_status=FALSE) %}
-            {% set snapshot_trigger_column = 'is_active' %}
+            {% set snapshot_trigger_column = 'IS_ACTIVE' %}
 
 
             CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
@@ -960,8 +960,8 @@ stepTypes:
                 
                 SELECT
                     c."{{ sdts_alias }}",
-                    c."replacement_sdts",
-                    c."force_active",
+                    c."REPLACEMENT_SDTS",
+                    c."FORCE_ACTIVE",
                     {%- if log_logic is none %}
                     TRUE AS {{ snapshot_trigger_column }},
                     {%- else %}
@@ -981,44 +981,44 @@ stepTypes:
                         {%- if 'weekly' in log_logic.keys() %} OR 
                             {%- if log_logic['weekly']['forever'] is true -%}
                                 {%- set ns.forever_status = 'TRUE' -%}
-                          (c."is_beginning_of_week" = TRUE)
+                          (c."IS_BEGINNING_OF_WEEK" = TRUE)
                             {%- else %} 
                                 {%- set weekly_duration = log_logic['weekly']['duration'] -%}
                                 {%- set weekly_unit = log_logic['weekly']['unit'] %}            
-                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ weekly_duration }} {{ weekly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_week" = TRUE))
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ weekly_duration }} {{ weekly_unit }}' AND CURRENT_DATE()) AND (c."IS_BEGINNING_OF_WEEK" = TRUE))
                             {%- endif -%}
                         {% endif -%}
 
                         {%- if 'monthly' in log_logic.keys() %} OR
                             {%- if log_logic['monthly']['forever'] is true -%}
                                 {%- set ns.forever_status = 'TRUE' %}
-                          (c."is_beginning_of_month" = TRUE)
+                          (c."IS_BEGINNING_OF_MONTH" = TRUE)
                             {%- else %}
                                 {%- set monthly_duration = log_logic['monthly']['duration'] -%}
                                 {%- set monthly_unit = log_logic['monthly']['unit'] %}            
-                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ monthly_duration }} {{ monthly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_month" = TRUE))
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ monthly_duration }} {{ monthly_unit }}' AND CURRENT_DATE()) AND (c."IS_BEGINNING_OF_MONTH" = TRUE))
                             {%- endif -%}
                         {% endif -%}
 
                         {%- if 'quarterly' in log_logic.keys() %} OR
                             {%- if log_logic['quarterly']['forever'] is true -%}
                                 {%- set ns.forever_status = 'TRUE' %}
-                          (c."is_beginning_of_quarter" = TRUE)
+                          (c."IS_BEGINNING_OF_QUARTER" = TRUE)
                             {%- else %}
                                 {%- set quarterly_duration = log_logic['quarterly']['duration'] -%}
                                 {%- set quarterly_unit = log_logic['quarterly']['unit'] %}            
-                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ quarterly_duration }} {{ quarterly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_quarter" = TRUE))
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ quarterly_duration }} {{ quarterly_unit }}' AND CURRENT_DATE()) AND (c."IS_BEGINNING_OF_QUARTER" = TRUE))
                             {%- endif -%}
                         {% endif -%}
 
                         {%- if 'yearly' in log_logic.keys() %} OR 
                             {%- if log_logic['yearly']['forever'] is true -%}
                                 {%- set ns.forever_status = 'TRUE' %}
-                          (c."is_beginning_of_year" = TRUE)
+                          (c."IS_BEGINNING_OF_YEAR" = TRUE)
                             {%- else %}
                                 {%- set yearly_duration = log_logic['yearly']['duration'] -%}
                                 {%- set yearly_unit = log_logic['yearly']['unit'] %}                    
-                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ yearly_duration }} {{ yearly_unit }}' AND CURRENT_DATE()) AND (c."is_beginning_of_year" = TRUE))
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ yearly_duration }} {{ yearly_unit }}' AND CURRENT_DATE()) AND (c."IS_BEGINNING_OF_YEAR" = TRUE))
                             {%- endif -%}
                         {% endif %}
                         THEN TRUE
@@ -1029,31 +1029,31 @@ stepTypes:
                     CASE
                         WHEN l."{{ sdts_alias }}" IS NULL THEN FALSE
                         ELSE TRUE
-                    END AS "is_latest",
+                    END AS "IS_LATEST",
 
-                    c."caption",
-                    c."is_hourly",
-                    c."is_daily",
-                    c."is_beginning_of_week",
-                    c."is_beginning_of_month",
-                    c."is_beginning_of_quarter",
-                    c."is_beginning_of_year",
+                    c."CAPTION",
+                    c."IS_HOURLY",
+                    c."IS_DAILY",
+                    c."IS_BEGINNING_OF_WEEK",
+                    c."IS_BEGINNING_OF_MONTH",
+                    c."IS_BEGINNING_OF_QUARTER",
+                    c."IS_BEGINNING_OF_YEAR",
                     CASE
                         WHEN EXTRACT(YEAR FROM c."{{ sdts_alias }}") = EXTRACT(YEAR FROM CURRENT_DATE()) THEN TRUE
                         ELSE FALSE
-                    END AS "is_current_year",
+                    END AS "IS_CURRENT_YEAR",
                     CASE
                         WHEN EXTRACT(YEAR FROM c."{{ sdts_alias }}") = EXTRACT(YEAR FROM CURRENT_DATE())-1 THEN TRUE
                         ELSE FALSE
-                    END AS "is_last_year",
+                    END AS "IS_LAST_YEAR",
                     CASE
                         WHEN DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN (CURRENT_DATE() - INTERVAL '1 YEAR') AND CURRENT_DATE() THEN TRUE
                         ELSE FALSE
-                    END AS "is_rolling_year",
+                    END AS "IS_ROLLING_YEAR",
                     CASE
                         WHEN DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN (CURRENT_DATE() - INTERVAL '2 YEAR') AND (CURRENT_DATE() - INTERVAL '1 YEAR') THEN TRUE
                         ELSE FALSE
-                    END AS "is_last_rolling_year"
+                    END AS "IS_LAST_ROLLING_YEAR"
                 FROM {{ ref(sources[0].columns[0].sourceColumns[0].node.location.name, sources[0].columns[0].sourceColumns[0].node.name) }} c
                 LEFT JOIN latest_row l
                 ON c."{{ sdts_alias }}" = l."{{ sdts_alias }}"
@@ -1064,24 +1064,24 @@ stepTypes:
 
                 SELECT 
                     "{{ sdts_alias }}",
-                    "force_active",
-                    "replacement_sdts",
-                    "caption",
-                    "is_hourly",
-                    "is_daily",
-                    "is_beginning_of_week",
-                    "is_beginning_of_month",
-                    "is_beginning_of_quarter",
-                    "is_beginning_of_year",
+                    "FORCE_ACTIVE",
+                    "REPLACEMENT_SDTS",
+                    "CAPTION",
+                    "IS_HOURLY",
+                    "IS_DAILY",
+                    "IS_BEGINNING_OF_WEEK",
+                    "IS_BEGINNING_OF_MONTH",
+                    "IS_BEGINNING_OF_QUARTER",
+                    "IS_BEGINNING_OF_YEAR",
                     CASE
-                        WHEN "force_active" AND {{ snapshot_trigger_column }} THEN TRUE
-                        WHEN NOT "force_active" OR NOT {{ snapshot_trigger_column }} THEN FALSE
+                        WHEN "FORCE_ACTIVE" AND {{ snapshot_trigger_column }} THEN TRUE
+                        WHEN NOT "FORCE_ACTIVE" OR NOT {{ snapshot_trigger_column }} THEN FALSE
                     END AS "{{ snapshot_trigger_column }}",
-                    "is_latest",         
-                    "is_current_year",
-                    "is_last_year",
-                    "is_rolling_year",
-                    "is_last_rolling_year"
+                    "IS_LATEST",         
+                    "IS_CURRENT_YEAR",
+                    "IS_LAST_YEAR",
+                    "IS_ROLLING_YEAR",
+                    "IS_LAST_ROLLING_YEAR"
                 FROM virtual_logic
                 ORDER BY "{{ sdts_alias }}" DESC
             )
@@ -1303,7 +1303,7 @@ stepTypes:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: Copy of Stage
+        capitalized: Stage
         short: STG
         plural: Stages
         tagColor: '#2EB67D'
@@ -1318,39 +1318,10 @@ stepTypes:
             isRequired: true
             enableIf: "false"
 
-          - type: multisourceToggle
-            enableIf: "{% if node.materializationType == 'table' %} true {% else %} false {% endif %}" 
-
-          - type: overrideSQLToggle
-            enableIf: "{% if node.materializationType == 'view' %} true {% else %} false {% endif %}"
-            
-          - displayName: Multi Source Strategy
-            attributeName: insertStrategy
-            type: dropdownSelector
-            default: INSERT
-            options:
-            - "INSERT"
-            - "UNION"
-            - "UNION ALL"
-            isRequired: true
-            enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
-
           - displayName: Enable Tests
             attributeName: testsEnabled
             type: toggleButton
             default: true
-            
-          - displayName: Pre-SQL
-            attributeName: preSQL
-            type: textBox
-            syntax: sql
-            isRequired: false
-
-          - displayName: Post-SQL
-            attributeName: postSQL
-            type: textBox
-            syntax: sql
-            isRequired: false
 
         - groupName: Data Vault
           items:
@@ -1360,13 +1331,13 @@ stepTypes:
             default: true
 
         systemColumns:
-        - displayName: "ldts"
+        - displayName: "LDTS"
           transform: "PLEASE FILL OUT"
           dataType: TIMESTAMP
           placement: end
           attributeName: is_system_ldts    
-          description: "Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used."
-        - displayName: "rsrc"
+          description: "Search for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used."
+        - displayName: "RSRC"
           transform: "{{record_source()}}"
           dataType: STRING
           placement: end
@@ -1380,21 +1351,6 @@ stepTypes:
             	{{ node.override.create.script }}
 
             {% elif node.materializationType == 'table' %}
-            	{{ stage('Create Stage Table') }}
-
-            	CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            	(
-            		{% for col in columns %}
-            			"{{ col.name }}" {{ col.dataType }}
-            			{%- if not col.nullable %} NOT NULL
-            				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            			{% endif %}
-            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	)
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-
 
             {% elif node.materializationType == 'view' %}
                 {{ stage('Create Stage View') }}
@@ -1471,92 +1427,7 @@ stepTypes:
 
             {% endif %}
         run:
-          templateString: |2
-
-                {% for test in node.tests if config.testsEnabled %}
-                    {% if test.runOrder == 'Before' %}
-                        {{ test_stage(test.name, test.continueOnFailure) }}
-                        {{ test.templateString }}
-                    {% endif %}
-                {% endfor %}
-
-            {% if node.materializationType == 'table' %}
-            	{% if config.preSQL %}
-            		{{ stage('Pre-SQL') }}
-            		{{ config.preSQL }}
-            	{% endif %}
-            	
-            	
-            	
-            		{% if config.truncateBefore %}
-            	
-            			{{ stage('Truncate Stage Table') }}
-            			TRUNCATE IF EXISTS {{ ref_no_link(node.location.name, node.name) }}
-            	
-            		{% endif %}
-            	
-            	
-            		{% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
-            			{{ stage( config.insertStrategy + ' Sources' | string ) }}
-            			INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-            				(
-            					{% for col in columns %}
-            						"{{ col.name }}"
-            						{%- if not loop.last -%},{% endif %}
-            					{% endfor %}
-            				)
-            		{% endif %}
-            	
-            	
-            		{% for source in sources %}
-            	
-            			{% if config.insertStrategy == 'INSERT' %}
-            				{{ stage('Insert ' + source.name | string ) }}
-            	
-            				INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-            				(
-            					{% for col in source.columns %}
-            						"{{ col.name }}"
-            						{%- if not loop.last -%},{% endif %}
-            					{% endfor %}
-            				)
-            			{% endif %}
-            	
-            			SELECT
-            			{% for col in source.columns %}
-                            {{ get_source_transform(col) }} AS "{{ col.name }}"
-            				{%- if not loop.last -%}, {% endif %}
-            			{% endfor %}
-            	
-            			{{ source.join }}
-            	
-            			{% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
-            				{{config.insertStrategy}}
-            			{% endif %}
-            	
-            		{% endfor %}
-            	
-            	{% if config.postSQL %}
-            		{{ stage('Post-SQL') }}
-            		{{ config.postSQL }}
-            	{% endif %}
-            {% endif %}
-
-            {% if config.testsEnabled %}
-            	{% for test in node.tests %}
-            		{% if test.runOrder == 'After' %}
-            			{{ test_stage(test.name, test.continueOnFailure) }}
-            			{{ test.templateString }}
-                    {% endif %}
-            	{% endfor %}
-
-            	{% for column in columns %}
-            		{% for test in column.tests %}
-            			{{ test_stage(column.name + ": " + test.name) }}
-            			{{ test.templateString }}
-            		{% endfor %}
-            	{% endfor %}
-            {% endif %}
+          templateString: ""
     name: "Datavault4Coalesce: Stage"
     version: 1
   StepType-6:
@@ -1964,11 +1835,6 @@ stepTypes:
             attributeName: is_hk
             isRequired: false
 
-          - displayName: LDTS Column
-            type: columnSelector
-            attributeName: is_ldts
-            isRequired: false
-
         - groupName: Pre/Post SQL
           items:
           - displayName: Pre-SQL
@@ -1982,13 +1848,24 @@ stepTypes:
             isRequired: false
 
         systemColumns:
-        - displayName: "ledts"
-          transform: COALESCE(LEAD("{{ get_value_by_column_attribute("is_ldts") }}" - INTERVAL '1 MICROSECOND') OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ get_value_by_column_attribute("is_ldts") }}"),{{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
+        - displayName: "LEDTS"
+          transform: |-
+            COALESCE(LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+            OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" 
+            ORDER BY "{{ datavault4coalesce.config.ldts_alias }}"), {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
           dataType: TIMESTAMP
           placement: end
           attributeName: is_system_ledts
-        - displayName: "is_current"
-          transform: CASE WHEN LEAD("{{ get_value_by_column_attribute("is_ldts") }}" - INTERVAL '1 MICROSECOND') OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ get_value_by_column_attribute("is_ldts") }}") IS NULL THEN TRUE ELSE FALSE END
+        - displayName: "IS_CURRENT"
+          transform: |-
+            CASE 
+              WHEN 
+                LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+                OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" 
+                ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
+              THEN TRUE 
+              ELSE FALSE 
+            END
           dataType: BOOLEAN
           placement: end
           attributeName: is_system_current_col
@@ -4821,4 +4698,17 @@ subgraphs:
       - "165"
       - "168"
       - "180"
+  Subgraph-6:
+    id: 6
+    name: Only Sources
+    steps:
+      - "162"
+      - "164"
+      - "165"
+      - "168"
+      - "226"
+      - "231"
+      - "233"
+      - "234"
+      - "236"
 version: 1

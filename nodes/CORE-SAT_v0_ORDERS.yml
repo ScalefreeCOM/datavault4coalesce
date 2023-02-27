@@ -1,5 +1,5 @@
 steps:
-  Orders_n0_s-178:
+  SAT_v0_ORDERS-251:
     operation:
       config:
         postSQL: ""
@@ -17,15 +17,15 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3340
-              stepCounter: "178"
+              columnCounter: 4298
+              stepCounter: "251"
             config:
               is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hk_orders_h
+            name: HK_ORDERS_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -33,15 +33,15 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3343
-              stepCounter: "178"
+              columnCounter: 4301
+              stepCounter: "251"
             config:
               is_hd: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hd_orders_n_s
+            name: HD_ORDERS_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -49,13 +49,13 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3338
-              stepCounter: "178"
+              columnCounter: 4296
+              stepCounter: "251"
             dataType: TIMESTAMP
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
             hashColumns: []
             hashDetails: null
-            name: ldts
+            name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -63,13 +63,13 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3339
-              stepCounter: "178"
+              columnCounter: 4297
+              stepCounter: "251"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
             hashDetails: null
-            name: rsrc
+            name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences:
@@ -77,36 +77,22 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3332
-              stepCounter: "178"
-            dataType: NUMBER(12,2)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: O_TOTALPRICE
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3272
-                    stepCounter: "174"
-                transform: ""
-          - columnReference:
-              columnCounter: 3336
-              stepCounter: "178"
+              columnCounter: 4287
+              stepCounter: "251"
             dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: O_SHIPPRIORITY
+            name: O_ORDERKEY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3276
+                  - columnCounter: 3269
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3331
-              stepCounter: "178"
+              columnCounter: 4289
+              stepCounter: "251"
             dataType: VARCHAR(1)
             description: ""
             hashColumns: []
@@ -119,8 +105,22 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3333
-              stepCounter: "178"
+              columnCounter: 4290
+              stepCounter: "251"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_TOTALPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3272
+                    stepCounter: "174"
+                transform: ""
+          - columnReference:
+              columnCounter: 4291
+              stepCounter: "251"
             dataType: DATE
             description: ""
             hashColumns: []
@@ -133,8 +133,8 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3334
-              stepCounter: "178"
+              columnCounter: 4292
+              stepCounter: "251"
             dataType: VARCHAR(15)
             description: ""
             hashColumns: []
@@ -147,8 +147,8 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3335
-              stepCounter: "178"
+              columnCounter: 4293
+              stepCounter: "251"
             dataType: VARCHAR(15)
             description: ""
             hashColumns: []
@@ -161,8 +161,22 @@ steps:
                     stepCounter: "174"
                 transform: ""
           - columnReference:
-              columnCounter: 3337
-              stepCounter: "178"
+              columnCounter: 4294
+              stepCounter: "251"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: O_SHIPPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3276
+                    stepCounter: "174"
+                transform: ""
+          - columnReference:
+              columnCounter: 4295
+              stepCounter: "251"
             dataType: VARCHAR(79)
             description: ""
             hashColumns: []
@@ -184,11 +198,11 @@ steps:
                 nodeName: STG_ORDERS
             join:
               joinCondition: FROM {{ ref('CORE', 'STG_ORDERS') }} "STG_ORDERS"
-            name: Orders_n0_s
+            name: SAT_v0_ORDERS
             noLinkRefs: []
-      name: Orders_n0_s
+      name: SAT_v0_ORDERS
       overrideSQL: false
       schema: ""
       sqlType: "8"
       type: sql
-    stepCounter: "178"
+    stepCounter: "251"

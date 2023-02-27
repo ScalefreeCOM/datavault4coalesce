@@ -1,15 +1,16 @@
 steps:
-  nation_h-201:
+  CUSTOMER_NATION_L-248:
     operation:
       config:
+        insertStrategy: UNION
         postSQL: ""
         preSQL: ""
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Nation data as defined by TPC-H
+      description: Customer data as defined by TPC-H
       isDataVault: false
-      isMultisource: true
+      isMultisource: false
       locationID: ""
       locationName: CORE
       materializationType: table
@@ -17,106 +18,94 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3652
-              stepCounter: "201"
+              columnCounter: 4263
+              stepCounter: "248"
             config:
-              is_Hub_hk: true
+              is_Link_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hk_nation_h
+            name: HK_CUSTOMER_NATION_L
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3643
-                    stepCounter: "200"
+                  - columnCounter: 3404
+                    stepCounter: "183"
                 transform: ""
+          - columnReference:
+              columnCounter: 4262
+              stepCounter: "248"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_CUSTOMER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3403
+                    stepCounter: "183"
+                transform: ""
+          - columnReference:
+              columnCounter: 4264
+              stepCounter: "248"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_NATION_H
+            nullable: true
+            sourceColumnReferences:
               - columnReferences:
                   - columnCounter: 3405
                     stepCounter: "183"
                 transform: ""
           - columnReference:
-              columnCounter: 3646
-              stepCounter: "201"
-            dataType: NUMBER(38,0)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: N_NATIONKEY
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3637
-                    stepCounter: "200"
-                transform: ""
-              - columnReferences:
-                  - columnCounter: 3396
-                    stepCounter: "183"
-                transform: ""
-          - columnReference:
-              columnCounter: 3650
-              stepCounter: "201"
+              columnCounter: 4260
+              stepCounter: "248"
+            config:
+              is_Link_ldts: true
             dataType: TIMESTAMP
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
             hashColumns: []
             hashDetails: null
-            name: ldts
+            name: LDTS
             nullable: true
             sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3641
-                    stepCounter: "200"
-                transform: ""
               - columnReferences:
                   - columnCounter: 3401
                     stepCounter: "183"
                 transform: ""
           - columnReference:
-              columnCounter: 3651
-              stepCounter: "201"
+              columnCounter: 4261
+              stepCounter: "248"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
             hashDetails: null
-            name: rsrc
+            name: RSRC
             nullable: true
             sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3642
-                    stepCounter: "200"
-                transform: ""
               - columnReferences:
                   - columnCounter: 3402
                     stepCounter: "183"
                 transform: ""
+        cteString: ""
         enabledColumnTestIDs: []
         sourceMapping:
-          - aliases:
-              STG_NATION: "200"
-            customSQL:
-              customSQL: ""
-            dependencies:
-              - locationName: CORE
-                nodeName: STG_NATION
-            join:
-              joinCondition: FROM {{ ref('CORE', 'STG_NATION') }} "STG_NATION"
-            name: nation
-            noLinkRefs: []
-          - aliases:
-              STG_CUSTOMER: "183"
-            customSQL:
+          - customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
                 nodeName: STG_CUSTOMER
             join:
               joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER') }} "STG_CUSTOMER"
-            name: customer
+            name: CUSTOMER_NATION_L
             noLinkRefs: []
-      name: nation_h
+      name: CUSTOMER_NATION_L
       overrideSQL: false
       schema: ""
-      sqlType: "6"
+      sqlType: "7"
       type: sql
-    stepCounter: "201"
+    stepCounter: "248"

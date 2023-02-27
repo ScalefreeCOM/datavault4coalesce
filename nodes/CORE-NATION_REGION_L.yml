@@ -1,5 +1,5 @@
 steps:
-  nation_region_l-202:
+  NATION_REGION_L-250:
     operation:
       config:
         insertStrategy: UNION
@@ -17,81 +17,79 @@ steps:
       metadata:
         appliedNodeTests: []
         columns:
-          - acceptedValues:
-              strictMatch: false
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 3666
-              stepCounter: "202"
+          - columnReference:
+              columnCounter: 4286
+              stepCounter: "250"
             config:
               is_Link_hk: true
             dataType: STRING
             description: ""
-            name: hk_nation_region_l
+            hashColumns: []
+            hashDetails: null
+            name: HK_NATION_REGION_L
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3665
-                    stepCounter: "200"
+                  - columnCounter: 4276
+                    stepCounter: "243"
                 transform: ""
           - columnReference:
-              columnCounter: 3662
-              stepCounter: "202"
+              columnCounter: 4283
+              stepCounter: "250"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hk_nation_h
+            name: HK_NATION_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3643
-                    stepCounter: "200"
+                  - columnCounter: 4212
+                    stepCounter: "243"
                 transform: ""
           - columnReference:
-              columnCounter: 3663
-              stepCounter: "202"
+              columnCounter: 4285
+              stepCounter: "250"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hk_region_h
+            name: HK_REGION_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3644
-                    stepCounter: "200"
+                  - columnCounter: 4229
+                    stepCounter: "243"
                 transform: ""
           - columnReference:
-              columnCounter: 3660
-              stepCounter: "202"
+              columnCounter: 4281
+              stepCounter: "250"
             config:
               is_Link_ldts: true
             dataType: TIMESTAMP
-            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            description: Search for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
             hashColumns: []
             hashDetails: null
-            name: ldts
+            name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3641
-                    stepCounter: "200"
+                  - columnCounter: 4210
+                    stepCounter: "243"
                 transform: ""
           - columnReference:
-              columnCounter: 3661
-              stepCounter: "202"
+              columnCounter: 4282
+              stepCounter: "250"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
             hashDetails: null
-            name: rsrc
+            name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3642
-                    stepCounter: "200"
+                  - columnCounter: 4211
+                    stepCounter: "243"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
@@ -103,11 +101,11 @@ steps:
                 nodeName: STG_NATION
             join:
               joinCondition: FROM {{ ref('CORE', 'STG_NATION') }} "STG_NATION"
-            name: nation_region_l
+            name: NATION_REGION_L
             noLinkRefs: []
-      name: nation_region_l
+      name: NATION_REGION_L
       overrideSQL: false
       schema: ""
       sqlType: "7"
       type: sql
-    stepCounter: "202"
+    stepCounter: "250"

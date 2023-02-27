@@ -1,5 +1,5 @@
 steps:
-  orders_h-175:
+  REGION_H-246:
     operation:
       config:
         postSQL: ""
@@ -7,9 +7,9 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Orders data as defined by TPC-H
+      description: Region data as defined by TPC-H
       isDataVault: false
-      isMultisource: false
+      isMultisource: true
       locationID: ""
       locationName: CORE
       materializationType: table
@@ -17,82 +17,104 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3295
-              stepCounter: "175"
+              columnCounter: 4235
+              stepCounter: "246"
             config:
               is_Hub_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hk_orders_h
+            name: HK_REGION_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3280
-                    stepCounter: "174"
+                  - columnCounter: 3707
+                    stepCounter: "206"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4229
+                    stepCounter: "243"
                 transform: ""
           - columnReference:
-              columnCounter: 3284
-              stepCounter: "175"
-            config:
-              is_Hub_bk: true
+              columnCounter: 4230
+              stepCounter: "246"
             dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: O_ORDERKEY
+            name: R_REGIONKEY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3269
-                    stepCounter: "174"
+                  - columnCounter: 3702
+                    stepCounter: "206"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4208
+                    stepCounter: "243"
                 transform: ""
           - columnReference:
-              columnCounter: 3293
-              stepCounter: "175"
-            config:
-              is_Hub_ldts: true
+              columnCounter: 4233
+              stepCounter: "246"
             dataType: TIMESTAMP
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
             hashColumns: []
             hashDetails: null
-            name: ldts
+            name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3278
-                    stepCounter: "174"
+                  - columnCounter: 3705
+                    stepCounter: "206"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4210
+                    stepCounter: "243"
                 transform: ""
           - columnReference:
-              columnCounter: 3294
-              stepCounter: "175"
+              columnCounter: 4234
+              stepCounter: "246"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
             hashDetails: null
-            name: rsrc
+            name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3279
-                    stepCounter: "174"
+                  - columnCounter: 3706
+                    stepCounter: "206"
                 transform: ""
-        cteString: ""
+              - columnReferences:
+                  - columnCounter: 4211
+                    stepCounter: "243"
+                transform: ""
         enabledColumnTestIDs: []
         sourceMapping:
           - customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_ORDERS
+                nodeName: STG_REGION
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS') }} "STG_ORDERS"
-            name: orders_h
+              joinCondition: FROM {{ ref('CORE', 'STG_REGION') }} "STG_REGION"
+            name: REGION_H
             noLinkRefs: []
-      name: orders_h
+          - aliases:
+              STG_NATION: "243"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_NATION
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_NATION') }} "STG_NATION"
+            name: STG_NATION
+            noLinkRefs: []
+      name: REGION_H
       overrideSQL: false
       schema: ""
       sqlType: "6"
       type: sql
-    stepCounter: "175"
+    stepCounter: "246"

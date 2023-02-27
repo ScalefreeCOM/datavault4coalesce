@@ -1,5 +1,5 @@
 steps:
-  customer_p0_s-187:
+  CUSTOMER_H-242:
     operation:
       config:
         postSQL: ""
@@ -9,7 +9,7 @@ steps:
       deployEnabled: true
       description: Customer data as defined by TPC-H
       isDataVault: false
-      isMultisource: false
+      isMultisource: true
       locationID: ""
       locationName: CORE
       materializationType: table
@@ -17,108 +17,106 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 3458
-              stepCounter: "187"
+              columnCounter: 4201
+              stepCounter: "242"
             config:
-              is_hk: true
+              is_Hub_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hk_customer_h
+            name: HK_CUSTOMER_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
                   - columnCounter: 3403
                     stepCounter: "183"
                 transform: ""
+              - columnReferences:
+                  - columnCounter: 3281
+                    stepCounter: "174"
+                transform: ""
           - columnReference:
-              columnCounter: 3462
-              stepCounter: "187"
-            config:
-              is_hd: true
-            dataType: STRING
+              columnCounter: 4191
+              stepCounter: "242"
+            dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: hd_customer_p_s
-            nullable: true
+            name: C_CUSTKEY
+            nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3407
+                  - columnCounter: 3393
                     stepCounter: "183"
                 transform: ""
+              - columnReferences:
+                  - columnCounter: 3281
+                    stepCounter: "174"
+                transform: ""
           - columnReference:
-              columnCounter: 3456
-              stepCounter: "187"
+              columnCounter: 4199
+              stepCounter: "242"
             dataType: TIMESTAMP
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
             hashColumns: []
             hashDetails: null
-            name: ldts
+            name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
                   - columnCounter: 3401
                     stepCounter: "183"
                 transform: ""
+              - columnReferences:
+                  - columnCounter: 3278
+                    stepCounter: "174"
+                transform: ""
           - columnReference:
-              columnCounter: 3457
-              stepCounter: "187"
+              columnCounter: 4200
+              stepCounter: "242"
             dataType: STRING
             description: If available, replace with existing column from source.
             hashColumns: []
             hashDetails: null
-            name: rsrc
+            name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences:
                   - columnCounter: 3402
                     stepCounter: "183"
                 transform: ""
-          - columnReference:
-              columnCounter: 3449
-              stepCounter: "187"
-            dataType: VARCHAR(25)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: C_NAME
-            nullable: false
-            sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3394
-                    stepCounter: "183"
+                  - columnCounter: 3279
+                    stepCounter: "174"
                 transform: ""
-          - columnReference:
-              columnCounter: 3450
-              stepCounter: "187"
-            dataType: VARCHAR(40)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: C_ADDRESS
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3395
-                    stepCounter: "183"
-                transform: ""
-        cteString: ""
         enabledColumnTestIDs: []
         sourceMapping:
-          - customSQL:
+          - aliases:
+              STG_CUSTOMER: "183"
+            customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
                 nodeName: STG_CUSTOMER
             join:
               joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER') }} "STG_CUSTOMER"
-            name: customer_p0_s
+            name: CUSTOMER_H
             noLinkRefs: []
-      name: customer_p0_s
+          - aliases:
+              STG_ORDERS: "174"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_ORDERS
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS') }} "STG_ORDERS"
+            name: STG_ORDERS
+            noLinkRefs: []
+      name: CUSTOMER_H
       overrideSQL: false
       schema: ""
-      sqlType: "8"
+      sqlType: "6"
       type: sql
-    stepCounter: "187"
+    stepCounter: "242"

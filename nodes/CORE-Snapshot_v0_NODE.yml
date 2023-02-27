@@ -1,5 +1,5 @@
 steps:
-  Snapshot_v0-180:
+  Snapshot_v0_NODE-257:
     operation:
       config:
         input_daily_snapshot_time: "07:00:00"
@@ -24,14 +24,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3357
-              stepCounter: "180"
+              columnCounter: 4375
+              stepCounter: "257"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: sdts
+            name: SDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -42,14 +42,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3358
-              stepCounter: "180"
+              columnCounter: 4376
+              stepCounter: "257"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: force_active
+            name: FORCE_ACTIVE
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -60,14 +60,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3359
-              stepCounter: "180"
+              columnCounter: 4377
+              stepCounter: "257"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: replacement_sdts
+            name: REPLACEMENT_SDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -78,14 +78,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3360
-              stepCounter: "180"
+              columnCounter: 4378
+              stepCounter: "257"
             config: {}
             dataType: STRING
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: caption
+            name: CAPTION
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -96,14 +96,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3361
-              stepCounter: "180"
+              columnCounter: 4379
+              stepCounter: "257"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_hourly
+            name: IS_HOURLY
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -114,14 +114,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3362
-              stepCounter: "180"
+              columnCounter: 4380
+              stepCounter: "257"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_daily
+            name: IS_DAILY
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -132,14 +132,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3363
-              stepCounter: "180"
+              columnCounter: 4381
+              stepCounter: "257"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_beginning_of_week
+            name: IS_BEGINNING_OF_WEEK
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -150,14 +150,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3364
-              stepCounter: "180"
+              columnCounter: 4382
+              stepCounter: "257"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_beginning_of_month
+            name: IS_BEGINNING_OF_MONTH
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -168,14 +168,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3365
-              stepCounter: "180"
+              columnCounter: 4383
+              stepCounter: "257"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_beginning_of_quarter
+            name: IS_BEGINNING_OF_QUARTER
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -186,14 +186,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 3366
-              stepCounter: "180"
+              columnCounter: 4384
+              stepCounter: "257"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
             description: ""
             hashColumns: []
-            name: is_beginning_of_year
+            name: IS_BEGINNING_OF_YEAR
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -207,11 +207,11 @@ steps:
             dependencies: []
             join:
               joinCondition: ""
-            name: Snapshot_v0
+            name: Snapshot_v0_NODE
             noLinkRefs: []
-      name: Snapshot_v0
+      name: Snapshot_v0_NODE
       overrideSQL: false
       schema: ""
       sqlType: "13"
       type: sql
-    stepCounter: "180"
+    stepCounter: "257"

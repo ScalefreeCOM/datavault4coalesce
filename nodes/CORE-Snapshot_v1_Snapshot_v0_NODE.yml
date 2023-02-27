@@ -1,0 +1,300 @@
+steps:
+  Snapshot_v1_Snapshot_v0_NODE-258:
+    operation:
+      config:
+        daily_snapshot_duration: "30"
+        daily_snapshot_unit: DAY
+        daily_snapshots_forever: false
+        monthly_snapshot_duration: "3"
+        monthly_snapshot_unit: YEAR
+        monthly_snapshots_forever: false
+        postSQL: ""
+        preSQL: ""
+        quarterly_snapshot_duration: "5"
+        quarterly_snapshot_unit: YEAR
+        quarterly_snapshots_forever: false
+        use_logarithmic_logic: true
+        weekly_snapshot_duration: "1"
+        weekly_snapshot_unit: YEAR
+        weekly_snapshots_forever: false
+        yearly_snapshot_duration: "10"
+        yearly_snapshot_unit: YEAR
+        yearly_snapshots_forever: false
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4385
+              stepCounter: "258"
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: SDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4375
+                    stepCounter: "257"
+                transform: ""
+          - columnReference:
+              columnCounter: 4386
+              stepCounter: "258"
+            dataType: BOOLEAN
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: FORCE_ACTIVE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4376
+                    stepCounter: "257"
+                transform: ""
+          - columnReference:
+              columnCounter: 4387
+              stepCounter: "258"
+            dataType: TIMESTAMP
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: REPLACEMENT_SDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4377
+                    stepCounter: "257"
+                transform: ""
+          - columnReference:
+              columnCounter: 4388
+              stepCounter: "258"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CAPTION
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4378
+                    stepCounter: "257"
+                transform: ""
+          - columnReference:
+              columnCounter: 4389
+              stepCounter: "258"
+            dataType: BOOLEAN
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: IS_HOURLY
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4379
+                    stepCounter: "257"
+                transform: ""
+          - columnReference:
+              columnCounter: 4390
+              stepCounter: "258"
+            dataType: BOOLEAN
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: IS_DAILY
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4380
+                    stepCounter: "257"
+                transform: ""
+          - columnReference:
+              columnCounter: 4391
+              stepCounter: "258"
+            dataType: BOOLEAN
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: IS_BEGINNING_OF_WEEK
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4381
+                    stepCounter: "257"
+                transform: ""
+          - columnReference:
+              columnCounter: 4392
+              stepCounter: "258"
+            dataType: BOOLEAN
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: IS_BEGINNING_OF_MONTH
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4382
+                    stepCounter: "257"
+                transform: ""
+          - columnReference:
+              columnCounter: 4393
+              stepCounter: "258"
+            dataType: BOOLEAN
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: IS_BEGINNING_OF_QUARTER
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4383
+                    stepCounter: "257"
+                transform: ""
+          - columnReference:
+              columnCounter: 4394
+              stepCounter: "258"
+            dataType: BOOLEAN
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: IS_BEGINNING_OF_YEAR
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4384
+                    stepCounter: "257"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4395
+              stepCounter: "258"
+            config: {}
+            dataType: BOOLEAN
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            name: IS_ACTIVE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+            system_is_active: true
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4396
+              stepCounter: "258"
+            config: {}
+            dataType: BOOLEAN
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            name: IS_LATEST
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+            system_is_latest: true
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4397
+              stepCounter: "258"
+            config: {}
+            dataType: BOOLEAN
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            name: IS_CURRENT_YEAR
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+            system_is_current_year: true
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4398
+              stepCounter: "258"
+            config: {}
+            dataType: BOOLEAN
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            name: IS_LAST_YEAR
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+            system_is_last_year: true
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4399
+              stepCounter: "258"
+            config: {}
+            dataType: BOOLEAN
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            name: IS_ROLLING_YEAR
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+            system_is_rolling_year: true
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4400
+              stepCounter: "258"
+            config: {}
+            dataType: BOOLEAN
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            name: IS_LAST_ROLLING_YEAR
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+            system_is_last_rolling_year: true
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: Snapshot_v0_NODE
+            join:
+              joinCondition: FROM {{ ref('CORE', 'Snapshot_v0_NODE') }} "Snapshot_v0_NODE"
+            name: Snapshot_v1_Snapshot_v0_NODE
+            noLinkRefs: []
+      name: Snapshot_v1_Snapshot_v0_NODE
+      overrideSQL: false
+      schema: ""
+      sqlType: "14"
+      type: sql
+    stepCounter: "258"

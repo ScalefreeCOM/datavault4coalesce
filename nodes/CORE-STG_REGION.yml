@@ -24,8 +24,6 @@ steps:
               stepCounter: "206"
             dataType: NUMBER(38,0)
             description: ""
-            hashColumns: []
-            hashDetails: null
             name: R_REGIONKEY
             nullable: false
             sourceColumnReferences:
@@ -38,8 +36,6 @@ steps:
               stepCounter: "206"
             dataType: VARCHAR(25)
             description: ""
-            hashColumns: []
-            hashDetails: null
             name: R_NAME
             nullable: false
             sourceColumnReferences:
@@ -52,8 +48,6 @@ steps:
               stepCounter: "206"
             dataType: VARCHAR(152)
             description: ""
-            hashColumns: []
-            hashDetails: null
             name: R_COMMENT
             nullable: true
             sourceColumnReferences:
@@ -72,9 +66,8 @@ steps:
             dataType: TIMESTAMP
             defaultValue: ""
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
-            hashColumns: []
             is_system_ldts: true
-            name: ldts
+            name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -90,9 +83,8 @@ steps:
             dataType: STRING
             defaultValue: ""
             description: If available, replace with existing column from source.
-            hashColumns: []
             is_system_rsrc: true
-            name: rsrc
+            name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -108,13 +100,12 @@ steps:
             dataType: STRING
             defaultValue: ""
             description: ""
-            hashColumns: []
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
               - columnCounter: 3702
                 stepCounter: "206"
-            name: hk_region_h
+            name: HK_REGION_H
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -130,7 +121,6 @@ steps:
             dataType: STRING
             defaultValue: ""
             description: ""
-            hashColumns: []
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
@@ -138,7 +128,7 @@ steps:
                 stepCounter: "206"
               - columnCounter: 3704
                 stepCounter: "206"
-            name: hd_region_n_s
+            name: HD_REGION_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences: []

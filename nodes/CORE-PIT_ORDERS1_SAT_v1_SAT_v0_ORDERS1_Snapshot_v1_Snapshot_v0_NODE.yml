@@ -1,0 +1,119 @@
+steps:
+  PIT_ORDERS1_SAT_v1_SAT_v0_ORDERS1_Snapshot_v1_Snapshot_v0_NODE-259:
+    operation:
+      config:
+        cleanup_pit: true
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4434
+              stepCounter: "259"
+            config:
+              is_dimension_key: true
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 4401
+                stepCounter: "259"
+              - columnCounter: 4418
+                stepCounter: "259"
+            name: HK_CUSTOMER_D
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - columnReference:
+              columnCounter: 4401
+              stepCounter: "259"
+            dataType: STRING
+            description: ""
+            name: HK_ORDER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4328
+                    stepCounter: "253"
+                transform: ""
+          - columnReference:
+              columnCounter: 4418
+              stepCounter: "259"
+            dataType: TIMESTAMP
+            description: ""
+            name: SDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4385
+                    stepCounter: "258"
+                transform: ""
+          - columnReference:
+              columnCounter: 4405
+              stepCounter: "259"
+            dataType: STRING
+            description: ""
+            name: HK_ORDER_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4362
+                    stepCounter: "256"
+                transform: ""
+          - columnReference:
+              columnCounter: 4407
+              stepCounter: "259"
+            dataType: TIMESTAMP
+            description: Search for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            name: LDTS_ORDER_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4364
+                    stepCounter: "256"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases: {}
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: HUB_ORDERS1
+              - locationName: CORE
+                nodeName: SAT_v1_SAT_v0_ORDERS1
+              - locationName: CORE
+                nodeName: Snapshot_v1_Snapshot_v0_NODE
+            join:
+              joinCondition: |-
+                FROM {{ ref('CORE', 'HUB_ORDERS1') }} "HUB_ORDERS1"
+                INNER JOIN {{ ref('CORE', 'SAT_v1_SAT_v0_ORDERS1') }} "SAT_v1_SAT_v0_ORDERS1"
+                ON "HUB_ORDERS1"./*COLUMN*/ = "SAT_v1_SAT_v0_ORDERS1"./*COLUMN*/
+                INNER JOIN {{ ref('CORE', 'Snapshot_v1_Snapshot_v0_NODE') }} "Snapshot_v1_Snapshot_v0_NODE"
+                ON "HUB_ORDERS1"./*COLUMN*/ = "Snapshot_v1_Snapshot_v0_NODE"./*COLUMN*/
+            name: PIT_ORDERS1_SAT_v1_SAT_v0_ORDERS1_Snapshot_v1_Snapshot_v0_NODE
+            noLinkRefs: []
+      name: PIT_ORDERS1_SAT_v1_SAT_v0_ORDERS1_Snapshot_v1_Snapshot_v0_NODE
+      overrideSQL: false
+      schema: ""
+      sqlType: "12"
+      type: sql
+    stepCounter: "259"
