@@ -1477,6 +1477,8 @@ stepTypes:
 
             	{{ stage('INSERT INTO Hub - ' ~ source.name) }}
 
+            	{%- set hashkey_column = get_value_by_column_attribute("is_Hub_hk") -%}
+
             	INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
             	
             WITH incoming AS (
@@ -1493,19 +1495,17 @@ stepTypes:
 
             new_records AS (
 
-            	SELECT "SRC".* 
+            	SELECT 
+            	"SRC".* 
             	FROM incoming "SRC"
             	WHERE NOT EXISTS 
 
             	(SELECT 1 
             	FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
             	WHERE 
-            	{% for col in sources[0].columns if (col.is_Hub_hk) -%}
-            		{% if not loop.first %}
-            			AND
-            		{% endif %}
-            		"SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
-            	{% endfor %} )
+            		"SRC"."{{ hashkey_column }}" = "TGT"."{{ hashkey_column }}")
+
+            	QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
             )
 
 
@@ -1586,7 +1586,10 @@ stepTypes:
 
             {% for source in sources %}
                         
-                {{ stage('Merge Link - ' ~ source.name) }}
+                {{ stage('INSERT INTO Link - ' ~ source.name) }}
+
+                {%- set link_hashkey = get_value_by_column_attribute("is_Link_hk") -%}
+
                 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
             WITH incoming AS 
@@ -1608,14 +1611,9 @@ stepTypes:
                     SELECT
                         1
                     FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
-                    WHERE
-                {% for col in sources[0].columns if (col.is_Link_hk) -%}
-                    {% if not loop.first %}
-                        AND
-                    {% endif %}
-                    "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
-                {% endfor %}        
+                    WHERE "SRC"."{{ link_hashkey }}" = "TGT"."{{ link_hashkey }}"
                 )
+                QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ link_hashkey }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
             )
 
             SELECT * FROM new_records
