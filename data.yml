@@ -302,34 +302,12 @@ stepTypes:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: 'DATAVAULT4COALESCE: PIT'
+        capitalized: 'DATAVAULT BY SCALEFREE: PIT'
         short: 'PIT'
-        tagColor: brown
-        plural: 'PITs'
+        tagColor: '#C0C0C0'
+        plural: 'DATAVAULT BY SCALEFREE: PITS'
 
         config:
-        - groupName: Options
-          items:
-          - type: materializationSelector
-            isRequired: true
-            enableIf: 'true'
-            options: 
-            - table
-            default: table
-         
-          - displayName: Pre-SQL
-            attributeName: preSQL
-            type: textBox
-            isRequired: false
-
-          - displayName: Post-SQL
-            attributeName: postSQL
-            type: textBox
-            isRequired: false
-
-          - type: multisourceToggle
-            default: true
-
         - groupName: Data Vault
           items:
           - displayName: Dimension Key Column
@@ -476,7 +454,7 @@ stepTypes:
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
             {% endif %}
-    name: "Datavault4Coalesce: PIT"
+    name: "Datavault by Scalefree: PIT"
     version: 1
   StepType-13:
     id: "13"
@@ -485,37 +463,31 @@ stepTypes:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: Snapshot v0
+        capitalized: 'DATAVAULT BY SCALEFREE: SNAPSHOT V0'
         short: 'Snapshot_v0'
-        plural: 'Snapshots'
-        tagColor: 'green'
+        plural: 'DATAVAULT BY SCALEFREE: SNAPSHOTS V0'
+        tagColor: '#1E8449'
 
         config:
-        - groupName: Options
-          items:
-          - type: materializationSelector
-            isRequired: true
-            enableIf: 'false'
-            default: table
-            options:
-            - table
-
         - groupName: Data Vault
           items:
           - displayName: Snapshot Start Date (yyyy-mm-dd)
             type: textBox
             attributeName: input_snapshot_start_date
             isRequired: true
+            default: "2020-01-01"
 
           - displayName: Snapshot End Date (yyyy-mm-dd)
             type: textBox
             attributeName: input_snapshot_end_date
             isRequired: true
+            default: "2025-12-31"
 
           - displayName: Daily Snapshot Time (hh:mm:ss)
             type: textBox
             attributeName: input_daily_snapshot_time
             isRequired: true
+            default: "07:00:00"
 
         - groupName: Pre/Post SQL
           items:
@@ -629,7 +601,7 @@ stepTypes:
                         ELSE FALSE
                     END AS "is_hourly",
                     CASE
-                        WHEN EXTRACT(MINUTE FROM "sdts") = 0 AND EXTRACT(SECOND FROM "sdts") = 0 THEN TRUE
+                        WHEN EXTRACT(HOUR FROM "sdts") = 0 AND EXTRACT(MINUTE FROM "sdts") = 0 AND EXTRACT(SECOND FROM "sdts") = 0 THEN TRUE
                         ELSE FALSE
                     END AS "is_daily",
                     CASE
@@ -677,7 +649,7 @@ stepTypes:
             SELECT * FROM "records_to_insert"
 
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-    name: "Datavault4Coalesce: Snapshot v0"
+    name: "Datavault by Scalefree: Snapshot v0"
     version: 1
   StepType-14:
     id: "14"
@@ -686,10 +658,10 @@ stepTypes:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: Snapshot v1
+        capitalized: 'DATAVAULT BY SCALEFREE: SNAPSHOT V1'
         short: 'Snapshot_v1'
-        plural: 'Snapshots'
-        tagColor: 'green'
+        plural: 'DATAVAULT BY SCALEFREE: SNAPSHOTS V1'
+        tagColor: '#58D68D'
 
         config:
 
@@ -950,7 +922,7 @@ stepTypes:
                 SELECT
                     "{{ sdts_alias }}"
                 FROM {{ ref(sources[0].columns[0].sourceColumns[0].node.location.name, sources[0].columns[0].sourceColumns[0].node.name) }}
-                WHERE DATE("{{ sdts_alias }}") = DATE(GETDATE())
+                WHERE "{{ sdts_alias }}" <= SYSDATE()
                 ORDER BY "{{ sdts_alias }}" DESC
                 LIMIT 1
 
@@ -974,7 +946,7 @@ stepTypes:
                             {%- else %}
                                 {%- set daily_duration = log_logic['daily']['duration'] -%}
                                 {%- set daily_unit = log_logic['daily']['unit'] -%}
-                              (DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ daily_duration }} {{ daily_unit }}' AND CURRENT_DATE())
+                              (DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN SYSDATE() - INTERVAL '{{ daily_duration }} {{ daily_unit }}' AND SYSDATE())
                             {%- endif -%}   
                         {%- endif %}
 
@@ -985,7 +957,7 @@ stepTypes:
                             {%- else %} 
                                 {%- set weekly_duration = log_logic['weekly']['duration'] -%}
                                 {%- set weekly_unit = log_logic['weekly']['unit'] %}            
-                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ weekly_duration }} {{ weekly_unit }}' AND CURRENT_DATE()) AND (c."IS_BEGINNING_OF_WEEK" = TRUE))
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN SYSDATE() - INTERVAL '{{ weekly_duration }} {{ weekly_unit }}' AND SYSDATE()) AND (c."IS_BEGINNING_OF_WEEK" = TRUE))
                             {%- endif -%}
                         {% endif -%}
 
@@ -996,7 +968,7 @@ stepTypes:
                             {%- else %}
                                 {%- set monthly_duration = log_logic['monthly']['duration'] -%}
                                 {%- set monthly_unit = log_logic['monthly']['unit'] %}            
-                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ monthly_duration }} {{ monthly_unit }}' AND CURRENT_DATE()) AND (c."IS_BEGINNING_OF_MONTH" = TRUE))
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN SYSDATE() - INTERVAL '{{ monthly_duration }} {{ monthly_unit }}' AND SYSDATE()) AND (c."IS_BEGINNING_OF_MONTH" = TRUE))
                             {%- endif -%}
                         {% endif -%}
 
@@ -1007,7 +979,7 @@ stepTypes:
                             {%- else %}
                                 {%- set quarterly_duration = log_logic['quarterly']['duration'] -%}
                                 {%- set quarterly_unit = log_logic['quarterly']['unit'] %}            
-                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ quarterly_duration }} {{ quarterly_unit }}' AND CURRENT_DATE()) AND (c."IS_BEGINNING_OF_QUARTER" = TRUE))
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN SYSDATE() - INTERVAL '{{ quarterly_duration }} {{ quarterly_unit }}' AND SYSDATE()) AND (c."IS_BEGINNING_OF_QUARTER" = TRUE))
                             {%- endif -%}
                         {% endif -%}
 
@@ -1018,7 +990,7 @@ stepTypes:
                             {%- else %}
                                 {%- set yearly_duration = log_logic['yearly']['duration'] -%}
                                 {%- set yearly_unit = log_logic['yearly']['unit'] %}                    
-                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN CURRENT_DATE() - INTERVAL '{{ yearly_duration }} {{ yearly_unit }}' AND CURRENT_DATE()) AND (c."IS_BEGINNING_OF_YEAR" = TRUE))
+                          ((DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN SYSDATE() - INTERVAL '{{ yearly_duration }} {{ yearly_unit }}' AND SYSDATE()) AND (c."IS_BEGINNING_OF_YEAR" = TRUE))
                             {%- endif -%}
                         {% endif %}
                         THEN TRUE
@@ -1039,25 +1011,25 @@ stepTypes:
                     c."IS_BEGINNING_OF_QUARTER",
                     c."IS_BEGINNING_OF_YEAR",
                     CASE
-                        WHEN EXTRACT(YEAR FROM c."{{ sdts_alias }}") = EXTRACT(YEAR FROM CURRENT_DATE()) THEN TRUE
+                        WHEN EXTRACT(YEAR FROM c."{{ sdts_alias }}") = EXTRACT(YEAR FROM SYSDATE()) THEN TRUE
                         ELSE FALSE
                     END AS "IS_CURRENT_YEAR",
                     CASE
-                        WHEN EXTRACT(YEAR FROM c."{{ sdts_alias }}") = EXTRACT(YEAR FROM CURRENT_DATE())-1 THEN TRUE
+                        WHEN EXTRACT(YEAR FROM c."{{ sdts_alias }}") = EXTRACT(YEAR FROM SYSDATE())-1 THEN TRUE
                         ELSE FALSE
                     END AS "IS_LAST_YEAR",
                     CASE
-                        WHEN DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN (CURRENT_DATE() - INTERVAL '1 YEAR') AND CURRENT_DATE() THEN TRUE
+                        WHEN DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN (SYSDATE() - INTERVAL '1 YEAR') AND SYSDATE() THEN TRUE
                         ELSE FALSE
                     END AS "IS_ROLLING_YEAR",
                     CASE
-                        WHEN DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN (CURRENT_DATE() - INTERVAL '2 YEAR') AND (CURRENT_DATE() - INTERVAL '1 YEAR') THEN TRUE
+                        WHEN DATE_TRUNC('DAY', c."{{ sdts_alias }}"::DATE) BETWEEN (SYSDATE() - INTERVAL '2 YEAR') AND (SYSDATE() - INTERVAL '1 YEAR') THEN TRUE
                         ELSE FALSE
                     END AS "IS_LAST_ROLLING_YEAR"
                 FROM {{ ref(sources[0].columns[0].sourceColumns[0].node.location.name, sources[0].columns[0].sourceColumns[0].node.name) }} c
                 LEFT JOIN latest_row l
                 ON c."{{ sdts_alias }}" = l."{{ sdts_alias }}"
-                WHERE c."{{ sdts_alias }}" < GETDATE()
+                WHERE c."{{ sdts_alias }}" < SYSDATE()
             ),
 
             active_logic_combined AS (
@@ -1089,11 +1061,11 @@ stepTypes:
             SELECT * FROM active_logic_combined
         run:
           templateString: ""
-    name: "Datavault4Coalesce: Snapshot v1"
+    name: "Datavault by Scalefree: Snapshot v1"
     version: 1
   StepType-15:
     id: "15"
-    isDisabled: false
+    isDisabled: true
     metadata:
       defaultStorageLocation: null
       error: null
@@ -1303,10 +1275,10 @@ stepTypes:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: Stage
-        short: STG
-        plural: Stages
-        tagColor: '#2EB67D'
+        capitalized: 'DATAVAULT BY SCALEFREE: STAGE'
+        short: DV_STG
+        plural: 'DATAVAULT BY SCALEFREE: STAGES'
+        tagColor: '#AED6F1'
 
         config:
         - groupName: Options
@@ -1332,17 +1304,17 @@ stepTypes:
 
         systemColumns:
         - displayName: "LDTS"
-          transform: "PLEASE FILL OUT"
+          transform: SYSDATE()
           dataType: TIMESTAMP
           placement: end
           attributeName: is_system_ldts    
-          description: "Search for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used."
+          description: "The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse."
         - displayName: "RSRC"
           transform: "{{record_source()}}"
           dataType: STRING
           placement: end
           attributeName: is_system_rsrc    
-          description: "If available, replace with existing column from source."  
+          description: "The Record Source (RSRC) describes the source of this data."  
       templates:
         create:
           templateString: |-
@@ -1428,7 +1400,7 @@ stepTypes:
             {% endif %}
         run:
           templateString: ""
-    name: "Datavault4Coalesce: Stage"
+    name: "Datavault by Scalefree: Stage"
     version: 1
   StepType-6:
     id: "6"
@@ -1437,10 +1409,10 @@ stepTypes:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: 'DATAVAULT4COALESCE: HUB'
+        capitalized: 'DATAVAULT BY SCALEFREE: HUB'
         short: 'HUB'
-        tagColor: purple
-        plural: 'DATAVAULT4COALESCE: HUBS'
+        tagColor: blue
+        plural: 'DATAVAULT BY SCALEFREE: HUBS'
 
         config:
         - groupName: Options
@@ -1503,40 +1475,41 @@ stepTypes:
 
             {% for source in sources %}
 
-            	{{ stage('Merge Hub - ' ~ source.name) }}
-            	MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
-            	(
-            		SELECT DISTINCT
-            		{% for col in source.columns %}
-            			{{ get_source_transform(col) }} AS "{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
+            	{{ stage('INSERT INTO Hub - ' ~ source.name) }}
 
-            		{{ source.join }}
+            	INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            	
+            WITH incoming AS (
 
-            	)
-            	AS "SRC"
-            	ON
+            	SELECT DISTINCT
+            	{% for col in source.columns %}
+            		{{ get_source_transform(col) }} AS "{{ col.name }}"
+            		{%- if not loop.last -%}, {% endif %}
+            	{% endfor %}
+
+            	{{ source.join }}
+
+            ), 
+
+            new_records AS (
+
+            	SELECT "SRC".* 
+            	FROM incoming "SRC"
+            	WHERE NOT EXISTS 
+
+            	(SELECT 1 
+            	FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
+            	WHERE 
             	{% for col in sources[0].columns if (col.is_Hub_hk) -%}
             		{% if not loop.first %}
             			AND
             		{% endif %}
             		"SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
-            	{% endfor %}
-            	WHEN NOT MATCHED THEN
-            	INSERT
-            	(
-            		{% for col in columns %}
-            			"{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	) VALUES
-            	(
-            		{% for col in columns %}
-            			"SRC"."{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	)
+            	{% endfor %} )
+            )
+
+
+            	SELECT * FROM new_records
 
             {% endfor %}
 
@@ -1544,7 +1517,7 @@ stepTypes:
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
             {% endif %}
-    name: "Datavault4Coalesce: Hub"
+    name: "Datavault by Scalefree: Hub"
     version: 1
   StepType-7:
     id: "7"
@@ -1553,10 +1526,10 @@ stepTypes:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: 'DATAVAULT4COALESCE: LINK'
+        capitalized: 'DATAVAULT BY SCALEFREE: LINK'
         short: 'LINK'
-        tagColor: '#CA2287'
-        plural: 'DATAVAULT4COALESCE: LINKS'
+        tagColor: 'Red'
+        plural: 'DATAVAULT BY SCALEFREE: LINKS'
 
         config:
         - groupName: Options
@@ -1568,15 +1541,6 @@ stepTypes:
             options:
             - table
 
-          - displayName: Insert Strategy
-            attributeName: insertStrategy
-            type: dropdownSelector
-            default: UNION
-            options:
-            - "UNION"
-            - "UNION ALL"
-            isRequired: true
-
           - displayName: Pre-SQL
             attributeName: preSQL
             type: textBox
@@ -1587,7 +1551,7 @@ stepTypes:
             type: textBox
             isRequired: false
             
-          - type: multisourcetoggle
+          - type: multisourceToggle
           
         - groupName: Data Vault
           items:
@@ -1595,11 +1559,6 @@ stepTypes:
             type: columnSelector
             attributeName: is_Link_hk
             isRequired: true 
-
-          - displayName: Link LoadDateTimestamp Column
-            type: columnSelector
-            attributeName: is_Link_ldts
-            isRequired: true
       templates:
         create:
           templateString: |-
@@ -1628,7 +1587,9 @@ stepTypes:
             {% for source in sources %}
                         
                 {{ stage('Merge Link - ' ~ source.name) }}
-                MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
+                INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
+            WITH incoming AS 
                 (
                     SELECT DISTINCT
                     {% for col in source.columns %}
@@ -1637,33 +1598,27 @@ stepTypes:
                     {% endfor %}
 
                     {{ source.join }}
+                ),
 
-                    {% if not loop.last %}
-                        {{ config.insertStrategy }}
-                    {% endif %}
-                )
-                AS "SRC"
-                ON
+            new_records AS (
+                SELECT
+                    "SRC".*
+                FROM incoming "SRC"
+                WHERE NOT EXISTS (
+                    SELECT
+                        1
+                    FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
+                    WHERE
                 {% for col in sources[0].columns if (col.is_Link_hk) -%}
                     {% if not loop.first %}
                         AND
                     {% endif %}
                     "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
-                {% endfor %}
-                WHEN NOT MATCHED THEN
-                INSERT
-                (
-                    {% for col in columns %}
-                        "{{ col.name }}"
-                        {%- if not loop.last -%}, {% endif %}
-                    {% endfor %}
-                ) VALUES
-                (
-                    {% for col in columns %}
-                        "SRC"."{{ col.name }}"
-                        {%- if not loop.last -%}, {% endif %}
-                    {% endfor %}
+                {% endfor %}        
                 )
+            )
+
+            SELECT * FROM new_records
 
             {% endfor %}
 
@@ -1671,7 +1626,7 @@ stepTypes:
                 {{ stage('Post-SQL') }}
                 {{ config.postSQL }}    
             {% endif %}
-    name: "Datavault4Coalesce: Link"
+    name: "Datavault by Scalefree: Link"
     version: 1
   StepType-8:
     id: "8"
@@ -1680,21 +1635,12 @@ stepTypes:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: Satellite v0
+        capitalized: 'DATAVAULT BY SCALEFREE: SATELLITE V0'
         short: 'SAT_v0'
-        plural: 'Satellites'
-        tagColor: '#627DE9'
+        plural: 'DATAVAULT BY SCALEFREE: SATELLITES V0'
+        tagColor: 'Yellow'
 
         config:
-        - groupName: Options
-          items:
-          - type: materializationSelector
-            isRequired: true
-            enableIf: 'false'
-            default: table
-            options:
-            - table
-
         - groupName: Data Vault
           items:
           - displayName: Hashkey Column
@@ -1804,7 +1750,7 @@ stepTypes:
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
             {% endif %}
-    name: "Datavault4Coalesce: Satellite v0"
+    name: "Datavault by Scalefree: Satellite v0"
     version: 1
   StepType-9:
     id: "9"
@@ -1813,10 +1759,10 @@ stepTypes:
       defaultStorageLocation: null
       error: null
       nodeMetadataSpec: |-
-        capitalized: Satellite v1
+        capitalized: 'DATAVAULT BY SCALEFREE: SATELLITE V1'
         short: 'SAT_v1'
-        plural: 'Satellites'
-        tagColor: '#627DE9'
+        plural: 'DATAVAULT BY SCALEFREE: SATELLITES V1'
+        tagColor: '#FFAC1C'
 
         config:
         - groupName: Options
@@ -1895,11 +1841,11 @@ stepTypes:
             {% endfor %}
         run:
           templateString: ""
-    name: "Datavault4Coalesce: Satellite v1"
+    name: "Datavault by Scalefree: Satellite v1"
     version: 1
   StepType-COALESCE-DATA_VAULT::1:
     id: COALESCE-DATA_VAULT::1
-    isDisabled: false
+    isDisabled: true
     metadata:
       defaultStorageLocation: null
       error: null
@@ -2025,7 +1971,7 @@ stepTypes:
     version: 1
   StepType-COALESCE-DATA_VAULT::2:
     id: COALESCE-DATA_VAULT::2
-    isDisabled: false
+    isDisabled: true
     metadata:
       defaultStorageLocation: null
       error: null
@@ -2033,7 +1979,7 @@ stepTypes:
         capitalized: LINK
         short: 'LNK'
         plural: 'Links'
-        tagColor: '#CA2287'
+        tagColor: 'red'
 
         config:
         - groupName: Options
@@ -2161,7 +2107,7 @@ stepTypes:
     version: 1
   StepType-COALESCE-DATA_VAULT::3:
     id: COALESCE-DATA_VAULT::3
-    isDisabled: false
+    isDisabled: true
     metadata:
       defaultStorageLocation: null
       error: null
@@ -2286,7 +2232,7 @@ stepTypes:
     version: 1
   StepType-COALESCE-DATA_VAULT::4:
     id: COALESCE-DATA_VAULT::4
-    isDisabled: false
+    isDisabled: true
     metadata:
       defaultStorageLocation: null
       error: null
@@ -2411,7 +2357,7 @@ stepTypes:
     version: 1
   StepType-COALESCE-DATA_VAULT::5:
     id: COALESCE-DATA_VAULT::5
-    isDisabled: false
+    isDisabled: true
     metadata:
       defaultStorageLocation: null
       error: null
@@ -2530,7 +2476,7 @@ stepTypes:
     version: 1
   StepType-COALESCE-DATA_VAULT::6:
     id: COALESCE-DATA_VAULT::6
-    isDisabled: false
+    isDisabled: true
     metadata:
       defaultStorageLocation: null
       error: null
@@ -2656,7 +2602,7 @@ stepTypes:
     version: 1
   StepType-COALESCE-DATA_VAULT::7:
     id: COALESCE-DATA_VAULT::7
-    isDisabled: false
+    isDisabled: true
     metadata:
       defaultStorageLocation: null
       error: null

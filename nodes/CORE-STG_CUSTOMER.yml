@@ -127,7 +127,7 @@ steps:
             defaultValue: ""
             description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
             is_system_ldts: true
-            name: ldts
+            name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -144,7 +144,7 @@ steps:
             defaultValue: ""
             description: If available, replace with existing column from source.
             is_system_rsrc: true
-            name: rsrc
+            name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -165,7 +165,7 @@ steps:
             hashedColumns:
               - columnCounter: 3393
                 stepCounter: "183"
-            name: hk_customer_h
+            name: HK_CUSTOMER_H
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -188,7 +188,7 @@ steps:
                 stepCounter: "183"
               - columnCounter: 3396
                 stepCounter: "183"
-            name: hk_customer_nation_l
+            name: HK_CUSTOMER_NATION_L
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -209,7 +209,7 @@ steps:
             hashedColumns:
               - columnCounter: 3396
                 stepCounter: "183"
-            name: hk_nation_h
+            name: HK_NATION_H
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -236,7 +236,7 @@ steps:
                 stepCounter: "183"
               - columnCounter: 3400
                 stepCounter: "183"
-            name: hd_customer_n_s
+            name: HD_CUSTOMER_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -259,7 +259,7 @@ steps:
                 stepCounter: "183"
               - columnCounter: 3395
                 stepCounter: "183"
-            name: hd_customer_p_s
+            name: HD_CUSTOMER_P_S
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
