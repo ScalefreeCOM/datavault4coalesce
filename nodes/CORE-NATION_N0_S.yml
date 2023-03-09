@@ -1,5 +1,5 @@
 steps:
-  CUSTOMER_WIKI_N0_S-273:
+  NATION_N0_S-291:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: Nation data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,40 +17,40 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4607
-              stepCounter: "273"
+              columnCounter: 4827
+              stepCounter: "291"
             config:
               is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_CUSTOMER_H
+            name: HK_NATION_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4579
-                    stepCounter: "271"
+                  - columnCounter: 4807
+                    stepCounter: "289"
                 transform: ""
           - columnReference:
-              columnCounter: 4610
-              stepCounter: "273"
+              columnCounter: 4830
+              stepCounter: "291"
             config:
               is_hd: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HD_CUSTOMER_N_S
+            name: HD_NATION_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4582
-                    stepCounter: "271"
+                  - columnCounter: 4810
+                    stepCounter: "289"
                 transform: ""
           - columnReference:
-              columnCounter: 4605
-              stepCounter: "273"
+              columnCounter: 4825
+              stepCounter: "291"
             dataType: TIMESTAMP
             description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
@@ -59,12 +59,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4577
-                    stepCounter: "271"
+                  - columnCounter: 4805
+                    stepCounter: "289"
                 transform: ""
           - columnReference:
-              columnCounter: 4606
-              stepCounter: "273"
+              columnCounter: 4826
+              stepCounter: "291"
             dataType: STRING
             description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
@@ -73,50 +73,36 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4578
-                    stepCounter: "271"
+                  - columnCounter: 4806
+                    stepCounter: "289"
                 transform: ""
           - columnReference:
-              columnCounter: 4602
-              stepCounter: "273"
-            dataType: NUMBER(12,2)
+              columnCounter: 4822
+              stepCounter: "291"
+            dataType: VARCHAR(25)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_ACCTBAL
+            name: N_NAME
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4574
-                    stepCounter: "271"
+                  - columnCounter: 4802
+                    stepCounter: "289"
                 transform: ""
           - columnReference:
-              columnCounter: 4603
-              stepCounter: "273"
-            dataType: VARCHAR(10)
+              columnCounter: 4824
+              stepCounter: "291"
+            dataType: VARCHAR(152)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_MKTSEGMENT
+            name: N_COMMENT
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4575
-                    stepCounter: "271"
-                transform: ""
-          - columnReference:
-              columnCounter: 4604
-              stepCounter: "273"
-            dataType: VARCHAR(117)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: C_COMMENT
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 4576
-                    stepCounter: "271"
+                  - columnCounter: 4804
+                    stepCounter: "289"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
@@ -125,14 +111,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_CUSTOMER_WIKI
+                nodeName: DV_STG_NATION
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER_WIKI') }} "STG_CUSTOMER_WIKI"
-            name: CUSTOMER_WIKI_N0_S
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_NATION') }} "DV_STG_NATION"
+            name: NATION_N0_S
             noLinkRefs: []
-      name: CUSTOMER_WIKI_N0_S
+      name: NATION_N0_S
       overrideSQL: false
       schema: ""
       sqlType: "8"
       type: sql
-    stepCounter: "273"
+    stepCounter: "291"

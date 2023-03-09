@@ -1,5 +1,5 @@
 steps:
-  NATION_H-244:
+  NATION_H-290:
     operation:
       config:
         postSQL: ""
@@ -17,8 +17,8 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4220
-              stepCounter: "244"
+              columnCounter: 4817
+              stepCounter: "290"
             config:
               is_Hub_hk: true
             dataType: STRING
@@ -29,16 +29,20 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4212
-                    stepCounter: "243"
+                  - columnCounter: 4807
+                    stepCounter: "289"
                 transform: ""
               - columnReferences:
-                  - columnCounter: 3405
-                    stepCounter: "183"
+                  - columnCounter: 4747
+                    stepCounter: "284"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4892
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4214
-              stepCounter: "244"
+              columnCounter: 4811
+              stepCounter: "290"
             dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
@@ -47,48 +51,60 @@ steps:
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4206
-                    stepCounter: "243"
+                  - columnCounter: 4801
+                    stepCounter: "289"
                 transform: ""
               - columnReferences:
-                  - columnCounter: 3396
-                    stepCounter: "183"
+                  - columnCounter: 4740
+                    stepCounter: "284"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4884
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4218
-              stepCounter: "244"
+              columnCounter: 4815
+              stepCounter: "290"
             dataType: TIMESTAMP
-            description: Search for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
             hashDetails: null
             name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4210
-                    stepCounter: "243"
+                  - columnCounter: 4805
+                    stepCounter: "289"
                 transform: ""
               - columnReferences:
-                  - columnCounter: 3401
-                    stepCounter: "183"
+                  - columnCounter: 4744
+                    stepCounter: "284"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4889
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4219
-              stepCounter: "244"
+              columnCounter: 4816
+              stepCounter: "290"
             dataType: STRING
-            description: If available, replace with existing column from source.
+            description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
             hashDetails: null
             name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4211
-                    stepCounter: "243"
+                  - columnCounter: 4806
+                    stepCounter: "289"
                 transform: ""
               - columnReferences:
-                  - columnCounter: 3402
-                    stepCounter: "183"
+                  - columnCounter: 4745
+                    stepCounter: "284"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4890
+                    stepCounter: "298"
                 transform: ""
         enabledColumnTestIDs: []
         sourceMapping:
@@ -96,25 +112,36 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_NATION
+                nodeName: DV_STG_NATION
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_NATION') }} "STG_NATION"
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_NATION') }} "DV_STG_NATION"
             name: NATION_H
             noLinkRefs: []
           - aliases:
-              STG_CUSTOMER: "183"
+              DV_STG_SUPPLIER: "284"
             customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_CUSTOMER
+                nodeName: DV_STG_SUPPLIER
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER') }} "STG_CUSTOMER"
-            name: STG_CUSTOMER
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_SUPPLIER') }} "DV_STG_SUPPLIER"
+            name: SUPPLIER
+            noLinkRefs: []
+          - aliases:
+              DV_STG_CUSTOMER: "298"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DV_STG_CUSTOMER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_CUSTOMER') }} "DV_STG_CUSTOMER"
+            name: STG CUSTOMER
             noLinkRefs: []
       name: NATION_H
       overrideSQL: false
       schema: ""
       sqlType: "6"
       type: sql
-    stepCounter: "244"
+    stepCounter: "290"

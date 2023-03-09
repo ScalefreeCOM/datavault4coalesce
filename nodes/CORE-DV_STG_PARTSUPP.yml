@@ -1,5 +1,5 @@
 steps:
-  STG_NATION-243:
+  DV_STG_PARTSUPP-309:
     operation:
       config:
         generate_ghost_records: true
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Nation data as defined by TPC-H
+      description: Partsupp data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,81 +17,105 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4206
-              stepCounter: "243"
+              columnCounter: 5027
+              stepCounter: "309"
             dataType: NUMBER(38,0)
             description: ""
-            name: N_NATIONKEY
+            hashColumns: []
+            hashDetails: null
+            name: PS_PARTKEY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3107
-                    stepCounter: "164"
+                  - columnCounter: 4725
+                    stepCounter: "282"
                 transform: ""
           - columnReference:
-              columnCounter: 4207
-              stepCounter: "243"
-            dataType: VARCHAR(25)
-            description: ""
-            name: N_NAME
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3108
-                    stepCounter: "164"
-                transform: ""
-          - columnReference:
-              columnCounter: 4208
-              stepCounter: "243"
+              columnCounter: 5028
+              stepCounter: "309"
             dataType: NUMBER(38,0)
             description: ""
-            name: N_REGIONKEY
+            hashColumns: []
+            hashDetails: null
+            name: PS_SUPPKEY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3109
-                    stepCounter: "164"
+                  - columnCounter: 4726
+                    stepCounter: "282"
                 transform: ""
           - columnReference:
-              columnCounter: 4209
-              stepCounter: "243"
-            dataType: VARCHAR(152)
+              columnCounter: 5029
+              stepCounter: "309"
+            dataType: NUMBER(38,0)
             description: ""
-            name: N_COMMENT
+            hashColumns: []
+            hashDetails: null
+            name: PS_AVAILQTY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4727
+                    stepCounter: "282"
+                transform: ""
+          - columnReference:
+              columnCounter: 5030
+              stepCounter: "309"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: PS_SUPPLYCOST
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4728
+                    stepCounter: "282"
+                transform: ""
+          - columnReference:
+              columnCounter: 5031
+              stepCounter: "309"
+            dataType: VARCHAR(199)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: PS_COMMENT
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3110
-                    stepCounter: "164"
+                  - columnCounter: 4729
+                    stepCounter: "282"
                 transform: ""
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4210
-              stepCounter: "243"
+              columnCounter: 5032
+              stepCounter: "309"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
-            description: Search for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
             is_system_ldts: true
             name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
-                transform: GETDATE()
+                transform: SYSDATE()
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4211
-              stepCounter: "243"
+              columnCounter: 5033
+              stepCounter: "309"
             config: {}
             dataType: STRING
             defaultValue: ""
-            description: If available, replace with existing column from source.
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
             is_system_rsrc: true
             name: RSRC
             nullable: true
@@ -103,75 +127,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4212
-              stepCounter: "243"
-            config: {}
-            dataType: STRING
-            defaultValue: ""
-            description: ""
-            hashDetails:
-              hashAlgorithm: SHA1
-            hashedColumns:
-              - columnCounter: 4206
-                stepCounter: "243"
-            name: HK_NATION_H
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: ""
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 4213
-              stepCounter: "243"
-            config: {}
-            dataType: STRING
-            defaultValue: ""
-            description: ""
-            hashDetails:
-              hashAlgorithm: SHA1
-            hashedColumns:
-              - columnCounter: 4207
-                stepCounter: "243"
-              - columnCounter: 4208
-                stepCounter: "243"
-              - columnCounter: 4209
-                stepCounter: "243"
-            name: HD_NATION_N_S
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: ""
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 4229
-              stepCounter: "243"
-            config: {}
-            dataType: STRING
-            defaultValue: ""
-            description: ""
-            hashDetails:
-              hashAlgorithm: SHA1
-            hashedColumns:
-              - columnCounter: 4208
-                stepCounter: "243"
-            name: HK_REGION_H
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: ""
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 4276
-              stepCounter: "243"
+              columnCounter: 5034
+              stepCounter: "309"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -180,11 +137,81 @@ steps:
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 4206
-                stepCounter: "243"
-              - columnCounter: 4208
-                stepCounter: "243"
-            name: HK_NATION_REGION_L
+              - columnCounter: 5027
+                stepCounter: "309"
+            name: HK_PART_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 5035
+              stepCounter: "309"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 5028
+                stepCounter: "309"
+            name: HK_SUPPLIER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 5036
+              stepCounter: "309"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 5027
+                stepCounter: "309"
+              - columnCounter: 5028
+                stepCounter: "309"
+            name: HK_PART_SUPPLIER_L
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 5037
+              stepCounter: "309"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 5029
+                stepCounter: "309"
+              - columnCounter: 5030
+                stepCounter: "309"
+              - columnCounter: 5031
+                stepCounter: "309"
+            name: HD_PART_SUPPLIER_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -196,14 +223,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: TPCH_SF1
-                nodeName: NATION
+                nodeName: PARTSUPP
             join:
-              joinCondition: FROM {{ ref('TPCH_SF1', 'NATION') }} "NATION"
-            name: STG_NATION
+              joinCondition: FROM {{ ref('TPCH_SF1', 'PARTSUPP') }} "PARTSUPP"
+            name: DV_STG_PARTSUPP
             noLinkRefs: []
-      name: STG_NATION
+      name: DV_STG_PARTSUPP
       overrideSQL: false
       schema: ""
       sqlType: "4"
       type: sql
-    stepCounter: "243"
+    stepCounter: "309"

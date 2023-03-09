@@ -1,5 +1,5 @@
 steps:
-  STG_NATION_WIKI-269:
+  DV_STG_NATION-289:
     operation:
       config:
         generate_ghost_records: true
@@ -17,10 +17,12 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4544
-              stepCounter: "269"
+              columnCounter: 4801
+              stepCounter: "289"
             dataType: NUMBER(38,0)
             description: ""
+            hashColumns: []
+            hashDetails: null
             name: N_NATIONKEY
             nullable: false
             sourceColumnReferences:
@@ -29,10 +31,12 @@ steps:
                     stepCounter: "164"
                 transform: ""
           - columnReference:
-              columnCounter: 4545
-              stepCounter: "269"
+              columnCounter: 4802
+              stepCounter: "289"
             dataType: VARCHAR(25)
             description: ""
+            hashColumns: []
+            hashDetails: null
             name: N_NAME
             nullable: false
             sourceColumnReferences:
@@ -41,10 +45,12 @@ steps:
                     stepCounter: "164"
                 transform: ""
           - columnReference:
-              columnCounter: 4546
-              stepCounter: "269"
+              columnCounter: 4803
+              stepCounter: "289"
             dataType: NUMBER(38,0)
             description: ""
+            hashColumns: []
+            hashDetails: null
             name: N_REGIONKEY
             nullable: false
             sourceColumnReferences:
@@ -53,10 +59,12 @@ steps:
                     stepCounter: "164"
                 transform: ""
           - columnReference:
-              columnCounter: 4547
-              stepCounter: "269"
+              columnCounter: 4804
+              stepCounter: "289"
             dataType: VARCHAR(152)
             description: ""
+            hashColumns: []
+            hashDetails: null
             name: N_COMMENT
             nullable: true
             sourceColumnReferences:
@@ -69,29 +77,31 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4548
-              stepCounter: "269"
+              columnCounter: 4805
+              stepCounter: "289"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
             description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
             is_system_ldts: true
             name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
-                transform: GETDATE()
+                transform: SYSDATE()
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4549
-              stepCounter: "269"
+              columnCounter: 4806
+              stepCounter: "289"
             config: {}
             dataType: STRING
             defaultValue: ""
             description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
             is_system_rsrc: true
             name: RSRC
             nullable: true
@@ -103,17 +113,18 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4550
-              stepCounter: "269"
+              columnCounter: 4807
+              stepCounter: "289"
             config: {}
             dataType: STRING
             defaultValue: ""
             description: ""
+            hashColumns: []
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 4544
-                stepCounter: "269"
+              - columnCounter: 4801
+                stepCounter: "289"
             name: HK_NATION_H
             nullable: true
             sourceColumnReferences:
@@ -124,17 +135,18 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4551
-              stepCounter: "269"
+              columnCounter: 4808
+              stepCounter: "289"
             config: {}
             dataType: STRING
             defaultValue: ""
             description: ""
+            hashColumns: []
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 4546
-                stepCounter: "269"
+              - columnCounter: 4803
+                stepCounter: "289"
             name: HK_REGION_H
             nullable: true
             sourceColumnReferences:
@@ -145,20 +157,21 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4552
-              stepCounter: "269"
+              columnCounter: 4809
+              stepCounter: "289"
             config: {}
             dataType: STRING
             defaultValue: ""
             description: ""
+            hashColumns: []
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 4545
-                stepCounter: "269"
-              - columnCounter: 4547
-                stepCounter: "269"
-            name: HD_NATION_N_S
+              - columnCounter: 4801
+                stepCounter: "289"
+              - columnCounter: 4803
+                stepCounter: "289"
+            name: HK_NATION_REGION_L
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -168,20 +181,21 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4553
-              stepCounter: "269"
+              columnCounter: 4810
+              stepCounter: "289"
             config: {}
             dataType: STRING
             defaultValue: ""
             description: ""
+            hashColumns: []
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 4544
-                stepCounter: "269"
-              - columnCounter: 4546
-                stepCounter: "269"
-            name: HK_NATION_REGION_L
+              - columnCounter: 4802
+                stepCounter: "289"
+              - columnCounter: 4804
+                stepCounter: "289"
+            name: HD_NATION_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -196,11 +210,11 @@ steps:
                 nodeName: NATION
             join:
               joinCondition: FROM {{ ref('TPCH_SF1', 'NATION') }} "NATION"
-            name: STG_NATION_WIKI
+            name: DV_STG_NATION
             noLinkRefs: []
-      name: STG_NATION_WIKI
+      name: DV_STG_NATION
       overrideSQL: false
       schema: ""
       sqlType: "4"
       type: sql
-    stepCounter: "269"
+    stepCounter: "289"

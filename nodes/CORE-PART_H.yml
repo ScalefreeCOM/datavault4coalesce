@@ -1,5 +1,5 @@
 steps:
-  CUSTOMER_WIKI_H-272:
+  PART_H-306:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: Part data as defined by TPC-H
       isDataVault: false
       isMultisource: true
       locationID: ""
@@ -17,46 +17,54 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4593
-              stepCounter: "272"
+              columnCounter: 4998
+              stepCounter: "306"
             config:
               is_Hub_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_CUSTOMER_H
+            name: HK_PART_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4579
-                    stepCounter: "271"
+                  - columnCounter: 4985
+                    stepCounter: "305"
                 transform: ""
               - columnReferences:
-                  - columnCounter: 4566
-                    stepCounter: "270"
+                  - columnCounter: 5034
+                    stepCounter: "309"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5088
+                    stepCounter: "313"
                 transform: ""
           - columnReference:
-              columnCounter: 4583
-              stepCounter: "272"
+              columnCounter: 4987
+              stepCounter: "306"
             dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_CUSTKEY
+            name: P_PARTKEY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4569
-                    stepCounter: "271"
+                  - columnCounter: 4974
+                    stepCounter: "305"
                 transform: ""
               - columnReferences:
-                  - columnCounter: 4555
-                    stepCounter: "270"
+                  - columnCounter: 5027
+                    stepCounter: "309"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5070
+                    stepCounter: "313"
                 transform: ""
           - columnReference:
-              columnCounter: 4591
-              stepCounter: "272"
+              columnCounter: 4996
+              stepCounter: "306"
             dataType: TIMESTAMP
             description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
@@ -65,16 +73,20 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4577
-                    stepCounter: "271"
+                  - columnCounter: 4983
+                    stepCounter: "305"
                 transform: ""
               - columnReferences:
-                  - columnCounter: 4563
-                    stepCounter: "270"
+                  - columnCounter: 5032
+                    stepCounter: "309"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5085
+                    stepCounter: "313"
                 transform: ""
           - columnReference:
-              columnCounter: 4592
-              stepCounter: "272"
+              columnCounter: 4997
+              stepCounter: "306"
             dataType: STRING
             description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
@@ -83,12 +95,16 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4578
-                    stepCounter: "271"
+                  - columnCounter: 4984
+                    stepCounter: "305"
                 transform: ""
               - columnReferences:
-                  - columnCounter: 4564
-                    stepCounter: "270"
+                  - columnCounter: 5033
+                    stepCounter: "309"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5086
+                    stepCounter: "313"
                 transform: ""
         enabledColumnTestIDs: []
         sourceMapping:
@@ -96,25 +112,36 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_CUSTOMER_WIKI
+                nodeName: DV_STG_PART
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER_WIKI') }} "STG_CUSTOMER_WIKI"
-            name: CUSTOMER_WIKI_H
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_PART') }} "DV_STG_PART"
+            name: PART_H
             noLinkRefs: []
           - aliases:
-              STG_ORDERS_WIKI: "270"
+              DV_STG_PARTSUPP: "309"
             customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_ORDERS_WIKI
+                nodeName: DV_STG_PARTSUPP
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS_WIKI') }} "STG_ORDERS_WIKI"
-            name: STG_ORDERS_WIKI
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_PARTSUPP') }} "DV_STG_PARTSUPP"
+            name: STG PARTSUPP
             noLinkRefs: []
-      name: CUSTOMER_WIKI_H
+          - aliases:
+              DV_STG_LINEITEM: "313"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DV_STG_LINEITEM
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_LINEITEM') }} "DV_STG_LINEITEM"
+            name: LINEITEM
+            noLinkRefs: []
+      name: PART_H
       overrideSQL: false
       schema: ""
       sqlType: "6"
       type: sql
-    stepCounter: "272"
+    stepCounter: "306"

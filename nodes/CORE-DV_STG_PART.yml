@@ -1,5 +1,5 @@
 steps:
-  STG_CUSTOMER_WIKI-271:
+  DV_STG_PART-305:
     operation:
       config:
         generate_ghost_records: true
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: Part data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,124 +17,138 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4569
-              stepCounter: "271"
+              columnCounter: 4974
+              stepCounter: "305"
             dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_CUSTKEY
+            name: P_PARTKEY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3083
-                    stepCounter: "162"
+                  - columnCounter: 4716
+                    stepCounter: "281"
                 transform: ""
           - columnReference:
-              columnCounter: 4570
-              stepCounter: "271"
+              columnCounter: 4975
+              stepCounter: "305"
+            dataType: VARCHAR(55)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4717
+                    stepCounter: "281"
+                transform: ""
+          - columnReference:
+              columnCounter: 4976
+              stepCounter: "305"
             dataType: VARCHAR(25)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_NAME
+            name: P_MFGR
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3084
-                    stepCounter: "162"
+                  - columnCounter: 4718
+                    stepCounter: "281"
                 transform: ""
           - columnReference:
-              columnCounter: 4571
-              stepCounter: "271"
-            dataType: VARCHAR(40)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: C_ADDRESS
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3085
-                    stepCounter: "162"
-                transform: ""
-          - columnReference:
-              columnCounter: 4572
-              stepCounter: "271"
-            dataType: NUMBER(38,0)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: C_NATIONKEY
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3086
-                    stepCounter: "162"
-                transform: ""
-          - columnReference:
-              columnCounter: 4573
-              stepCounter: "271"
-            dataType: VARCHAR(15)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: C_PHONE
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3087
-                    stepCounter: "162"
-                transform: ""
-          - columnReference:
-              columnCounter: 4574
-              stepCounter: "271"
-            dataType: NUMBER(12,2)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: C_ACCTBAL
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 3088
-                    stepCounter: "162"
-                transform: ""
-          - columnReference:
-              columnCounter: 4575
-              stepCounter: "271"
+              columnCounter: 4977
+              stepCounter: "305"
             dataType: VARCHAR(10)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_MKTSEGMENT
-            nullable: true
+            name: P_BRAND
+            nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3089
-                    stepCounter: "162"
+                  - columnCounter: 4719
+                    stepCounter: "281"
                 transform: ""
           - columnReference:
-              columnCounter: 4576
-              stepCounter: "271"
-            dataType: VARCHAR(117)
+              columnCounter: 4978
+              stepCounter: "305"
+            dataType: VARCHAR(25)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_COMMENT
+            name: P_TYPE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4720
+                    stepCounter: "281"
+                transform: ""
+          - columnReference:
+              columnCounter: 4979
+              stepCounter: "305"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_SIZE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4721
+                    stepCounter: "281"
+                transform: ""
+          - columnReference:
+              columnCounter: 4980
+              stepCounter: "305"
+            dataType: VARCHAR(10)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_CONTAINER
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4722
+                    stepCounter: "281"
+                transform: ""
+          - columnReference:
+              columnCounter: 4981
+              stepCounter: "305"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_RETAILPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4723
+                    stepCounter: "281"
+                transform: ""
+          - columnReference:
+              columnCounter: 4982
+              stepCounter: "305"
+            dataType: VARCHAR(23)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_COMMENT
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3090
-                    stepCounter: "162"
+                  - columnCounter: 4724
+                    stepCounter: "281"
                 transform: ""
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4577
-              stepCounter: "271"
+              columnCounter: 4983
+              stepCounter: "305"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
@@ -151,8 +165,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4578
-              stepCounter: "271"
+              columnCounter: 4984
+              stepCounter: "305"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -169,8 +183,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4579
-              stepCounter: "271"
+              columnCounter: 4985
+              stepCounter: "305"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -179,9 +193,9 @@ steps:
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 4569
-                stepCounter: "271"
-            name: HK_CUSTOMER_H
+              - columnCounter: 4974
+                stepCounter: "305"
+            name: HK_PART_H
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -191,8 +205,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4580
-              stepCounter: "271"
+              columnCounter: 4986
+              stepCounter: "305"
             config: {}
             dataType: STRING
             defaultValue: ""
@@ -201,61 +215,23 @@ steps:
             hashDetails:
               hashAlgorithm: SHA1
             hashedColumns:
-              - columnCounter: 4572
-                stepCounter: "271"
-            name: HK_NATION_H
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: ""
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 4581
-              stepCounter: "271"
-            config: {}
-            dataType: STRING
-            defaultValue: ""
-            description: ""
-            hashColumns: []
-            hashDetails:
-              hashAlgorithm: SHA1
-            hashedColumns:
-              - columnCounter: 4570
-                stepCounter: "271"
-              - columnCounter: 4571
-                stepCounter: "271"
-              - columnCounter: 4573
-                stepCounter: "271"
-            name: HD_CUSTOMER_P_S
-            nullable: true
-            sourceColumnReferences:
-              - columnReferences: []
-                transform: ""
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 4582
-              stepCounter: "271"
-            config: {}
-            dataType: STRING
-            defaultValue: ""
-            description: ""
-            hashColumns: []
-            hashDetails:
-              hashAlgorithm: SHA1
-            hashedColumns:
-              - columnCounter: 4574
-                stepCounter: "271"
-              - columnCounter: 4575
-                stepCounter: "271"
-              - columnCounter: 4576
-                stepCounter: "271"
-            name: HD_CUSTOMER_N_S
+              - columnCounter: 4975
+                stepCounter: "305"
+              - columnCounter: 4976
+                stepCounter: "305"
+              - columnCounter: 4977
+                stepCounter: "305"
+              - columnCounter: 4978
+                stepCounter: "305"
+              - columnCounter: 4979
+                stepCounter: "305"
+              - columnCounter: 4980
+                stepCounter: "305"
+              - columnCounter: 4981
+                stepCounter: "305"
+              - columnCounter: 4982
+                stepCounter: "305"
+            name: HD_PART_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences: []
@@ -267,14 +243,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: TPCH_SF1
-                nodeName: CUSTOMER
+                nodeName: PART
             join:
-              joinCondition: FROM {{ ref('TPCH_SF1', 'CUSTOMER') }} "CUSTOMER"
-            name: STG_CUSTOMER_WIKI
+              joinCondition: FROM {{ ref('TPCH_SF1', 'PART') }} "PART"
+            name: DV_STG_PART
             noLinkRefs: []
-      name: STG_CUSTOMER_WIKI
+      name: DV_STG_PART
       overrideSQL: false
       schema: ""
       sqlType: "4"
       type: sql
-    stepCounter: "271"
+    stepCounter: "305"

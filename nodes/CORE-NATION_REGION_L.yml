@@ -1,8 +1,7 @@
 steps:
-  NATION_REGION_L-250:
+  NATION_REGION_L-293:
     operation:
       config:
-        insertStrategy: UNION
         postSQL: ""
         preSQL: ""
       database: ""
@@ -18,8 +17,8 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4286
-              stepCounter: "250"
+              columnCounter: 4847
+              stepCounter: "293"
             config:
               is_Link_hk: true
             dataType: STRING
@@ -30,12 +29,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4276
-                    stepCounter: "243"
+                  - columnCounter: 4809
+                    stepCounter: "289"
                 transform: ""
           - columnReference:
-              columnCounter: 4283
-              stepCounter: "250"
+              columnCounter: 4845
+              stepCounter: "293"
             dataType: STRING
             description: ""
             hashColumns: []
@@ -44,12 +43,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4212
-                    stepCounter: "243"
+                  - columnCounter: 4807
+                    stepCounter: "289"
                 transform: ""
           - columnReference:
-              columnCounter: 4285
-              stepCounter: "250"
+              columnCounter: 4846
+              stepCounter: "293"
             dataType: STRING
             description: ""
             hashColumns: []
@@ -58,38 +57,36 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4229
-                    stepCounter: "243"
+                  - columnCounter: 4808
+                    stepCounter: "289"
                 transform: ""
           - columnReference:
-              columnCounter: 4281
-              stepCounter: "250"
-            config:
-              is_Link_ldts: true
+              columnCounter: 4843
+              stepCounter: "293"
             dataType: TIMESTAMP
-            description: Search for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
             hashDetails: null
             name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4210
-                    stepCounter: "243"
+                  - columnCounter: 4805
+                    stepCounter: "289"
                 transform: ""
           - columnReference:
-              columnCounter: 4282
-              stepCounter: "250"
+              columnCounter: 4844
+              stepCounter: "293"
             dataType: STRING
-            description: If available, replace with existing column from source.
+            description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
             hashDetails: null
             name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4211
-                    stepCounter: "243"
+                  - columnCounter: 4806
+                    stepCounter: "289"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
@@ -98,9 +95,9 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_NATION
+                nodeName: DV_STG_NATION
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_NATION') }} "STG_NATION"
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_NATION') }} "DV_STG_NATION"
             name: NATION_REGION_L
             noLinkRefs: []
       name: NATION_REGION_L
@@ -108,4 +105,4 @@ steps:
       schema: ""
       sqlType: "7"
       type: sql
-    stepCounter: "250"
+    stepCounter: "293"

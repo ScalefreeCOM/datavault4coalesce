@@ -1,14 +1,13 @@
 steps:
-  ORDERS_CUSTOMER_L-247:
+  SUPPLIER_NATION_L-286:
     operation:
       config:
-        insertStrategy: UNION
         postSQL: ""
         preSQL: ""
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Orders data as defined by TPC-H
+      description: Supplier data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -18,78 +17,76 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4250
-              stepCounter: "247"
+              columnCounter: 4774
+              stepCounter: "286"
             config:
               is_Link_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_ORDERS_CUSTOMER_L
+            name: HK_SUPPLIER_NATION_L
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3282
-                    stepCounter: "174"
+                  - columnCounter: 4748
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4248
-              stepCounter: "247"
+              columnCounter: 4772
+              stepCounter: "286"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_ORDERS_H
+            name: HK_SUPPLIER_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3280
-                    stepCounter: "174"
+                  - columnCounter: 4746
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4249
-              stepCounter: "247"
+              columnCounter: 4773
+              stepCounter: "286"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_CUSTOMER_H
+            name: HK_NATION_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3281
-                    stepCounter: "174"
+                  - columnCounter: 4747
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4246
-              stepCounter: "247"
-            config:
-              is_Link_ldts: true
+              columnCounter: 4770
+              stepCounter: "286"
             dataType: TIMESTAMP
-            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
             hashDetails: null
             name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3278
-                    stepCounter: "174"
+                  - columnCounter: 4744
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4247
-              stepCounter: "247"
+              columnCounter: 4771
+              stepCounter: "286"
             dataType: STRING
-            description: If available, replace with existing column from source.
+            description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
             hashDetails: null
             name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3279
-                    stepCounter: "174"
+                  - columnCounter: 4745
+                    stepCounter: "284"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
@@ -98,14 +95,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_ORDERS
+                nodeName: DV_STG_SUPPLIER
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS') }} "STG_ORDERS"
-            name: ORDERS_CUSTOMER_L
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_SUPPLIER') }} "DV_STG_SUPPLIER"
+            name: SUPPLIER_NATION_L
             noLinkRefs: []
-      name: ORDERS_CUSTOMER_L
+      name: SUPPLIER_NATION_L
       overrideSQL: false
       schema: ""
       sqlType: "7"
       type: sql
-    stepCounter: "247"
+    stepCounter: "286"

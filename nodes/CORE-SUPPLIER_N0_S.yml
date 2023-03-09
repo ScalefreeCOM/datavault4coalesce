@@ -1,5 +1,5 @@
 steps:
-  SAT_v0_ORDERS1-255:
+  SUPPLIER_N0_S-287:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Orders data as defined by TPC-H
+      description: Supplier data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,162 +17,148 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4358
-              stepCounter: "255"
+              columnCounter: 4785
+              stepCounter: "287"
             config:
               is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_ORDER_H
+            name: HK_SUPPLIER_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4313
-                    stepCounter: "252"
+                  - columnCounter: 4746
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4360
-              stepCounter: "255"
+              columnCounter: 4788
+              stepCounter: "287"
             config:
               is_hd: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HD_ORDERS_N_S
+            name: HD_SUPPLIER_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4315
-                    stepCounter: "252"
+                  - columnCounter: 4749
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4356
-              stepCounter: "255"
+              columnCounter: 4783
+              stepCounter: "287"
             dataType: TIMESTAMP
-            description: Search for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
             hashDetails: null
             name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4311
-                    stepCounter: "252"
+                  - columnCounter: 4744
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4357
-              stepCounter: "255"
+              columnCounter: 4784
+              stepCounter: "287"
             dataType: STRING
-            description: If available, replace with existing column from source.
+            description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
             hashDetails: null
             name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4312
-                    stepCounter: "252"
+                  - columnCounter: 4745
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4349
-              stepCounter: "255"
-            dataType: VARCHAR(1)
+              columnCounter: 4777
+              stepCounter: "287"
+            dataType: VARCHAR(25)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: O_ORDERSTATUS
+            name: S_NAME
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4304
-                    stepCounter: "252"
+                  - columnCounter: 4738
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4350
-              stepCounter: "255"
-            dataType: NUMBER(12,2)
+              columnCounter: 4778
+              stepCounter: "287"
+            dataType: VARCHAR(40)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: O_TOTALPRICE
+            name: S_ADDRESS
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4305
-                    stepCounter: "252"
+                  - columnCounter: 4739
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4351
-              stepCounter: "255"
-            dataType: DATE
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: O_ORDERDATE
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 4306
-                    stepCounter: "252"
-                transform: ""
-          - columnReference:
-              columnCounter: 4352
-              stepCounter: "255"
-            dataType: VARCHAR(15)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: O_ORDERPRIORITY
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 4307
-                    stepCounter: "252"
-                transform: ""
-          - columnReference:
-              columnCounter: 4353
-              stepCounter: "255"
-            dataType: VARCHAR(15)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: O_CLERK
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 4308
-                    stepCounter: "252"
-                transform: ""
-          - columnReference:
-              columnCounter: 4354
-              stepCounter: "255"
+              columnCounter: 4779
+              stepCounter: "287"
             dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: O_SHIPPRIORITY
+            name: S_NATIONKEY
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4309
-                    stepCounter: "252"
+                  - columnCounter: 4740
+                    stepCounter: "284"
                 transform: ""
           - columnReference:
-              columnCounter: 4355
-              stepCounter: "255"
-            dataType: VARCHAR(79)
+              columnCounter: 4780
+              stepCounter: "287"
+            dataType: VARCHAR(15)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: O_COMMENT
+            name: S_PHONE
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4310
-                    stepCounter: "252"
+                  - columnCounter: 4741
+                    stepCounter: "284"
+                transform: ""
+          - columnReference:
+              columnCounter: 4781
+              stepCounter: "287"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: S_ACCTBAL
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4742
+                    stepCounter: "284"
+                transform: ""
+          - columnReference:
+              columnCounter: 4782
+              stepCounter: "287"
+            dataType: VARCHAR(101)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: S_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4743
+                    stepCounter: "284"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
@@ -181,14 +167,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_ORDERS1
+                nodeName: DV_STG_SUPPLIER
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS1') }} "STG_ORDERS1"
-            name: SAT_v0_ORDERS1
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_SUPPLIER') }} "DV_STG_SUPPLIER"
+            name: SUPPLIER_N0_S
             noLinkRefs: []
-      name: SAT_v0_ORDERS1
+      name: SUPPLIER_N0_S
       overrideSQL: false
       schema: ""
       sqlType: "8"
       type: sql
-    stepCounter: "255"
+    stepCounter: "287"

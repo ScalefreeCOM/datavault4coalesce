@@ -1,5 +1,5 @@
 steps:
-  CUSTOMER_H-242:
+  CUSTOMER_H-299:
     operation:
       config:
         postSQL: ""
@@ -9,7 +9,7 @@ steps:
       deployEnabled: true
       description: Customer data as defined by TPC-H
       isDataVault: false
-      isMultisource: true
+      isMultisource: false
       locationID: ""
       locationName: CORE
       materializationType: table
@@ -17,8 +17,8 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4201
-              stepCounter: "242"
+              columnCounter: 4906
+              stepCounter: "299"
             config:
               is_Hub_hk: true
             dataType: STRING
@@ -29,16 +29,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3403
-                    stepCounter: "183"
-                transform: ""
-              - columnReferences:
-                  - columnCounter: 3281
-                    stepCounter: "174"
+                  - columnCounter: 4891
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4191
-              stepCounter: "242"
+              columnCounter: 4896
+              stepCounter: "299"
             dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
@@ -47,76 +43,52 @@ steps:
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3393
-                    stepCounter: "183"
-                transform: ""
-              - columnReferences:
-                  - columnCounter: 3281
-                    stepCounter: "174"
+                  - columnCounter: 4881
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4199
-              stepCounter: "242"
+              columnCounter: 4904
+              stepCounter: "299"
             dataType: TIMESTAMP
-            description: Seach for existing column in source. Only in case that nothing is available, functions like GETDATE() should be used.
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
             hashDetails: null
             name: LDTS
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3401
-                    stepCounter: "183"
-                transform: ""
-              - columnReferences:
-                  - columnCounter: 3278
-                    stepCounter: "174"
+                  - columnCounter: 4889
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4200
-              stepCounter: "242"
+              columnCounter: 4905
+              stepCounter: "299"
             dataType: STRING
-            description: If available, replace with existing column from source.
+            description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
             hashDetails: null
             name: RSRC
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 3402
-                    stepCounter: "183"
+                  - columnCounter: 4890
+                    stepCounter: "298"
                 transform: ""
-              - columnReferences:
-                  - columnCounter: 3279
-                    stepCounter: "174"
-                transform: ""
+        cteString: ""
         enabledColumnTestIDs: []
         sourceMapping:
-          - aliases:
-              STG_CUSTOMER: "183"
-            customSQL:
+          - customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: STG_CUSTOMER
+                nodeName: DV_STG_CUSTOMER
             join:
-              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER') }} "STG_CUSTOMER"
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_CUSTOMER') }} "DV_STG_CUSTOMER"
             name: CUSTOMER_H
-            noLinkRefs: []
-          - aliases:
-              STG_ORDERS: "174"
-            customSQL:
-              customSQL: ""
-            dependencies:
-              - locationName: CORE
-                nodeName: STG_ORDERS
-            join:
-              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS') }} "STG_ORDERS"
-            name: STG_ORDERS
             noLinkRefs: []
       name: CUSTOMER_H
       overrideSQL: false
       schema: ""
       sqlType: "6"
       type: sql
-    stepCounter: "242"
+    stepCounter: "299"

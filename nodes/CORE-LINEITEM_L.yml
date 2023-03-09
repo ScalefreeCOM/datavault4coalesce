@@ -1,5 +1,5 @@
 steps:
-  CUSTOMER_NATION_L-300:
+  LINEITEM_L-314:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: Lineitem data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,52 +17,80 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4923
-              stepCounter: "300"
+              columnCounter: 5113
+              stepCounter: "314"
             config:
               is_Link_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_CUSTOMER_NATION_L
+            name: HK_LINEITEM_L
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4893
-                    stepCounter: "298"
+                  - columnCounter: 5090
+                    stepCounter: "313"
                 transform: ""
           - columnReference:
-              columnCounter: 4921
-              stepCounter: "300"
+              columnCounter: 5110
+              stepCounter: "314"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_CUSTOMER_H
+            name: HK_ORDER_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4891
-                    stepCounter: "298"
+                  - columnCounter: 5087
+                    stepCounter: "313"
                 transform: ""
           - columnReference:
-              columnCounter: 4922
-              stepCounter: "300"
+              columnCounter: 5111
+              stepCounter: "314"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_NATION_H
+            name: HK_PART_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4892
-                    stepCounter: "298"
+                  - columnCounter: 5088
+                    stepCounter: "313"
                 transform: ""
           - columnReference:
-              columnCounter: 4919
-              stepCounter: "300"
+              columnCounter: 5112
+              stepCounter: "314"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_SUPPLIER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5089
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5095
+              stepCounter: "314"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: DCK_LINENUMBER
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5072
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5108
+              stepCounter: "314"
             dataType: TIMESTAMP
             description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
@@ -71,12 +99,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4889
-                    stepCounter: "298"
+                  - columnCounter: 5085
+                    stepCounter: "313"
                 transform: ""
           - columnReference:
-              columnCounter: 4920
-              stepCounter: "300"
+              columnCounter: 5109
+              stepCounter: "314"
             dataType: STRING
             description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
@@ -85,8 +113,8 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4890
-                    stepCounter: "298"
+                  - columnCounter: 5086
+                    stepCounter: "313"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
@@ -95,14 +123,14 @@ steps:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: DV_STG_CUSTOMER
+                nodeName: DV_STG_LINEITEM
             join:
-              joinCondition: FROM {{ ref('CORE', 'DV_STG_CUSTOMER') }} "DV_STG_CUSTOMER"
-            name: CUSTOMER_NATION_L
+              joinCondition: FROM {{ ref('CORE', 'DV_STG_LINEITEM') }} "DV_STG_LINEITEM"
+            name: LINEITEM_L
             noLinkRefs: []
-      name: CUSTOMER_NATION_L
+      name: LINEITEM_L
       overrideSQL: false
       schema: ""
       sqlType: "7"
       type: sql
-    stepCounter: "300"
+    stepCounter: "314"
