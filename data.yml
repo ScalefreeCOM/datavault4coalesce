@@ -29,7 +29,7 @@ locations:
 macros:
   Macro-1:
     id: "1"
-    macroString: |-
+    macroString: |+
       {%- set datavault4coalesce = namespace(
 
            config = {
@@ -42,8 +42,8 @@ macros:
            "is_current_col_alias": "IS_CURRENT", 
            "hash": "MD5", 
            "hash_datatype": "STRING", 
-           "hashkey_input_case_sensitive": "FALSE", 
-           "hashdiff_input_case_sensitive": "TRUE",
+           "hash_input_case_sensitive": "TRUE",
+           "hash_passthrough_input_transformations": "TRUE",
            "copy_rsrc_ldts_input_columns": "false",  
            "beginning_of_all_times": "0001-01-01T00:00:01", 
            "end_of_all_times": "8888-12-31T23:59:59",
@@ -111,14 +111,14 @@ macros:
                      {%- if datavault4coalesce__is_expression(column_str) -%}
                           {{- column_str -}}
                      {%- else -%}
-                          {{- datavault4coalesce__escape_column_names(column_str) -}}
+                          {{- datavault4coalesce__escape_column_name(column_str) -}}
                      {%- endif -%}
                 {%- endif -%}
            {%- endif -%}
       {%- endmacro -%}
 
 
-      {%- macro datavault4coalesce__ghost_record_per_datatype(column_name, datatype, ghost_record_type, hash) -%}
+      {%- macro datavault4coalesce__ghost_record_per_datatype(column_name, datatype, ghost_record_type, hash, hash_algo=none) -%}
 
       {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times -%}
       {%- set end_of_all_times = datavault4coalesce.config.end_of_all_times -%}
@@ -128,13 +128,12 @@ macros:
       {%- set error_value__STRING = datavault4coalesce.config.error_value__STRING -%}
       {%- set error_value_alt__STRING = datavault4coalesce.config.error_value_alt__STRING -%}
 
-      {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
-
-      {%- set hash_alg = datavault4coalesce__hash_algorithm() -%}
-      {%- set unknown_key = datavault4coalesce__unknown_key() -%}
-      {%- set error_key = datavault4coalesce__error_key() -%}
-
       {%- if hash %}
+
+           {%- set datatype = datatype|upper -%}
+           {%- set hash_alg = datavault4coalesce__hash_algorithm(hash_function=hash_algo, hash_datatype=datatype) -%}
+           {%- set unknown_key = datavault4coalesce__unknown_key(hash_function=hash_algo, hash_datatype=datatype) -%}
+           {%- set error_key = datavault4coalesce__error_key(hash_function=hash_algo, hash_datatype=datatype) -%}
 
            {%- if ghost_record_type == 'unknown' -%}
                 {{ unknown_key }} as {{ column_name }}
@@ -173,10 +172,14 @@ macros:
       {%- endmacro -%}
 
 
-      {%- macro datavault4coalesce__hash_algorithm() -%}
+      {%- macro datavault4coalesce__hash_algorithm(hash_function=none, hash_datatype=none) -%}
 
-           {%- set hash_function = datavault4coalesce.config.hash -%}
-           {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
+           {%- if hash_function is none -%}
+                {%- set hash_function = datavault4coalesce.config.hash -%}
+           {%- endif -%}
+           {%- if hash_datatype is none -%}
+                {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
+           {%- endif -%}  
 
            {%- set dict_result = {} -%}
            {%- set hash_alg = '' -%}
@@ -189,7 +192,7 @@ macros:
                 {%- elif 'BINARY' in hash_datatype -%}
                      {%- set hash_alg = 'SHA1_BINARY' -%}       
                 {%- endif -%}
-           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' -%}
+           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' or hash_function == 'SHA256' -%}
                 {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
                      {%- set hash_alg = 'SHA2' -%}
                 {%- elif 'BINARY' in hash_datatype -%}
@@ -202,9 +205,13 @@ macros:
       {%- endmacro -%}
 
 
-      {%- macro datavault4coalesce__unknown_key() -%}
-           {%- set hash_function = datavault4coalesce.config.hash -%}
-           {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
+      {%- macro datavault4coalesce__unknown_key(hash_function=none, hash_datatype=none) -%}
+           {%- if hash_function is none -%}
+                {%- set hash_function = datavault4coalesce.config.hash -%}
+           {%- endif -%}
+           {%- if hash_datatype is none -%}
+                {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
+           {%- endif -%}     
 
            {%- set dict_result = {} -%}
            {%- set unknown_key = '' -%}
@@ -217,7 +224,7 @@ macros:
                 {%- elif 'BINARY' in hash_datatype -%}
                      {%- set unknown_key = "TO_BINARY('0000000000000000000000000000000000000000')" -%}     
                 {%- endif -%}
-           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' -%}
+           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' or hash_function == 'SHA256'  -%}
                 {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
                      {%- set unknown_key = '!0000000000000000000000000000000000000000000000000000000000000000' -%}
                 {%- elif 'BINARY' in hash_datatype -%}
@@ -231,9 +238,13 @@ macros:
       {%- endmacro -%}
 
 
-      {%- macro datavault4coalesce__error_key() -%}
-           {%- set hash_function = datavault4coalesce.config.hash -%}
-           {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
+      {%- macro datavault4coalesce__error_key(hash_function=none, hash_datatype=none) -%}
+           {%- if hash_function is none -%}
+                {%- set hash_function = datavault4coalesce.config.hash -%}
+           {%- endif -%}
+           {%- if hash_datatype is none -%}
+                {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
+           {%- endif -%}  
 
            {%- set dict_result = {} -%}
            {%- set error_key = '' -%}
@@ -246,7 +257,7 @@ macros:
                 {%- elif 'BINARY' in hash_datatype -%}
                      {%- set error_key = "TO_BINARY('ffffffffffffffffffffffffffffffffffffffff')" -%}        
                 {%- endif -%}
-           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' -%}
+           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' or hash_function == 'SHA256'  -%}
                 {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
                      {%- set error_key = '!ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' -%}
                 {%- elif 'BINARY' in hash_datatype -%}
@@ -258,6 +269,184 @@ macros:
            {{ error_key }}
 
       {%- endmacro -%}
+
+
+      {%- macro datavault4coalesce__is_something(obj) -%}
+
+          {%- if obj is not none and obj is defined and obj -%}
+              {{ true }}
+          {%- else -%}
+              {{ false }}
+          {%- endif -%}
+
+      {%- endmacro -%}
+
+
+      {%- macro datavault4coalesce__attribute_standardise() -%}
+
+      CONCAT('\"', REPLACE(REPLACE(REPLACE(TRIM(CAST([EXPRESSION] AS STRING)), '\\', '\\\\'), '[QUOTE]', '\"'), '[NULL_PLACEHOLDER_STRING]', '--'), '\"')
+
+      {%- endmacro -%}
+
+
+      {%- macro datavault4coalesce__standardise_prefix(case_sensitive, hash_alg, datatype, zero_key, alias) -%}
+
+      {%- set dict_result = {} -%}
+
+      {%- set zero_key = datavault4coalesce__as_constant(column_str=zero_key) -%}
+
+      {%- if 'VARCHAR' in datatype or 'CHAR' in datatype or 'STRING' in datatype or 'TEXT' in datatype %}
+
+          {%- if case_sensitive -%}
+              
+              {%- set standardise_prefix = "IFNULL(LOWER({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
+
+          {%- else -%}
+              
+              {%- set standardise_prefix = "IFNULL(LOWER({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg)-%}
+
+          {%- endif -%}
+
+      {%- else -%}
+
+          {%- if case_sensitive -%}
+              
+              {%- set standardise_prefix = "IFNULL({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
+
+          {%- else -%}
+              
+              {%- set standardise_prefix = "IFNULL({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg)-%}
+
+          {%- endif -%}
+
+      {%- endif -%}
+
+      {{ standardise_prefix }}
+
+      {%- endmacro -%}
+
+
+      {%- macro datavault4coalesce__standardise_suffix(case_sensitive, hash_alg, datatype, zero_key, alias) -%}
+
+      {%- set dict_result = {} -%}
+
+      {%- set zero_key = datavault4coalesce__as_constant(column_str=zero_key) -%}
+
+      {%- if 'VARCHAR' in datatype or 'CHAR' in datatype or 'STRING' in datatype or 'TEXT' in datatype %}
+
+          {%- if case_sensitive -%}
+       
+              {%- if alias is not none -%}
+                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]'))), {}) AS {}".format(zero_key, alias)-%}
+              {%- else -%}
+                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]'))), {})".format(zero_key)-%}
+              {%- endif -%}
+
+          {%- else -%}
+       
+              {%- if alias is not none -%}
+                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]'))), {}) AS {}".format(zero_key, alias)-%}
+              {%- else -%}
+                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]'))), {})".format(zero_key)-%}
+              {%- endif -%}
+
+          {%- endif -%}
+
+      {%- else -%}
+
+          {%- if case_sensitive -%}
+
+              {%- if alias is not none -%}
+                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')), {}) AS {}".format(zero_key, alias)-%}
+              {%- else -%}
+                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')), {})".format(zero_key)-%}
+              {%- endif -%}
+
+          {%- else -%}
+
+              {%- if alias is not none -%}
+                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')), {}) AS {}".format(zero_key, alias)-%}
+              {%- else -%}
+                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')), {})".format(zero_key)-%}
+              {%- endif -%}
+
+          {%- endif -%}
+
+      {%- endif -%}
+
+      {{ standardise_suffix }}
+
+      {%- endmacro -%}
+
+
+      {%- macro datavault4coalesce__hash(columns, alias=none, datatype='STRING', algo='MD5') -%}
+
+      {%- set concat_string = '||' -%}
+      {%- set quote = '"' -%}
+      {%- set null_placeholder_string = '^^' -%}
+
+      {%- set hash_input_case_sensitive = datavault4coalesce.config.hash_input_case_sensitive -%}
+
+      {#- Select hashing algorithm -#}
+      {%- set datatype = datatype|upper -%}
+      {%- set hash_alg = datavault4coalesce__hash_algorithm(hash_function=algo, hash_datatype=datatype) -%}
+      {%- set unknown_key = datavault4coalesce__unknown_key(hash_function=algo, hash_datatype=datatype) -%}
+      {%- set error_key = datavault4coalesce__error_key(hash_function=algo, hash_datatype=datatype) -%}
+
+      {%- set ns = namespace(columns=[], all_null=[]) -%}
+
+      {%- set attribute_standardise = datavault4coalesce__attribute_standardise() %}
+
+      {%- set columns_input = columns -%}
+
+      {%- for column in columns_input -%}
+           {%- set ns.columns = ns.columns + [column.name] -%}
+      {%- endfor -%}
+
+
+      {%- set standardise_prefix = datavault4coalesce__standardise_prefix(case_sensitive=hash_input_case_sensitive, hash_alg=hash_alg, datatype=hash_dtype, alias=alias, zero_key=unknown_key) -%}
+      {%- set standardise_suffix = datavault4coalesce__standardise_suffix(case_sensitive=hash_input_case_sensitive, hash_alg=hash_alg, datatype=hash_dtype, alias=alias, zero_key=unknown_key) -%}    
+
+      {{ standardise_prefix }}
+
+      {%- for column in columns -%}
+
+          {%- set ns.all_null = ns.all_null + [null_placeholder_string] -%}
+
+           {%- if datavault4coalesce.config.hash_passthrough_input_transformations -%}
+
+                {%- set column_str = datavault4coalesce__as_constant(get_source_transform(column)) -%}
+
+           {%- else -%}
+
+                {%- if '.' in column.name %}
+                     {% set column_str = column.name -%}
+                {%- else -%}
+                     {%- set column_str = datavault4coalesce__as_constant(column.name) -%}
+                {%- endif -%}
+           {%- endif -%}
+
+          {{- "\nIFNULL(({}), '{}')".format(attribute_standardise | replace('[EXPRESSION]', column_str) | replace('[QUOTE]', quote) | replace('[NULL_PLACEHOLDER_STRING]', null_placeholder_string), null_placeholder_string) | indent(4) -}}
+          {{- ",'{}',".format(concat_string) if not loop.last -}}
+
+          {%- if loop.last -%}
+
+              {{ standardise_suffix | replace('[ALL_NULL]', ns.all_null | join("")) | indent(4) }}
+
+          {%- else -%}
+
+              {%- set ns.all_null = ns.all_null + [concat_string] -%}
+
+          {%- endif -%}
+
+      {%- endfor -%}
+
+      {%- endmacro -%}
+
+
+
+
+
 packages:
   COALESCE-DATA_VAULT:
     addedBy: K2XWoywkSJObLCIwZGW4xprzNYo2
@@ -464,7 +653,7 @@ stepTypes:
       error: null
       nodeMetadataSpec: |-
         capitalized: 'DATAVAULT BY SCALEFREE: SNAPSHOT V0'
-        short: 'Snapshot_v0'
+        short: 'SNAPSHOT_V0'
         plural: 'DATAVAULT BY SCALEFREE: SNAPSHOTS V0'
         tagColor: '#1E8449'
 
@@ -659,7 +848,7 @@ stepTypes:
       error: null
       nodeMetadataSpec: |-
         capitalized: 'DATAVAULT BY SCALEFREE: SNAPSHOT V1'
-        short: 'Snapshot_v1'
+        short: 'SNAPSHOT_V1'
         plural: 'DATAVAULT BY SCALEFREE: SNAPSHOTS V1'
         tagColor: '#58D68D'
 
@@ -1347,7 +1536,11 @@ stepTypes:
                 {% for source in sources %}
                     SELECT
                     {% for col in source.columns %}
-                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {% if col.hashDetails %}
+                            {{ datavault4coalesce__hash(columns=col.hashDetails.columns, datatype=col.dataType, algo=col.hashDetails.algorithm) }} AS "{{ col.name }}"
+                        {% else %}
+                            {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {% endif %}
                         {%- if not loop.last -%}, {% endif %}
                     {% endfor %}
 
@@ -1370,7 +1563,7 @@ stepTypes:
                         {% for source in sources %}
                             {% for col in source.columns %}
                                 {%- if "hashDetails" in col.keys() %}
-                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true) }}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true, hash_algo=col.hashDetails.algorithm) }}
                                 {%- else -%}
                                     {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=false) }}
                                 {%- endif -%}
@@ -1385,7 +1578,7 @@ stepTypes:
                         {% for source in sources %}
                             {% for col in source.columns %}
                                 {%- if "hashDetails" in col.keys() %}
-                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true) }}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true, hash_algo=col.hashDetails.algorithm) }}
                                 {%- else -%}
                                     {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=false) }}
                                 {%- endif -%}
@@ -1634,7 +1827,7 @@ stepTypes:
       error: null
       nodeMetadataSpec: |-
         capitalized: 'DATAVAULT BY SCALEFREE: SATELLITE V0'
-        short: 'SAT_v0'
+        short: 'SAT_V0'
         plural: 'DATAVAULT BY SCALEFREE: SATELLITES V0'
         tagColor: 'Yellow'
 
@@ -1758,7 +1951,7 @@ stepTypes:
       error: null
       nodeMetadataSpec: |-
         capitalized: 'DATAVAULT BY SCALEFREE: SATELLITE V1'
-        short: 'SAT_v1'
+        short: 'SAT_V1'
         plural: 'DATAVAULT BY SCALEFREE: SATELLITES V1'
         tagColor: '#FFAC1C'
 

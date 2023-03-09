@@ -1,0 +1,138 @@
+steps:
+  CUSTOMER_WIKI_N0_S-273:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Customer data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4607
+              stepCounter: "273"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_CUSTOMER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4579
+                    stepCounter: "271"
+                transform: ""
+          - columnReference:
+              columnCounter: 4610
+              stepCounter: "273"
+            config:
+              is_hd: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HD_CUSTOMER_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4582
+                    stepCounter: "271"
+                transform: ""
+          - columnReference:
+              columnCounter: 4605
+              stepCounter: "273"
+            dataType: TIMESTAMP
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4577
+                    stepCounter: "271"
+                transform: ""
+          - columnReference:
+              columnCounter: 4606
+              stepCounter: "273"
+            dataType: STRING
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4578
+                    stepCounter: "271"
+                transform: ""
+          - columnReference:
+              columnCounter: 4602
+              stepCounter: "273"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_ACCTBAL
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4574
+                    stepCounter: "271"
+                transform: ""
+          - columnReference:
+              columnCounter: 4603
+              stepCounter: "273"
+            dataType: VARCHAR(10)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_MKTSEGMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4575
+                    stepCounter: "271"
+                transform: ""
+          - columnReference:
+              columnCounter: 4604
+              stepCounter: "273"
+            dataType: VARCHAR(117)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4576
+                    stepCounter: "271"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_CUSTOMER_WIKI
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER_WIKI') }} "STG_CUSTOMER_WIKI"
+            name: CUSTOMER_WIKI_N0_S
+            noLinkRefs: []
+      name: CUSTOMER_WIKI_N0_S
+      overrideSQL: false
+      schema: ""
+      sqlType: "8"
+      type: sql
+    stepCounter: "273"

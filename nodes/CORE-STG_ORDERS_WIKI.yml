@@ -1,0 +1,342 @@
+steps:
+  STG_ORDERS_WIKI-270:
+    operation:
+      config:
+        generate_ghost_records: true
+        testsEnabled: true
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Orders data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4554
+              stepCounter: "270"
+            dataType: NUMBER(38,0)
+            description: ""
+            name: O_ORDERKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3111
+                    stepCounter: "165"
+                transform: ""
+          - columnReference:
+              columnCounter: 4555
+              stepCounter: "270"
+            dataType: NUMBER(38,0)
+            description: ""
+            name: O_CUSTKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3112
+                    stepCounter: "165"
+                transform: ""
+          - columnReference:
+              columnCounter: 4556
+              stepCounter: "270"
+            dataType: VARCHAR(1)
+            description: ""
+            name: O_ORDERSTATUS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3113
+                    stepCounter: "165"
+                transform: ""
+          - columnReference:
+              columnCounter: 4557
+              stepCounter: "270"
+            dataType: NUMBER(12,2)
+            description: ""
+            name: O_TOTALPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3114
+                    stepCounter: "165"
+                transform: ""
+          - columnReference:
+              columnCounter: 4558
+              stepCounter: "270"
+            dataType: DATE
+            description: ""
+            name: O_ORDERDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3115
+                    stepCounter: "165"
+                transform: ""
+          - columnReference:
+              columnCounter: 4559
+              stepCounter: "270"
+            dataType: VARCHAR(15)
+            description: ""
+            name: O_ORDERPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3116
+                    stepCounter: "165"
+                transform: ""
+          - columnReference:
+              columnCounter: 4560
+              stepCounter: "270"
+            dataType: VARCHAR(15)
+            description: ""
+            name: O_CLERK
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3117
+                    stepCounter: "165"
+                transform: ""
+          - columnReference:
+              columnCounter: 4561
+              stepCounter: "270"
+            dataType: NUMBER(38,0)
+            description: ""
+            name: O_SHIPPRIORITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3118
+                    stepCounter: "165"
+                transform: ""
+          - columnReference:
+              columnCounter: 4562
+              stepCounter: "270"
+            dataType: VARCHAR(79)
+            description: ""
+            name: O_COMMENT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3119
+                    stepCounter: "165"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4563
+              stepCounter: "270"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            is_system_ldts: true
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: SYSDATE()
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4564
+              stepCounter: "270"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: The Record Source (RSRC) describes the source of this data.
+            is_system_rsrc: true
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: "{{record_source()}}"
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4565
+              stepCounter: "270"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 4554
+                stepCounter: "270"
+            name: HK_ORDERS_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4566
+              stepCounter: "270"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA256
+            hashedColumns:
+              - columnCounter: 4555
+                stepCounter: "270"
+            name: HK_CUSTOMER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4567
+              stepCounter: "270"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 4556
+                stepCounter: "270"
+              - columnCounter: 4557
+                stepCounter: "270"
+              - columnCounter: 4558
+                stepCounter: "270"
+              - columnCounter: 4559
+                stepCounter: "270"
+              - columnCounter: 4560
+                stepCounter: "270"
+              - columnCounter: 4561
+                stepCounter: "270"
+              - columnCounter: 4562
+                stepCounter: "270"
+            name: HD_ORDERS_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4568
+              stepCounter: "270"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: MD5
+            hashedColumns:
+              - columnCounter: 4554
+                stepCounter: "270"
+              - columnCounter: 4555
+                stepCounter: "270"
+            name: HK_ORDERS_CUSTOMER_L
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4697
+              stepCounter: "270"
+            config: {}
+            dataType: ""
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: Test1
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 0
+                    stepCounter: "0"
+                transform: ""
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4698
+              stepCounter: "270"
+            config: {}
+            dataType: ""
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: Test2
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 0
+                    stepCounter: "0"
+                transform: ""
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4699
+              stepCounter: "270"
+            config: {}
+            dataType: binary
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 4697
+                stepCounter: "270"
+              - columnCounter: 4698
+                stepCounter: "270"
+            name: GH
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: TPCH_SF1
+                nodeName: ORDERS
+            join:
+              joinCondition: FROM {{ ref('TPCH_SF1', 'ORDERS') }} "ORDERS"
+            name: STG_ORDERS_WIKI
+            noLinkRefs: []
+      name: STG_ORDERS_WIKI
+      overrideSQL: false
+      schema: ""
+      sqlType: "4"
+      type: sql
+    stepCounter: "270"

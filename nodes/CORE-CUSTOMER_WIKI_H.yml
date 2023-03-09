@@ -1,0 +1,120 @@
+steps:
+  CUSTOMER_WIKI_H-272:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Customer data as defined by TPC-H
+      isDataVault: false
+      isMultisource: true
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4593
+              stepCounter: "272"
+            config:
+              is_Hub_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_CUSTOMER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4579
+                    stepCounter: "271"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4566
+                    stepCounter: "270"
+                transform: ""
+          - columnReference:
+              columnCounter: 4583
+              stepCounter: "272"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_CUSTKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4569
+                    stepCounter: "271"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4555
+                    stepCounter: "270"
+                transform: ""
+          - columnReference:
+              columnCounter: 4591
+              stepCounter: "272"
+            dataType: TIMESTAMP
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4577
+                    stepCounter: "271"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4563
+                    stepCounter: "270"
+                transform: ""
+          - columnReference:
+              columnCounter: 4592
+              stepCounter: "272"
+            dataType: STRING
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4578
+                    stepCounter: "271"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4564
+                    stepCounter: "270"
+                transform: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_CUSTOMER_WIKI
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_CUSTOMER_WIKI') }} "STG_CUSTOMER_WIKI"
+            name: CUSTOMER_WIKI_H
+            noLinkRefs: []
+          - aliases:
+              STG_ORDERS_WIKI: "270"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: STG_ORDERS_WIKI
+            join:
+              joinCondition: FROM {{ ref('CORE', 'STG_ORDERS_WIKI') }} "STG_ORDERS_WIKI"
+            name: STG_ORDERS_WIKI
+            noLinkRefs: []
+      name: CUSTOMER_WIKI_H
+      overrideSQL: false
+      schema: ""
+      sqlType: "6"
+      type: sql
+    stepCounter: "272"

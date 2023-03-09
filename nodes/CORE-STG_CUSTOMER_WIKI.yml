@@ -1,0 +1,280 @@
+steps:
+  STG_CUSTOMER_WIKI-271:
+    operation:
+      config:
+        generate_ghost_records: true
+        testsEnabled: true
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Customer data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4569
+              stepCounter: "271"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_CUSTKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3083
+                    stepCounter: "162"
+                transform: ""
+          - columnReference:
+              columnCounter: 4570
+              stepCounter: "271"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3084
+                    stepCounter: "162"
+                transform: ""
+          - columnReference:
+              columnCounter: 4571
+              stepCounter: "271"
+            dataType: VARCHAR(40)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_ADDRESS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3085
+                    stepCounter: "162"
+                transform: ""
+          - columnReference:
+              columnCounter: 4572
+              stepCounter: "271"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_NATIONKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3086
+                    stepCounter: "162"
+                transform: ""
+          - columnReference:
+              columnCounter: 4573
+              stepCounter: "271"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_PHONE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3087
+                    stepCounter: "162"
+                transform: ""
+          - columnReference:
+              columnCounter: 4574
+              stepCounter: "271"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_ACCTBAL
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3088
+                    stepCounter: "162"
+                transform: ""
+          - columnReference:
+              columnCounter: 4575
+              stepCounter: "271"
+            dataType: VARCHAR(10)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_MKTSEGMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3089
+                    stepCounter: "162"
+                transform: ""
+          - columnReference:
+              columnCounter: 4576
+              stepCounter: "271"
+            dataType: VARCHAR(117)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 3090
+                    stepCounter: "162"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4577
+              stepCounter: "271"
+            config: {}
+            dataType: TIMESTAMP
+            defaultValue: ""
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            is_system_ldts: true
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: SYSDATE()
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4578
+              stepCounter: "271"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            is_system_rsrc: true
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: "{{record_source()}}"
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4579
+              stepCounter: "271"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 4569
+                stepCounter: "271"
+            name: HK_CUSTOMER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4580
+              stepCounter: "271"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 4572
+                stepCounter: "271"
+            name: HK_NATION_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4581
+              stepCounter: "271"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 4570
+                stepCounter: "271"
+              - columnCounter: 4571
+                stepCounter: "271"
+              - columnCounter: 4573
+                stepCounter: "271"
+            name: HD_CUSTOMER_P_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 4582
+              stepCounter: "271"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashColumns: []
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 4574
+                stepCounter: "271"
+              - columnCounter: 4575
+                stepCounter: "271"
+              - columnCounter: 4576
+                stepCounter: "271"
+            name: HD_CUSTOMER_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: TPCH_SF1
+                nodeName: CUSTOMER
+            join:
+              joinCondition: FROM {{ ref('TPCH_SF1', 'CUSTOMER') }} "CUSTOMER"
+            name: STG_CUSTOMER_WIKI
+            noLinkRefs: []
+      name: STG_CUSTOMER_WIKI
+      overrideSQL: false
+      schema: ""
+      sqlType: "4"
+      type: sql
+    stepCounter: "271"
