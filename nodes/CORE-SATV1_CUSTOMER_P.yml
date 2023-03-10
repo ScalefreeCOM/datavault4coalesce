@@ -1,5 +1,5 @@
 steps:
-  SAT_V1_CUSTOMER_N-304:
+  SATV1_CUSTOMER_P-303:
     operation:
       config:
         postSQL: ""
@@ -17,8 +17,8 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4965
-              stepCounter: "304"
+              columnCounter: 4956
+              stepCounter: "303"
             config:
               is_hk: true
             dataType: STRING
@@ -29,26 +29,26 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4951
-                    stepCounter: "302"
+                  - columnCounter: 4936
+                    stepCounter: "301"
                 transform: ""
           - columnReference:
-              columnCounter: 4966
-              stepCounter: "304"
+              columnCounter: 4957
+              stepCounter: "303"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HD_CUSTOMER_N_S
+            name: HD_CUSTOMER_P_S
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4955
-                    stepCounter: "302"
+                  - columnCounter: 4939
+                    stepCounter: "301"
                 transform: ""
           - columnReference:
-              columnCounter: 4967
-              stepCounter: "304"
+              columnCounter: 4958
+              stepCounter: "303"
             dataType: TIMESTAMP
             description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
@@ -57,12 +57,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4949
-                    stepCounter: "302"
+                  - columnCounter: 4934
+                    stepCounter: "301"
                 transform: ""
           - columnReference:
-              columnCounter: 4968
-              stepCounter: "304"
+              columnCounter: 4959
+              stepCounter: "303"
             dataType: STRING
             description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
@@ -71,58 +71,58 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4950
-                    stepCounter: "302"
+                  - columnCounter: 4935
+                    stepCounter: "301"
                 transform: ""
           - columnReference:
-              columnCounter: 4969
-              stepCounter: "304"
-            dataType: NUMBER(12,2)
+              columnCounter: 4960
+              stepCounter: "303"
+            dataType: VARCHAR(25)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_ACCTBAL
+            name: C_NAME
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4946
-                    stepCounter: "302"
+                  - columnCounter: 4927
+                    stepCounter: "301"
                 transform: ""
           - columnReference:
-              columnCounter: 4970
-              stepCounter: "304"
-            dataType: VARCHAR(10)
+              columnCounter: 4961
+              stepCounter: "303"
+            dataType: VARCHAR(40)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_MKTSEGMENT
-            nullable: true
+            name: C_ADDRESS
+            nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4947
-                    stepCounter: "302"
+                  - columnCounter: 4928
+                    stepCounter: "301"
                 transform: ""
           - columnReference:
-              columnCounter: 4971
-              stepCounter: "304"
-            dataType: VARCHAR(117)
+              columnCounter: 4962
+              stepCounter: "303"
+            dataType: VARCHAR(15)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_COMMENT
-            nullable: true
+            name: C_PHONE
+            nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4948
-                    stepCounter: "302"
+                  - columnCounter: 4930
+                    stepCounter: "301"
                 transform: ""
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4972
-              stepCounter: "304"
+              columnCounter: 4963
+              stepCounter: "303"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
@@ -142,8 +142,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4973
-              stepCounter: "304"
+              columnCounter: 4964
+              stepCounter: "303"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
@@ -167,19 +167,19 @@ steps:
         enabledColumnTestIDs: []
         sourceMapping:
           - aliases:
-              SAT_V0_CUSTOMER_N: "302"
+              SAT_V0_CUSTOMER_P: "301"
             customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: SAT_V0_CUSTOMER_N
+                nodeName: SAT_V0_CUSTOMER_P
             join:
-              joinCondition: FROM {{ ref('CORE', 'SAT_V0_CUSTOMER_N') }} "SAT_V0_CUSTOMER_N"
-            name: SAT_V1_CUSTOMER_N
+              joinCondition: FROM {{ ref('CORE', 'SAT_V0_CUSTOMER_P') }} "SAT_V0_CUSTOMER_P"
+            name: SATV1_CUSTOMER_P
             noLinkRefs: []
-      name: SAT_V1_CUSTOMER_N
+      name: SATV1_CUSTOMER_P
       overrideSQL: false
       schema: ""
       sqlType: "9"
       type: sql
-    stepCounter: "304"
+    stepCounter: "303"

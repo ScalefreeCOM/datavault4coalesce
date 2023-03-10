@@ -1,0 +1,266 @@
+steps:
+  SATV0_LINEITEM_N-315:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Lineitem data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 5136
+              stepCounter: "315"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_LINEITEM_L
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5090
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5137
+              stepCounter: "315"
+            config:
+              is_hd: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HD_LINEITEM_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5091
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5131
+              stepCounter: "315"
+            dataType: TIMESTAMP
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5085
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5132
+              stepCounter: "315"
+            dataType: STRING
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5086
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5119
+              stepCounter: "315"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_QUANTITY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5073
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5120
+              stepCounter: "315"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_EXTENDEDPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5074
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5121
+              stepCounter: "315"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_DISCOUNT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5075
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5122
+              stepCounter: "315"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_TAX
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5076
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5123
+              stepCounter: "315"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_RETURNFLAG
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5077
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5124
+              stepCounter: "315"
+            dataType: VARCHAR(1)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_LINESTATUS
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5078
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5125
+              stepCounter: "315"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_SHIPDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5079
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5126
+              stepCounter: "315"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_COMMITDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5080
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5127
+              stepCounter: "315"
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_RECEIPTDATE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5081
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5128
+              stepCounter: "315"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_SHIPINSTRUCT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5082
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5129
+              stepCounter: "315"
+            dataType: VARCHAR(10)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_SHIPMODE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5083
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 5130
+              stepCounter: "315"
+            dataType: VARCHAR(44)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: L_COMMENT
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5084
+                    stepCounter: "313"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              DVSTG_LINEITEM: "313"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_LINEITEM
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_LINEITEM') }} "DVSTG_LINEITEM"
+            name: SATV0_LINEITEM_N
+            noLinkRefs: []
+      name: SATV0_LINEITEM_N
+      overrideSQL: false
+      schema: ""
+      sqlType: "8"
+      type: sql
+    stepCounter: "315"

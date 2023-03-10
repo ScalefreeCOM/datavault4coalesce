@@ -1,5 +1,5 @@
 steps:
-  SAT_V0_CUSTOMER_N-302:
+  SATV0_CUSTOMER_N-302:
     operation:
       config:
         postSQL: ""
@@ -130,9 +130,9 @@ steps:
                 nodeName: DVSTG_CUSTOMER
             join:
               joinCondition: FROM {{ ref('CORE', 'DVSTG_CUSTOMER') }} "DVSTG_CUSTOMER"
-            name: SAT_V0_CUSTOMER_N
+            name: SATV0_CUSTOMER_N
             noLinkRefs: []
-      name: SAT_V0_CUSTOMER_N
+      name: SATV0_CUSTOMER_N
       overrideSQL: false
       schema: ""
       sqlType: "8"

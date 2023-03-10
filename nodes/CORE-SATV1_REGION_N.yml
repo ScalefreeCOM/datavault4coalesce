@@ -1,5 +1,5 @@
 steps:
-  SAT_V1_REGION_N-297:
+  SATV1_REGION_N-297:
     operation:
       config:
         postSQL: ""
@@ -161,9 +161,9 @@ steps:
                 nodeName: SAT_V0_REGION_N
             join:
               joinCondition: FROM {{ ref('CORE', 'SAT_V0_REGION_N') }} "SAT_V0_REGION_N"
-            name: SAT_V1_REGION_N
+            name: SATV1_REGION_N
             noLinkRefs: []
-      name: SAT_V1_REGION_N
+      name: SATV1_REGION_N
       overrideSQL: false
       schema: ""
       sqlType: "9"

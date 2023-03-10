@@ -1,5 +1,5 @@
 steps:
-  SAT_V1_SUPPLIER_N-288:
+  SATV1_SUPPLIER_N-288:
     operation:
       config:
         postSQL: ""
@@ -217,9 +217,9 @@ steps:
                 nodeName: SAT_V0_SUPPLIER_N
             join:
               joinCondition: FROM {{ ref('CORE', 'SAT_V0_SUPPLIER_N') }} "SAT_V0_SUPPLIER_N"
-            name: SAT_V1_SUPPLIER_N
+            name: SATV1_SUPPLIER_N
             noLinkRefs: []
-      name: SAT_V1_SUPPLIER_N
+      name: SATV1_SUPPLIER_N
       overrideSQL: false
       schema: ""
       sqlType: "9"

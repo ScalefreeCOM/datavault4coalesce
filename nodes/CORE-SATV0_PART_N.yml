@@ -1,5 +1,5 @@
 steps:
-  SAT_V0_PART_N-307:
+  SATV0_PART_N-307:
     operation:
       config:
         postSQL: ""
@@ -200,9 +200,9 @@ steps:
                 nodeName: DVSTG_PART
             join:
               joinCondition: FROM {{ ref('CORE', 'DVSTG_PART') }} "DVSTG_PART"
-            name: SAT_V0_PART_N
+            name: SATV0_PART_N
             noLinkRefs: []
-      name: SAT_V0_PART_N
+      name: SATV0_PART_N
       overrideSQL: false
       schema: ""
       sqlType: "8"

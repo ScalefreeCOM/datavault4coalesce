@@ -1,5 +1,5 @@
 steps:
-  SAT_V0_REGION_N-296:
+  SATV0_CUSTOMER_P-301:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Region data as defined by TPC-H
+      description: Customer data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,40 +17,40 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4871
-              stepCounter: "296"
+              columnCounter: 4936
+              stepCounter: "301"
             config:
               is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_REGION_H
+            name: HK_CUSTOMER_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4864
-                    stepCounter: "295"
+                  - columnCounter: 4891
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4872
-              stepCounter: "296"
+              columnCounter: 4939
+              stepCounter: "301"
             config:
               is_hd: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HD_REGION_N_S
+            name: HD_CUSTOMER_P_S
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4865
-                    stepCounter: "295"
+                  - columnCounter: 4894
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4869
-              stepCounter: "296"
+              columnCounter: 4934
+              stepCounter: "301"
             dataType: TIMESTAMP
             description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
@@ -59,12 +59,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4862
-                    stepCounter: "295"
+                  - columnCounter: 4889
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4870
-              stepCounter: "296"
+              columnCounter: 4935
+              stepCounter: "301"
             dataType: STRING
             description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
@@ -73,54 +73,68 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4863
-                    stepCounter: "295"
+                  - columnCounter: 4890
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4867
-              stepCounter: "296"
+              columnCounter: 4927
+              stepCounter: "301"
             dataType: VARCHAR(25)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: R_NAME
+            name: C_NAME
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4860
-                    stepCounter: "295"
+                  - columnCounter: 4882
+                    stepCounter: "298"
                 transform: ""
           - columnReference:
-              columnCounter: 4868
-              stepCounter: "296"
-            dataType: VARCHAR(152)
+              columnCounter: 4928
+              stepCounter: "301"
+            dataType: VARCHAR(40)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: R_COMMENT
-            nullable: true
+            name: C_ADDRESS
+            nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4861
-                    stepCounter: "295"
+                  - columnCounter: 4883
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4930
+              stepCounter: "301"
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_PHONE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4885
+                    stepCounter: "298"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
         sourceMapping:
           - aliases:
-              DVSTG_REGION: "295"
+              DVSTG_CUSTOMER: "298"
             customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: DVSTG_REGION
+                nodeName: DVSTG_CUSTOMER
             join:
-              joinCondition: FROM {{ ref('CORE', 'DVSTG_REGION') }} "DVSTG_REGION"
-            name: SAT_V0_REGION_N
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_CUSTOMER') }} "DVSTG_CUSTOMER"
+            name: SATV0_CUSTOMER_P
             noLinkRefs: []
-      name: SAT_V0_REGION_N
+      name: SATV0_CUSTOMER_P
       overrideSQL: false
       schema: ""
       sqlType: "8"
       type: sql
-    stepCounter: "296"
+    stepCounter: "301"

@@ -1,5 +1,5 @@
 steps:
-  SAT_V1_PART_SUPPLIER_N-312:
+  SATV1_CUSTOMER_N-304:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Partsupp data as defined by TPC-H
+      description: Customer data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,38 +17,38 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 5060
-              stepCounter: "312"
+              columnCounter: 4965
+              stepCounter: "304"
             config:
               is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_PART_SUPPLIER_L
+            name: HK_CUSTOMER_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 5058
-                    stepCounter: "311"
+                  - columnCounter: 4951
+                    stepCounter: "302"
                 transform: ""
           - columnReference:
-              columnCounter: 5061
-              stepCounter: "312"
+              columnCounter: 4966
+              stepCounter: "304"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HD_PART_SUPPLIER_N_S
+            name: HD_CUSTOMER_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 5059
-                    stepCounter: "311"
+                  - columnCounter: 4955
+                    stepCounter: "302"
                 transform: ""
           - columnReference:
-              columnCounter: 5062
-              stepCounter: "312"
+              columnCounter: 4967
+              stepCounter: "304"
             dataType: TIMESTAMP
             description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
@@ -57,12 +57,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 5054
-                    stepCounter: "311"
+                  - columnCounter: 4949
+                    stepCounter: "302"
                 transform: ""
           - columnReference:
-              columnCounter: 5063
-              stepCounter: "312"
+              columnCounter: 4968
+              stepCounter: "304"
             dataType: STRING
             description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
@@ -71,58 +71,58 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 5055
-                    stepCounter: "311"
+                  - columnCounter: 4950
+                    stepCounter: "302"
                 transform: ""
           - columnReference:
-              columnCounter: 5064
-              stepCounter: "312"
-            dataType: NUMBER(38,0)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: PS_AVAILQTY
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 5051
-                    stepCounter: "311"
-                transform: ""
-          - columnReference:
-              columnCounter: 5065
-              stepCounter: "312"
+              columnCounter: 4969
+              stepCounter: "304"
             dataType: NUMBER(12,2)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: PS_SUPPLYCOST
+            name: C_ACCTBAL
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 5052
-                    stepCounter: "311"
+                  - columnCounter: 4946
+                    stepCounter: "302"
                 transform: ""
           - columnReference:
-              columnCounter: 5066
-              stepCounter: "312"
-            dataType: VARCHAR(199)
+              columnCounter: 4970
+              stepCounter: "304"
+            dataType: VARCHAR(10)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: PS_COMMENT
+            name: C_MKTSEGMENT
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 5053
-                    stepCounter: "311"
+                  - columnCounter: 4947
+                    stepCounter: "302"
+                transform: ""
+          - columnReference:
+              columnCounter: 4971
+              stepCounter: "304"
+            dataType: VARCHAR(117)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4948
+                    stepCounter: "302"
                 transform: ""
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 5067
-              stepCounter: "312"
+              columnCounter: 4972
+              stepCounter: "304"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
@@ -142,8 +142,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 5068
-              stepCounter: "312"
+              columnCounter: 4973
+              stepCounter: "304"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
@@ -167,19 +167,19 @@ steps:
         enabledColumnTestIDs: []
         sourceMapping:
           - aliases:
-              SAT_V0_PART_SUPPLIER_N: "311"
+              SAT_V0_CUSTOMER_N: "302"
             customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: SAT_V0_PART_SUPPLIER_N
+                nodeName: SAT_V0_CUSTOMER_N
             join:
-              joinCondition: FROM {{ ref('CORE', 'SAT_V0_PART_SUPPLIER_N') }} "SAT_V0_PART_SUPPLIER_N"
-            name: SAT_V1_PART_SUPPLIER_N
+              joinCondition: FROM {{ ref('CORE', 'SAT_V0_CUSTOMER_N') }} "SAT_V0_CUSTOMER_N"
+            name: SATV1_CUSTOMER_N
             noLinkRefs: []
-      name: SAT_V1_PART_SUPPLIER_N
+      name: SATV1_CUSTOMER_N
       overrideSQL: false
       schema: ""
       sqlType: "9"
       type: sql
-    stepCounter: "312"
+    stepCounter: "304"

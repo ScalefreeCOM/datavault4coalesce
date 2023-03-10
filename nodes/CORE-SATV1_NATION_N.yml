@@ -1,5 +1,5 @@
 steps:
-  SAT_V1_CUSTOMER_P-303:
+  SATV1_NATION_N-292:
     operation:
       config:
         postSQL: ""
@@ -7,7 +7,7 @@ steps:
       database: ""
       dependencies: []
       deployEnabled: true
-      description: Customer data as defined by TPC-H
+      description: Nation data as defined by TPC-H
       isDataVault: false
       isMultisource: false
       locationID: ""
@@ -17,38 +17,38 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 4956
-              stepCounter: "303"
+              columnCounter: 4831
+              stepCounter: "292"
             config:
               is_hk: true
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HK_CUSTOMER_H
+            name: HK_NATION_H
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4936
-                    stepCounter: "301"
+                  - columnCounter: 4827
+                    stepCounter: "291"
                 transform: ""
           - columnReference:
-              columnCounter: 4957
-              stepCounter: "303"
+              columnCounter: 4832
+              stepCounter: "292"
             dataType: STRING
             description: ""
             hashColumns: []
             hashDetails: null
-            name: HD_CUSTOMER_P_S
+            name: HD_NATION_N_S
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4939
-                    stepCounter: "301"
+                  - columnCounter: 4830
+                    stepCounter: "291"
                 transform: ""
           - columnReference:
-              columnCounter: 4958
-              stepCounter: "303"
+              columnCounter: 4833
+              stepCounter: "292"
             dataType: TIMESTAMP
             description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
             hashColumns: []
@@ -57,12 +57,12 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4934
-                    stepCounter: "301"
+                  - columnCounter: 4825
+                    stepCounter: "291"
                 transform: ""
           - columnReference:
-              columnCounter: 4959
-              stepCounter: "303"
+              columnCounter: 4834
+              stepCounter: "292"
             dataType: STRING
             description: The Record Source (RSRC) describes the source of this data.
             hashColumns: []
@@ -71,58 +71,44 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4935
-                    stepCounter: "301"
+                  - columnCounter: 4826
+                    stepCounter: "291"
                 transform: ""
           - columnReference:
-              columnCounter: 4960
-              stepCounter: "303"
+              columnCounter: 4835
+              stepCounter: "292"
             dataType: VARCHAR(25)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_NAME
+            name: N_NAME
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4927
-                    stepCounter: "301"
+                  - columnCounter: 4822
+                    stepCounter: "291"
                 transform: ""
           - columnReference:
-              columnCounter: 4961
-              stepCounter: "303"
-            dataType: VARCHAR(40)
+              columnCounter: 4836
+              stepCounter: "292"
+            dataType: VARCHAR(152)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: C_ADDRESS
-            nullable: false
+            name: N_COMMENT
+            nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 4928
-                    stepCounter: "301"
-                transform: ""
-          - columnReference:
-              columnCounter: 4962
-              stepCounter: "303"
-            dataType: VARCHAR(15)
-            description: ""
-            hashColumns: []
-            hashDetails: null
-            name: C_PHONE
-            nullable: false
-            sourceColumnReferences:
-              - columnReferences:
-                  - columnCounter: 4930
-                    stepCounter: "301"
+                  - columnCounter: 4824
+                    stepCounter: "291"
                 transform: ""
           - acceptedValues:
               strictMatch: true
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4963
-              stepCounter: "303"
+              columnCounter: 4837
+              stepCounter: "292"
             config: {}
             dataType: TIMESTAMP
             defaultValue: ""
@@ -142,8 +128,8 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 4964
-              stepCounter: "303"
+              columnCounter: 4838
+              stepCounter: "292"
             config: {}
             dataType: BOOLEAN
             defaultValue: ""
@@ -167,19 +153,19 @@ steps:
         enabledColumnTestIDs: []
         sourceMapping:
           - aliases:
-              SAT_V0_CUSTOMER_P: "301"
+              SAT_V0_NATION_N: "291"
             customSQL:
               customSQL: ""
             dependencies:
               - locationName: CORE
-                nodeName: SAT_V0_CUSTOMER_P
+                nodeName: SAT_V0_NATION_N
             join:
-              joinCondition: FROM {{ ref('CORE', 'SAT_V0_CUSTOMER_P') }} "SAT_V0_CUSTOMER_P"
-            name: SAT_V1_CUSTOMER_P
+              joinCondition: FROM {{ ref('CORE', 'SAT_V0_NATION_N') }} "SAT_V0_NATION_N"
+            name: SATV1_NATION_N
             noLinkRefs: []
-      name: SAT_V1_CUSTOMER_P
+      name: SATV1_NATION_N
       overrideSQL: false
       schema: ""
       sqlType: "9"
       type: sql
-    stepCounter: "303"
+    stepCounter: "292"
