@@ -1,0 +1,149 @@
+steps:
+  HUB_PART-306:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Part data as defined by TPC-H
+      isDataVault: false
+      isMultisource: true
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4998
+              stepCounter: "306"
+            config:
+              is_Hub_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_PART_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4985
+                    stepCounter: "305"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5034
+                    stepCounter: "309"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5088
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 4987
+              stepCounter: "306"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_PARTKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4974
+                    stepCounter: "305"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5027
+                    stepCounter: "309"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5070
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 4996
+              stepCounter: "306"
+            dataType: TIMESTAMP
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4983
+                    stepCounter: "305"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5032
+                    stepCounter: "309"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5085
+                    stepCounter: "313"
+                transform: ""
+          - columnReference:
+              columnCounter: 4997
+              stepCounter: "306"
+            dataType: STRING
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4984
+                    stepCounter: "305"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5033
+                    stepCounter: "309"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 5086
+                    stepCounter: "313"
+                transform: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              DVSTG_PART: "305"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_PART
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_PART') }} "DVSTG_PART"
+            name: HUB_PART
+            noLinkRefs: []
+          - aliases:
+              DVSTG_PARTSUPP: "309"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_PARTSUPP
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_PARTSUPP') }} "DVSTG_PARTSUPP"
+            name: STG PARTSUPP
+            noLinkRefs: []
+          - aliases:
+              DVSTG_LINEITEM: "313"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_LINEITEM
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_LINEITEM') }} "DVSTG_LINEITEM"
+            name: LINEITEM
+            noLinkRefs: []
+      name: HUB_PART
+      overrideSQL: false
+      schema: ""
+      sqlType: "6"
+      type: sql
+    stepCounter: "306"

@@ -37,14 +37,12 @@ macros:
            "rsrc_alias": "RSRC", 
            "ledts_alias": "LEDTS", 
            "snapshot_trigger_column": "IS_ACTIVE",
-           "sdts_alias": "SDTS", 
-           "stg_alias": "STG", 
+           "sdts_alias": "SDTS",
            "is_current_col_alias": "IS_CURRENT", 
            "hash": "MD5", 
            "hash_datatype": "STRING", 
            "hash_input_case_sensitive": "TRUE",
            "hash_passthrough_input_transformations": "TRUE",
-           "copy_rsrc_ldts_input_columns": "false",  
            "beginning_of_all_times": "0001-01-01T00:00:01", 
            "end_of_all_times": "8888-12-31T23:59:59",
            "timestamp_format": "YYYY-MM-DDTHH24:MI:SS", 
@@ -52,7 +50,6 @@ macros:
            "default_error_rsrc": "ERROR", 
            "rsrc_default_dtype": "STRING", 
            "stg_default_dtype": "STRING", 
-           "derived_columns_default_dtype": "STRING",
            "error_value__STRING": "'(error)'", 
            "error_value_alt__STRING": "'e'", 
            "unknown_value__STRING": "'(unknown)'",
@@ -70,8 +67,12 @@ macros:
       {%-macro record_source()-%}
       {#--USAGE:{{record_source()}}#}
       {#--NOTES:Adds a Record Source (name of qualified previous table/view)#}
-      {% set src = storageLocations | selectattr('name', "equalto", sources[0].dependencies[0].node.location.name) | list | first %} 
-      '"{{src.database}}"."{{src.schema}}"."{{sources[0].dependencies[0].node.name}}"'
+      {%- if sources[0].dependencies -%}
+           {% set src = storageLocations | selectattr('name', "equalto", sources[0].dependencies[0].node.location.name) | list | first %} 
+           '"{{src.database}}"."{{src.schema}}"."{{sources[0].dependencies[0].node.name}}"'
+      {%- else -%}
+           'Missing Dependencies!'
+      {%- endif -%}
       {%- endmacro -%}
 
 
@@ -184,8 +185,12 @@ macros:
            {%- set dict_result = {} -%}
            {%- set hash_alg = '' -%}
 
-           {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
-                {%- set hash_alg = 'MD5' -%}
+           {%- if hash_function == 'MD5' -%}
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set hash_alg = 'MD5' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set hash_alg = 'MD5_BINARY' -%}       
+                {%- endif -%}
            {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
                 {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
                      {%- set hash_alg = 'SHA1' -%}
@@ -216,8 +221,12 @@ macros:
            {%- set dict_result = {} -%}
            {%- set unknown_key = '' -%}
 
-           {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
-                {%- set unknown_key = '!00000000000000000000000000000000' -%}
+           {%- if hash_function == 'MD5' -%}
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set unknown_key = '!00000000000000000000000000000000' -%}
+                {%- elif 'BINARY' in hash_datatype -%}  
+                     {%- set unknown_key = "TO_BINARY('00000000000000000000000000000000')" -%}     
+                {%- endif -%}                       
            {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
                 {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
                      {%- set unknown_key = '!0000000000000000000000000000000000000000' -%}
@@ -249,8 +258,12 @@ macros:
            {%- set dict_result = {} -%}
            {%- set error_key = '' -%}
 
-           {%- if hash_function == 'MD5' and hash_datatype == 'STRING' -%}
-                {%- set error_key = '!ffffffffffffffffffffffffffffffff' -%}
+           {%- if hash_function == 'MD5' -%}
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set error_key = '!ffffffffffffffffffffffffffffffff' -%}
+                {%- elif 'BINARY' in hash_datatype -%}  
+                     {%- set error_key = "TO_BINARY('ffffffffffffffffffffffffffffffff')" -%}     
+                {%- endif -%}          
            {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
                 {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
                      {%- set error_key = '!ffffffffffffffffffffffffffffffffffffffff' -%}
@@ -299,11 +312,11 @@ macros:
 
           {%- if case_sensitive -%}
               
-              {%- set standardise_prefix = "IFNULL(LOWER({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
+              {%- set standardise_prefix = "COALESCE(LOWER({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
 
           {%- else -%}
               
-              {%- set standardise_prefix = "IFNULL(LOWER({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg)-%}
+              {%- set standardise_prefix = "COALESCE(LOWER({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg)-%}
 
           {%- endif -%}
 
@@ -311,11 +324,11 @@ macros:
 
           {%- if case_sensitive -%}
               
-              {%- set standardise_prefix = "IFNULL({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
+              {%- set standardise_prefix = "COALESCE({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
 
           {%- else -%}
               
-              {%- set standardise_prefix = "IFNULL({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg)-%}
+              {%- set standardise_prefix = "COALESCE({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg)-%}
 
           {%- endif -%}
 
@@ -426,7 +439,7 @@ macros:
                 {%- endif -%}
            {%- endif -%}
 
-          {{- "\nIFNULL(({}), '{}')".format(attribute_standardise | replace('[EXPRESSION]', column_str) | replace('[QUOTE]', quote) | replace('[NULL_PLACEHOLDER_STRING]', null_placeholder_string), null_placeholder_string) | indent(4) -}}
+          {{- "\nCOALESCE(({}), '{}')".format(attribute_standardise | replace('[EXPRESSION]', column_str) | replace('[QUOTE]', quote) | replace('[NULL_PLACEHOLDER_STRING]', null_placeholder_string), null_placeholder_string) | indent(4) -}}
           {{- ",'{}',".format(concat_string) if not loop.last -}}
 
           {%- if loop.last -%}
@@ -1465,7 +1478,7 @@ stepTypes:
       error: null
       nodeMetadataSpec: |-
         capitalized: 'DATAVAULT BY SCALEFREE: STAGE'
-        short: DV_STG
+        short: DVSTG
         plural: 'DATAVAULT BY SCALEFREE: STAGES'
         tagColor: '#AED6F1'
 
@@ -4862,4 +4875,8 @@ subgraphs:
       - "302"
       - "303"
       - "304"
+  Subgraph-8:
+    id: 8
+    name: New Subgraph
+    steps: []
 version: 1

@@ -1,0 +1,126 @@
+steps:
+  SAT_V0_NATION_N-291:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Nation data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4827
+              stepCounter: "291"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_NATION_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4807
+                    stepCounter: "289"
+                transform: ""
+          - columnReference:
+              columnCounter: 4830
+              stepCounter: "291"
+            config:
+              is_hd: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HD_NATION_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4810
+                    stepCounter: "289"
+                transform: ""
+          - columnReference:
+              columnCounter: 4825
+              stepCounter: "291"
+            dataType: TIMESTAMP
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4805
+                    stepCounter: "289"
+                transform: ""
+          - columnReference:
+              columnCounter: 4826
+              stepCounter: "291"
+            dataType: STRING
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4806
+                    stepCounter: "289"
+                transform: ""
+          - columnReference:
+              columnCounter: 4822
+              stepCounter: "291"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: N_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4802
+                    stepCounter: "289"
+                transform: ""
+          - columnReference:
+              columnCounter: 4824
+              stepCounter: "291"
+            dataType: VARCHAR(152)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: N_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4804
+                    stepCounter: "289"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              DVSTG_NATION: "289"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_NATION
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_NATION') }} "DVSTG_NATION"
+            name: SAT_V0_NATION_N
+            noLinkRefs: []
+      name: SAT_V0_NATION_N
+      overrideSQL: false
+      schema: ""
+      sqlType: "8"
+      type: sql
+    stepCounter: "291"

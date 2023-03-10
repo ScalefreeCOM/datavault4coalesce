@@ -1,0 +1,149 @@
+steps:
+  HUB_NATION-290:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Nation data as defined by TPC-H
+      isDataVault: false
+      isMultisource: true
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4817
+              stepCounter: "290"
+            config:
+              is_Hub_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_NATION_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4807
+                    stepCounter: "289"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4747
+                    stepCounter: "284"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4892
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4811
+              stepCounter: "290"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: N_NATIONKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4801
+                    stepCounter: "289"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4740
+                    stepCounter: "284"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4884
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4815
+              stepCounter: "290"
+            dataType: TIMESTAMP
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4805
+                    stepCounter: "289"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4744
+                    stepCounter: "284"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4889
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4816
+              stepCounter: "290"
+            dataType: STRING
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4806
+                    stepCounter: "289"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4745
+                    stepCounter: "284"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 4890
+                    stepCounter: "298"
+                transform: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              DVSTG_NATION: "289"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_NATION
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_NATION') }} "DVSTG_NATION"
+            name: NATION_H
+            noLinkRefs: []
+          - aliases:
+              DVSTG_SUPPLIER: "284"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_SUPPLIER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_SUPPLIER') }} "DVSTG_SUPPLIER"
+            name: SUPPLIER
+            noLinkRefs: []
+          - aliases:
+              DVSTG_CUSTOMER: "298"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_CUSTOMER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_CUSTOMER') }} "DVSTG_CUSTOMER"
+            name: STG CUSTOMER
+            noLinkRefs: []
+      name: HUB_NATION
+      overrideSQL: false
+      schema: ""
+      sqlType: "6"
+      type: sql
+    stepCounter: "290"

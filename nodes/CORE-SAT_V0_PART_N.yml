@@ -1,0 +1,210 @@
+steps:
+  SAT_V0_PART_N-307:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Part data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 5011
+              stepCounter: "307"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_PART_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4985
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5012
+              stepCounter: "307"
+            config:
+              is_hd: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HD_PART_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4986
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5001
+              stepCounter: "307"
+            dataType: VARCHAR(55)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_NAME
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4975
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5002
+              stepCounter: "307"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_MFGR
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4976
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5003
+              stepCounter: "307"
+            dataType: VARCHAR(10)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_BRAND
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4977
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5004
+              stepCounter: "307"
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_TYPE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4978
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5005
+              stepCounter: "307"
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_SIZE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4979
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5006
+              stepCounter: "307"
+            dataType: VARCHAR(10)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_CONTAINER
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4980
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5007
+              stepCounter: "307"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_RETAILPRICE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4981
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5008
+              stepCounter: "307"
+            dataType: VARCHAR(23)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: P_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4982
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5009
+              stepCounter: "307"
+            dataType: TIMESTAMP
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4983
+                    stepCounter: "305"
+                transform: ""
+          - columnReference:
+              columnCounter: 5010
+              stepCounter: "307"
+            dataType: STRING
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4984
+                    stepCounter: "305"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              DVSTG_PART: "305"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_PART
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_PART') }} "DVSTG_PART"
+            name: SAT_V0_PART_N
+            noLinkRefs: []
+      name: SAT_V0_PART_N
+      overrideSQL: false
+      schema: ""
+      sqlType: "8"
+      type: sql
+    stepCounter: "307"

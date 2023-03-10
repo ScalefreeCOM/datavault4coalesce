@@ -1,0 +1,140 @@
+steps:
+  SAT_V0_CUSTOMER_N-302:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Customer data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 4951
+              stepCounter: "302"
+            config:
+              is_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_CUSTOMER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4891
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4955
+              stepCounter: "302"
+            config:
+              is_hd: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HD_CUSTOMER_N_S
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4895
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4949
+              stepCounter: "302"
+            dataType: TIMESTAMP
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4889
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4950
+              stepCounter: "302"
+            dataType: STRING
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4890
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4946
+              stepCounter: "302"
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_ACCTBAL
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4886
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4947
+              stepCounter: "302"
+            dataType: VARCHAR(10)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_MKTSEGMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4887
+                    stepCounter: "298"
+                transform: ""
+          - columnReference:
+              columnCounter: 4948
+              stepCounter: "302"
+            dataType: VARCHAR(117)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: C_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 4888
+                    stepCounter: "298"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              DVSTG_CUSTOMER: "298"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_CUSTOMER
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_CUSTOMER') }} "DVSTG_CUSTOMER"
+            name: SAT_V0_CUSTOMER_N
+            noLinkRefs: []
+      name: SAT_V0_CUSTOMER_N
+      overrideSQL: false
+      schema: ""
+      sqlType: "8"
+      type: sql
+    stepCounter: "302"

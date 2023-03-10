@@ -1,0 +1,110 @@
+steps:
+  LINK_PART_SUPPLIER-310:
+    operation:
+      config:
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      deployEnabled: true
+      description: Partsupp data as defined by TPC-H
+      isDataVault: false
+      isMultisource: false
+      locationID: ""
+      locationName: CORE
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 5047
+              stepCounter: "310"
+            config:
+              is_Link_hk: true
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_PART_SUPPLIER_L
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5036
+                    stepCounter: "309"
+                transform: ""
+          - columnReference:
+              columnCounter: 5045
+              stepCounter: "310"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_PART_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5034
+                    stepCounter: "309"
+                transform: ""
+          - columnReference:
+              columnCounter: 5046
+              stepCounter: "310"
+            dataType: STRING
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: HK_SUPPLIER_H
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5035
+                    stepCounter: "309"
+                transform: ""
+          - columnReference:
+              columnCounter: 5043
+              stepCounter: "310"
+            dataType: TIMESTAMP
+            description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+            hashColumns: []
+            hashDetails: null
+            name: LDTS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5032
+                    stepCounter: "309"
+                transform: ""
+          - columnReference:
+              columnCounter: 5044
+              stepCounter: "310"
+            dataType: STRING
+            description: The Record Source (RSRC) describes the source of this data.
+            hashColumns: []
+            hashDetails: null
+            name: RSRC
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 5033
+                    stepCounter: "309"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              DVSTG_PARTSUPP: "309"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: CORE
+                nodeName: DVSTG_PARTSUPP
+            join:
+              joinCondition: FROM {{ ref('CORE', 'DVSTG_PARTSUPP') }} "DVSTG_PARTSUPP"
+            name: LINK_PART_SUPPLIER
+            noLinkRefs: []
+      name: LINK_PART_SUPPLIER
+      overrideSQL: false
+      schema: ""
+      sqlType: "7"
+      type: sql
+    stepCounter: "310"
