@@ -634,7 +634,7 @@ stepTypes:
       error: null
       nodeMetadataSpec: |-
         capitalized: 'DATAVAULT BY SCALEFREE: SNAPSHOT V0'
-        short: 'SNAPSHOT_V0'
+        short: 'SNAPSHOTV0'
         plural: 'DATAVAULT BY SCALEFREE: SNAPSHOTS V0'
         tagColor: '#1E8449'
 
@@ -658,6 +658,13 @@ stepTypes:
             attributeName: input_daily_snapshot_time
             isRequired: true
             default: "07:00:00"
+
+          - type: materializationSelector
+            default: table
+            options:
+            - table
+            isRequired: true
+            enableIf: "false"     
 
         - groupName: Pre/Post SQL
           items:
@@ -829,7 +836,7 @@ stepTypes:
       error: null
       nodeMetadataSpec: |-
         capitalized: 'DATAVAULT BY SCALEFREE: SNAPSHOT V1'
-        short: 'SNAPSHOT_V1'
+        short: 'SNAPSHOTV1'
         plural: 'DATAVAULT BY SCALEFREE: SNAPSHOTS V1'
         tagColor: '#58D68D'
 
@@ -843,6 +850,12 @@ stepTypes:
             enableIf: 'true'
             isRequired: true
             default: true
+          - type: materializationSelector
+            default: view
+            options:
+            - view
+            isRequired: true
+            enableIf: "false"    
 
         - groupName: Daily Snapshot Logic
           enableIf: "{{ config.use_logarithmic_logic }}"
