@@ -1,31 +1,14 @@
 defaultStorageMapping: CORE
-jobs:
-  Job-1:
-    id: 1
-    name: New Job
-    steps: []
-    subgraphs: []
+jobs: {}
 locations:
   CORE:
-    mappingDefinitions:
-      "3":
-        database: COALESCE_WORKSHOP
-        schema: CORE
+    mappingDefinitions: {}
   EXTERNAL_TABLES:
-    mappingDefinitions:
-      "3":
-        database: COALESCE_WORKSHOP
-        schema: EXTERNAL_TABLES
+    mappingDefinitions: {}
   RAW_STAGE:
-    mappingDefinitions:
-      "3":
-        database: COALESCE_WORKSHOP
-        schema: RAW_STAGE
+    mappingDefinitions: {}
   TPCH_SF1:
-    mappingDefinitions:
-      "3":
-        database: SNOWFLAKE_SAMPLE_DATA
-        schema: TPCH_SF1
+    mappingDefinitions: {}
 macros:
   Macro-1:
     id: "1"
