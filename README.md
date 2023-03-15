@@ -1,4 +1,4 @@
-<h1 align=center>Welcome to datavault4coalesce</h1>
+<h1 align=center>Welcome to datavault4coalesce!</h1>
 <img src="https://user-images.githubusercontent.com/81677440/196627704-e230a88f-270a-44b2-a07d-dcd06694bd48.jpg" width = 80% align=center>
 
 ***
