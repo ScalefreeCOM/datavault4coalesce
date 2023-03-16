@@ -34,6 +34,7 @@ To have access to the Datavault4Coalesce node definitions, you have to write an 
 ### Resources:
 - Learn more about coalesce [in the docs](https://docs.coalesce.io/docs)
 - Check out the [Scalefree-Blog](https://www.scalefree.com/blog/)
+- Reach out to us via datavault4coalesce@scalefree.com!
 - Blog Articles:
    - [Datavault4Coalesce Announcement](https://www.scalefree.com/scalefree-newsletter/bring-your-data-vault-automation-to-the-next-level-with-datavault4coalesce/)
    - [PIT Tables](https://www.scalefree.com/scalefree-newsletter/point-in-time-tables-insurance/)
