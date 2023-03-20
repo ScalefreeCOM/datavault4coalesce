@@ -500,8 +500,9 @@ stepTypes:
 
             {{ stage('Insert New Rows') }}
 
-            {%- set target_database = storageLocations[0].database -%}
-            {%- set target_schema = node.location.name -%}
+            {%- set loc = storageLocations | selectattr('name', "eq", node.location.name) | list | first -%}
+            {%- set target_database = loc.database -%}
+            {%- set target_schema = loc.name -%}
             {%- set target_node = node.name -%}
 
             {%- set ns = namespace(sdts_node_name='', hub_node_name='') -%}
@@ -592,14 +593,15 @@ stepTypes:
 
             	DELETE FROM {{ ref_no_link(node.location.name, node.name) }}
             	WHERE "{{ datavault4coalesce.config.sdts_alias }}" NOT IN (
-            		SELECT "{{ datavault4coalesce.config.sdts_alias }}" FROM 
-            			{% for col in sources[0].columns %}
-            				{%- if col.name == datavault4coalesce.config.sdts_alias -%}
-                            	{%- set source_node_name = col.sourceColumns[0].node.name -%}
-            					"{{ target_database }}"."{{ target_schema }}"."{{ source_node_name }}"
-            				{%- endif -%}
-            			{%- endfor %}
-            		WHERE "{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
+                SELECT "{{ datavault4coalesce.config.sdts_alias }}" FROM 
+                {% for col in sources[0].columns %}
+                    {%- if col.name == datavault4coalesce.config.sdts_alias -%}
+                        {%- set snapshot_loc = storageLocations | selectattr('name', "eq", col.sourceColumns[0].node.location.name) | list | first -%}
+                        {%- set snapshot_node_name = col.sourceColumns[0].node.name -%}
+                        "{{ snapshot_loc.database }}"."{{ snapshot_loc.schema }}"."{{ snapshot_node_name }}"
+                    {%- endif -%}
+                {%- endfor %}
+                WHERE "{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
             		)
             {% endif %}
 
