@@ -621,6 +621,22 @@ stepTypes:
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
             {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
     name: "Datavault by Scalefree: PIT"
     version: 1
   StepType-13:
@@ -835,6 +851,22 @@ stepTypes:
             SELECT * FROM "records_to_insert"
 
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
     name: "Datavault by Scalefree: Snapshot v0"
     version: 1
   StepType-14:
@@ -1515,6 +1547,22 @@ stepTypes:
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
             {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
     name: "Datavault by Scalefree: Hub"
     version: 1
   StepType-7:
@@ -1633,6 +1681,22 @@ stepTypes:
             {% if config.postSQL %}
                 {{ stage('Post-SQL') }}
                 {{ config.postSQL }}    
+            {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
     name: "Datavault by Scalefree: Link"
     version: 1
@@ -1769,6 +1833,22 @@ stepTypes:
             {% if config.postSQL %}
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
+            {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
     name: "Datavault by Scalefree: Satellite v0"
     version: 1
