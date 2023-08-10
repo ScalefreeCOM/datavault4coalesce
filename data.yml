@@ -502,6 +502,13 @@ stepTypes:
             	{{ stage('Pre-SQL') }}
             	{{ config.preSQL }}
             {% endif %}
+            
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
 
             {{ stage('Insert New Rows') }}
 
@@ -753,6 +760,13 @@ stepTypes:
             	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
           templateString: |-
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
+            
             {{ stage('Insert New Rows') }}
 
             {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
@@ -851,11 +865,6 @@ stepTypes:
             - view
             isRequired: true
             enableIf: "false"   
-
-          - displayName: Enable Tests
-            attributeName: testsEnabled
-            type: toggleButton
-            default: true 
 
         - groupName: Daily Snapshot Logic
           enableIf: "{{ config.use_logarithmic_logic }}"
@@ -1268,11 +1277,6 @@ stepTypes:
             isRequired: true
             enableIf: "false"
 
-          - displayName: Enable Tests
-            attributeName: testsEnabled
-            type: toggleButton
-            default: true
-
         - groupName: Data Vault
           items:
           - displayName: Generate Ghost Records
@@ -1459,6 +1463,13 @@ stepTypes:
             	{{ stage('Pre-SQL') }}
             	{{ config.preSQL }}
             {% endif %}
+            
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
 
             {% for source in sources %}
 
@@ -1575,6 +1586,13 @@ stepTypes:
                 {{ config.preSQL }}
 
             {% endif %}
+            
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
 
             {% for source in sources %}
                         
@@ -1682,6 +1700,13 @@ stepTypes:
             	{{ stage('Pre-SQL') }}
             	{{ config.preSQL }}
             {% endif %}
+            
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
 
             {{ stage('Insert New Rows') }}
             INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
@@ -1768,11 +1793,6 @@ stepTypes:
             default: view
             options:
             - view
-
-          - displayName: Enable Tests
-            attributeName: testsEnabled
-            type: toggleButton
-            default: true
 
         - groupName: Data Vault
           items:
