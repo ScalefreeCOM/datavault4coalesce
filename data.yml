@@ -472,6 +472,11 @@ stepTypes:
             type: toggleButton
             attributeName: cleanup_pit
             default: true
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
       templates:
         create:
           templateString: |-
@@ -649,7 +654,12 @@ stepTypes:
             options:
             - table
             isRequired: true
-            enableIf: "false"     
+            enableIf: "false" 
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true    
 
         - groupName: Pre/Post SQL
           items:
@@ -840,7 +850,12 @@ stepTypes:
             options:
             - view
             isRequired: true
-            enableIf: "false"    
+            enableIf: "false"   
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true 
 
         - groupName: Daily Snapshot Logic
           enableIf: "{{ config.use_logarithmic_logic }}"
@@ -1401,6 +1416,11 @@ stepTypes:
             type: textBox
             isRequired: false
 
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+
           - type: multisourceToggle
 
         - groupName: Data Vault
@@ -1517,6 +1537,11 @@ stepTypes:
             attributeName: postSQL
             type: textBox
             isRequired: false
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
             
           - type: multisourceToggle
           
@@ -1617,6 +1642,11 @@ stepTypes:
             type: columnSelector
             attributeName: is_hd
             isRequired: true
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
 
         - groupName: Pre/Post SQL
           items:
@@ -1738,6 +1768,11 @@ stepTypes:
             default: view
             options:
             - view
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
 
         - groupName: Data Vault
           items:
