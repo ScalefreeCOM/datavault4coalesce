@@ -128,7 +128,7 @@ macros:
       {% else %}
 
            {%- if ghost_record_type == 'unknown' -%}
-           {%- if datatype in ['TIMESTAMP_NTZ','TIMESTAMP', 'DATE'] -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
+           {%- if datatype.upper().startswith('TIMESTAMP') or datatype.upper().startswith('DATE') -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
            {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
                 {%- if datatype.upper().startswith('VARCHAR') and datatype[8:-1]|int >= unknown_value__STRING|length -%} {{unknown_value__STRING}} AS {{ column_name }}
                 {%- elif datatype.upper().startswith('STRING') -%} {{unknown_value__STRING}} AS {{ column_name }}
@@ -139,7 +139,7 @@ macros:
            {% else %}NULL AS {{ column_name }}
            {% endif %}
            {%- elif ghost_record_type == 'error' -%}
-           {%- if datatype in ['TIMESTAMP_NTZ','TIMESTAMP', 'DATE'] -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, end_of_all_times) }} AS {{ column_name }}
+           {%- if datatype.upper().startswith('TIMESTAMP') or datatype.upper().startswith('DATE') -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, end_of_all_times) }} AS {{ column_name }}
            {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
                 {%- if datatype.upper().startswith('VARCHAR') and datatype[8:-1]|int >= error_value__STRING|length -%} {{error_value__STRING}} AS {{ column_name }}
                 {%- elif datatype.upper().startswith('STRING') -%} {{error_value__STRING}} AS {{ column_name }}
