@@ -518,7 +518,7 @@ stepTypes:
             			{%- set source_column_name = col.sourceColumns[0].column.name -%}
             			{%- set target_column_name = col.name -%}
 
-            			{%- if col.sourceColumns[0].column.is_Hub_hk -%}
+            			{%- if col.sourceColumns[0].column.is_Hub_hk  or col.sourceColumns[0].column.is_Link_hk -%}
                             {%- set ns.hub_node_name = source_node_name -%}
             				COALESCE("{{ source_node_name }}"."{{ target_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"
             			{%- elif col.sourceColumns[0].column.is_hk -%}
