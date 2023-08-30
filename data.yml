@@ -505,7 +505,7 @@ stepTypes:
             {%- set target_schema = loc.name -%}
             {%- set target_node = node.name -%}
 
-            {%- set ns = namespace(sdts_node_name='', hub_node_name='') -%}
+            {%- set ns = namespace(sdts_node_name='', hub_node_name='', hub_node_schema='') -%}
 
             INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
             WITH records_to_insert AS (
@@ -515,11 +515,13 @@ stepTypes:
             		{% if 'column' in col.sourceColumns[0].keys() -%}
 
             			{%- set source_node_name = col.sourceColumns[0].node.name -%}
+			            {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
             			{%- set source_column_name = col.sourceColumns[0].column.name -%}
             			{%- set target_column_name = col.name -%}
 
             			{%- if col.sourceColumns[0].column.is_Hub_hk  or col.sourceColumns[0].column.is_Link_hk -%}
                             {%- set ns.hub_node_name = source_node_name -%}
+				                    {%- set ns.hub_node_schema = source_node_schema -%}
             				COALESCE("{{ source_node_name }}"."{{ target_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"
             			{%- elif col.sourceColumns[0].column.is_hk -%}
             				COALESCE("{{ source_node_name }}"."{{ source_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"			
@@ -541,7 +543,7 @@ stepTypes:
 
                 {% endfor %}
 
-            	FROM {{ ref(target_schema, ns.hub_node_name) }} "{{ ns.hub_node_name }}"
+            	FROM {{ ref(ns.hub_node_schema, ns.hub_node_name) }} "{{ ns.hub_node_name }}"
 
             	{% for col in sources[0].columns -%}
             		{%- if col.name == datavault4coalesce.config.sdts_alias -%}
