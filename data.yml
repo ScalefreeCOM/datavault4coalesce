@@ -170,6 +170,7 @@ macros:
 
            {%- if ghost_record_type == 'unknown' -%}
            {%- if datatype.upper().startswith('TIMESTAMP') or datatype.upper().startswith('DATE') -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
+           {%- if datatype.upper().startswith('TIMESTAMP') or datatype.upper().startswith('DATE') -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
            {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
                 {%- if datatype.upper().startswith('VARCHAR') and datatype[8:-1]|int >= unknown_value__STRING|length -%} {{unknown_value__STRING}} AS {{ column_name }}
                 {%- elif datatype.upper().startswith('STRING') -%} {{unknown_value__STRING}} AS {{ column_name }}
@@ -586,6 +587,11 @@ stepTypes:
             type: toggleButton
             attributeName: cleanup_pit
             default: true
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
       templates:
         create:
           templateString: |-
@@ -611,6 +617,13 @@ stepTypes:
             	{{ stage('Pre-SQL') }}
             	{{ config.preSQL }}
             {% endif %}
+            
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
 
             {{ stage('Insert New Rows') }}
 
@@ -633,9 +646,9 @@ stepTypes:
             			{%- set source_column_name = col.sourceColumns[0].column.name -%}
             			{%- set target_column_name = col.name -%}
 
-            			{%- if col.sourceColumns[0].column.is_Hub_hk or col.sourceColumns[0].column.is_Link_hk -%}
+            			{%- if col.sourceColumns[0].column.is_Hub_hk  or col.sourceColumns[0].column.is_Link_hk -%}
                             {%- set ns.hub_node_name = source_node_name -%}
-            				{%- set ns.hub_node_schema = source_node_schema -%}
+				                    {%- set ns.hub_node_schema = source_node_schema -%}
             				COALESCE("{{ source_node_name }}"."{{ target_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"
             			{%- elif col.sourceColumns[0].column.is_hk -%}
             				COALESCE("{{ source_node_name }}"."{{ source_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"			
@@ -725,6 +738,22 @@ stepTypes:
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
             {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
     name: "Datavault by Scalefree: PIT"
     version: 1
   StepType-13:
@@ -765,7 +794,12 @@ stepTypes:
             options:
             - table
             isRequired: true
-            enableIf: "false"     
+            enableIf: "false" 
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true    
 
         - groupName: Pre/Post SQL
           items:
@@ -859,6 +893,13 @@ stepTypes:
             	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
           templateString: |-
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
+            
             {{ stage('Insert New Rows') }}
 
             {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
@@ -927,6 +968,22 @@ stepTypes:
             SELECT * FROM "records_to_insert"
 
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
     name: "Datavault by Scalefree: Snapshot v0"
     version: 1
   StepType-14:
@@ -956,7 +1013,7 @@ stepTypes:
             options:
             - view
             isRequired: true
-            enableIf: "false"    
+            enableIf: "false"   
 
         - groupName: Daily Snapshot Logic
           enableIf: "{{ config.use_logarithmic_logic }}"
@@ -1561,6 +1618,11 @@ stepTypes:
             type: textBox
             isRequired: false
 
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+
           - type: multisourceToggle
 
         - groupName: Data Vault
@@ -1608,6 +1670,13 @@ stepTypes:
             	{{ stage('Pre-SQL') }}
             	{{ config.preSQL }}
             {% endif %}
+            
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
 
             {% for source in sources %}
 
@@ -1672,6 +1741,22 @@ stepTypes:
             	{{ stage('Post-SQL') }}
             	{{ config.postSQL }}
             {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
     name: "Datavault by Scalefree: Hub"
     version: 1
   StepType-7:
@@ -1705,6 +1790,11 @@ stepTypes:
             attributeName: postSQL
             type: textBox
             isRequired: false
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
             
           - type: multisourceToggle
           
@@ -1745,6 +1835,13 @@ stepTypes:
                 {{ config.preSQL }}
 
             {% endif %}
+            
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
 
             {% for source in sources %}
                         
@@ -1798,6 +1895,22 @@ stepTypes:
             {% if config.postSQL %}
                 {{ stage('Post-SQL') }}
                 {{ config.postSQL }}    
+            {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
     name: "Datavault by Scalefree: Link"
     version: 1
