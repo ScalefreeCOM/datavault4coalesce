@@ -93,7 +93,7 @@ macros:
           {%- set escape_char_right = '"' -%}
           {%- set escaped_column_name = escape_char_left ~ column|upper|replace(escape_char_left, '')|replace(escape_char_right, '')|trim ~ escape_char_right|indent(4) -%}
           
-      	{{ escaped_column_name }}
+        {{ escaped_column_name }}
       {%- endmacro -%}
 
       {#-- Utility macro: wrap input between escape characters --#}
@@ -420,21 +420,21 @@ macros:
       {#--                       satellite's hash diff attribute.                              --#}
       {%- if is_hashdiff and multi_active_key is defined and multi_active_key|length>0 -%}
            {%- set multi_active_key = multi_active_key|join(", ") -%}
-      	{%- set listagg_closing = " WITHIN GROUP (ORDER BY {}) OVER (PARTITION BY {}, {}))".format(multi_active_key, main_hashkey_col, ldts_alias) -%}
+        {%- set listagg_closing = " WITHIN GROUP (ORDER BY {}) OVER (PARTITION BY {}, {}))".format(multi_active_key, main_hashkey_col, ldts_alias) -%}
       {%- endif -%}
 
       {%- if 'VARCHAR' in datatype or 'CHAR' in datatype or 'STRING' in datatype or 'TEXT' in datatype %}
           {%- if case_sensitive -%}
               {%- if alias is not none -%}
-      			{%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}			
+            {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}      
               {%- else -%}
-      			{%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
+            {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
               {%- endif -%}
           {%- else -%}
               {%- if alias is not none -%}
                   {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}
               {%- else -%}
-      			{%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
+            {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
               {%- endif -%}
           {%- endif -%}
 
@@ -492,7 +492,7 @@ macros:
 
       {%- set standardise_prefix = datavault4coalesce__standardise_prefix(case_sensitive=hash_input_case_sensitive, 
                                                                           hash_alg=hash_alg,
-      													   is_hashdiff=is_hashdiff,
+                                   is_hashdiff=is_hashdiff,
                                                                           datatype=hash_dtype,
                                                                           alias=alias, 
                                                                           zero_key=unknown_key,
@@ -500,7 +500,7 @@ macros:
                                                                           main_hashkey_col=main_hashkey_col) -%}
       {%- set standardise_suffix = datavault4coalesce__standardise_suffix(case_sensitive=hash_input_case_sensitive, 
                                                                           hash_alg=hash_alg,
-      													                is_hashdiff=is_hashdiff,
+                                                is_hashdiff=is_hashdiff,
                                                                           datatype=hash_dtype, 
                                                                           alias=alias, 
                                                                           zero_key=unknown_key,
@@ -601,21 +601,21 @@ stepTypes:
 
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
-            	{% for col in columns %}
-            		"{{ col.name }}" {{ col.dataType }}
-            		{%- if not col.nullable %} NOT NULL
-            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            		{% endif %}
-            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-            		{%- if not loop.last -%}, {% endif %}
-            	{% endfor %}
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
             )
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
           templateString: |-
             {% if config.preSQL %}
-            	{{ stage('Pre-SQL') }}
-            	{{ config.preSQL }}
+              {{ stage('Pre-SQL') }}
+              {{ config.preSQL }}
             {% endif %}
             
             {% for test in node.tests if config.testsEnabled %}
@@ -636,83 +636,83 @@ stepTypes:
 
             INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
             WITH records_to_insert AS (
-            	SELECT
-            	{% for col in sources[0].columns %}
+              SELECT
+              {% for col in sources[0].columns %}
 
-            		{% if 'column' in col.sourceColumns[0].keys() -%}
+                {% if 'column' in col.sourceColumns[0].keys() -%}
 
-            			{%- set source_node_name = col.sourceColumns[0].node.name -%}
-            			{%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
-            			{%- set source_column_name = col.sourceColumns[0].column.name -%}
-            			{%- set target_column_name = col.name -%}
+                  {%- set source_node_name = col.sourceColumns[0].node.name -%}
+                  {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
+                  {%- set source_column_name = col.sourceColumns[0].column.name -%}
+                  {%- set target_column_name = col.name -%}
 
-            			{%- if col.sourceColumns[0].column.is_Hub_hk  or col.sourceColumns[0].column.is_Link_hk -%}
+                  {%- if col.sourceColumns[0].column.is_Hub_hk  or col.sourceColumns[0].column.is_Link_hk -%}
                             {%- set ns.hub_node_name = source_node_name -%}
-				                    {%- set ns.hub_node_schema = source_node_schema -%}
-            				COALESCE("{{ source_node_name }}"."{{ target_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"
-            			{%- elif col.sourceColumns[0].column.is_hk -%}
-            				COALESCE("{{ source_node_name }}"."{{ source_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"			
-            			{%- elif source_column_name == datavault4coalesce.config.ldts_alias -%}
-            				COALESCE("{{ source_node_name }}"."{{ source_column_name }}", {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}) AS "{{ target_column_name }}"
-            			{%- elif col.name == datavault4coalesce.config.sdts_alias -%}
-            				"{{ source_node_name }}"."{{ target_column_name }}" AS "{{ target_column_name }}"
+                            {%- set ns.hub_node_schema = source_node_schema -%}
+                    COALESCE("{{ source_node_name }}"."{{ target_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"
+                  {%- elif col.sourceColumns[0].column.is_hk -%}
+                    COALESCE("{{ source_node_name }}"."{{ source_column_name }}", {{ datavault4coalesce__unknown_key() }}) AS "{{ target_column_name }}"      
+                  {%- elif source_column_name == datavault4coalesce.config.ldts_alias -%}
+                    COALESCE("{{ source_node_name }}"."{{ source_column_name }}", {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}) AS "{{ target_column_name }}"
+                  {%- elif col.name == datavault4coalesce.config.sdts_alias -%}
+                    "{{ source_node_name }}"."{{ target_column_name }}" AS "{{ target_column_name }}"
 
                             {%- set ns.sdts_node_name = col.sourceColumns[0].node.name -%}
 
-            			{%- else -%}
-            				"{{ source_node_name }}"."{{ source_column_name }}" AS "{{ target_column_name }}"
-            			{%- endif %}
+                  {%- else -%}
+                    "{{ source_node_name }}"."{{ source_column_name }}" AS "{{ target_column_name }}"
+                  {%- endif %}
 
-            		{%- if not loop.last -%} , {% endif %}
-            		{%- elif col.is_dimension_key -%}
-            			{{ get_source_transform(col) }} AS "{{ col.name }}",
-            		{%- endif %}
+                {%- if not loop.last -%} , {% endif %}
+                {%- elif col.is_dimension_key -%}
+                  {{ get_source_transform(col) }} AS "{{ col.name }}",
+                {%- endif %}
 
                 {% endfor %}
 
-            	FROM {{ ref(ns.hub_node_schema, ns.hub_node_name) }} "{{ ns.hub_node_name }}"
+              FROM {{ ref(ns.hub_node_schema, ns.hub_node_name) }} "{{ ns.hub_node_name }}"
 
-            	{% for col in sources[0].columns -%}
-            		{%- if col.name == datavault4coalesce.config.sdts_alias -%}
+              {% for col in sources[0].columns -%}
+                {%- if col.name == datavault4coalesce.config.sdts_alias -%}
 
                         {%- set source_node_name = col.sourceColumns[0].node.name -%}
-            			{%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
+                  {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
 
-            			JOIN {{ ref(source_node_schema, source_node_name) }} "{{ source_node_name }}"
-            			ON "{{ source_node_name }}"."{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
-            		{%- endif -%}
-            	{% endfor %}
+                  JOIN {{ ref(source_node_schema, source_node_name) }} "{{ source_node_name }}"
+                  ON "{{ source_node_name }}"."{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
+                {%- endif -%}
+              {% endfor %}
 
-            	{%- for col in sources[0].columns %}
-            		
-            		{%- if 'column' in col.sourceColumns[0].keys() %}
-            			{%- if col.sourceColumns[0].column.is_hk and not loop.first %}
+              {%- for col in sources[0].columns %}
+                
+                {%- if 'column' in col.sourceColumns[0].keys() %}
+                  {%- if col.sourceColumns[0].column.is_hk and not loop.first %}
 
                             {%- set source_node_name = col.sourceColumns[0].node.name -%}
-            				{%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
+                    {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
                             {%- set source_column_name = col.sourceColumns[0].column.name -%}
                             {%- set target_node = node.name -%}
 
-            				LEFT JOIN {{ ref(source_node_schema, source_node_name) }} "{{ source_node_name }}"
-            				ON "{{ ns.hub_node_name }}"."{{ source_column_name }}" = "{{ source_node_name }}"."{{ source_column_name }}"
-            				
+                    LEFT JOIN {{ ref(source_node_schema, source_node_name) }} "{{ source_node_name }}"
+                    ON "{{ ns.hub_node_name }}"."{{ source_column_name }}" = "{{ source_node_name }}"."{{ source_column_name }}"
+                    
                             {% for sdts_col in sources[0].columns %}
 
-            					{%- if sdts_col.name == datavault4coalesce.config.sdts_alias -%}
-            						AND "{{ ns.sdts_node_name }}"."{{ sdts_col.name}}" BETWEEN "{{ source_node_name }}"."{{ datavault4coalesce.config.ldts_alias }}" and "{{ source_node_name }}"."{{ datavault4coalesce.config.ledts_alias }}"
-            					{%- endif -%}
-            				{%- endfor -%}
-            			
-            			{% endif %}
-            		{%- endif %}
-            	{% endfor -%}
+                      {%- if sdts_col.name == datavault4coalesce.config.sdts_alias -%}
+                        AND "{{ ns.sdts_node_name }}"."{{ sdts_col.name}}" BETWEEN "{{ source_node_name }}"."{{ datavault4coalesce.config.ldts_alias }}" and "{{ source_node_name }}"."{{ datavault4coalesce.config.ledts_alias }}"
+                      {%- endif -%}
+                    {%- endfor -%}
+                  
+                  {% endif %}
+                {%- endif %}
+              {% endfor -%}
             )
 
             SELECT * FROM records_to_insert
             WHERE "{{ get_value_by_column_attribute('is_dimension_key') }}" NOT IN 
             (
-            	SELECT "{{ get_value_by_column_attribute('is_dimension_key') }}" FROM 
-            	{{ ref_no_link(node.location.name, node.name) }}
+              SELECT "{{ get_value_by_column_attribute('is_dimension_key') }}" FROM 
+              {{ ref_no_link(node.location.name, node.name) }}
             )
 
 
@@ -720,8 +720,8 @@ stepTypes:
 
             {{ stage('Clean up PIT') }}
 
-            	DELETE FROM {{ ref_no_link(node.location.name, node.name) }}
-            	WHERE "{{ datavault4coalesce.config.sdts_alias }}" NOT IN (
+              DELETE FROM {{ ref_no_link(node.location.name, node.name) }}
+              WHERE "{{ datavault4coalesce.config.sdts_alias }}" NOT IN (
                 SELECT "{{ datavault4coalesce.config.sdts_alias }}" FROM 
                 {% for col in sources[0].columns %}
                     {%- if col.name == datavault4coalesce.config.sdts_alias -%}
@@ -731,12 +731,12 @@ stepTypes:
                     {%- endif -%}
                 {%- endfor %}
                 WHERE "{{ datavault4coalesce.config.snapshot_trigger_column }}" = true
-            		)
+                )
             {% endif %}
 
             {% if config.postSQL %}
-            	{{ stage('Post-SQL') }}
-            	{{ config.postSQL }}
+              {{ stage('Post-SQL') }}
+              {{ config.postSQL }}
             {% endif %}
 
             {% if config.testsEnabled %}
@@ -879,18 +879,18 @@ stepTypes:
           templateString: |-
             {{ stage('Create Snapshot v0 Table') }}
 
-            	CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            	(
-            		{% for col in columns %}
-            			"{{ col.name }}" {{ col.dataType }}
-            			{%- if not col.nullable %} NOT NULL
-            				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            			{% endif %}
-            			{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	)
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+              CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+              (
+                {% for col in columns %}
+                  "{{ col.name }}" {{ col.dataType }}
+                  {%- if not col.nullable %} NOT NULL
+                    {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                  {% endif %}
+                  {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+              )
+              {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
           templateString: |-
             {% for test in node.tests if config.testsEnabled %}
@@ -1250,12 +1250,12 @@ stepTypes:
             CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
             (
                 {% for col in columns %}
-            		"{{ col.name }}"
-            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-            		{%- if not loop.last -%}, {% endif %}
-            	{% endfor %}
+                "{{ col.name }}"
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
             )
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+              {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
 
             AS
             WITH latest_row AS (
@@ -1485,8 +1485,8 @@ stepTypes:
         create:
           templateString: |-
             {% if node.override.create.enabled %}
-            	
-            	{{ node.override.create.script }}
+              
+              {{ node.override.create.script }}
 
             {% elif node.materializationType == 'table' %}
 
@@ -1654,21 +1654,21 @@ stepTypes:
 
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
-            	{% for col in columns %}
-            		"{{ col.name }}" {{ col.dataType }}
-            		{%- if not col.nullable %} NOT NULL
-            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            		{% endif %}
-            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-            		{%- if not loop.last -%}, {% endif %}
-            	{% endfor %}
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
             )
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
           templateString: |-
             {% if config.preSQL %}
-            	{{ stage('Pre-SQL') }}
-            	{{ config.preSQL }}
+              {{ stage('Pre-SQL') }}
+              {{ config.preSQL }}
             {% endif %}
             
             {% for test in node.tests if config.testsEnabled %}
@@ -1680,66 +1680,66 @@ stepTypes:
 
             {% for source in sources %}
 
-            	{{ stage('INSERT INTO Hub - ' ~ source.name) }}
+              {{ stage('INSERT INTO Hub - ' ~ source.name) }}
 
-            	{%- set hashkey_column = get_value_by_column_attribute("is_Hub_hk") -%}
-            	
-            	{#-- enable when ColumnDropDownSelector is used again
-            	{%- if 'is_Hub_hk' not in config.keys() -%}
+              {%- set hashkey_column = get_value_by_column_attribute("is_Hub_hk") -%}
+              
+              {#-- enable when ColumnDropDownSelector is used again
+              {%- if 'is_Hub_hk' not in config.keys() -%}
 
-            	{%- else -%}
-            		
-            		{%- set hashkey_column = config.is_Hub_hk.name -%}
-            	
-            	{%- endif -%}
-            	#}
+              {%- else -%}
+                
+                {%- set hashkey_column = config.is_Hub_hk.name -%}
+              
+              {%- endif -%}
+              #}
 
-            	INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-            	
+              INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+              
             WITH incoming AS (
 
-            	SELECT DISTINCT
-            	{% for col in source.columns %}
-            		{{ get_source_transform(col) }} AS "{{ col.name }}"
-            		{%- if not loop.last -%}, {% endif %}
-            	{% endfor %}
+              SELECT DISTINCT
+              {% for col in source.columns %}
+                {{ get_source_transform(col) }} AS "{{ col.name }}"
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
 
-            	{{ source.join }}
+              {{ source.join }}
 
                 {% if not config.disable_hwm -%}
                 WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
                     SELECT 
                         COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
                     FROM {{ ref_no_link(node.location.name, node.name) }}
-            		 WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                 WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
                     )
-                {%- endif %}	
+                {%- endif %}  
 
             ), 
 
             new_records AS (
 
-            	SELECT 
-            	"SRC".* 
-            	FROM incoming "SRC"
-            	WHERE NOT EXISTS 
+              SELECT 
+              "SRC".* 
+              FROM incoming "SRC"
+              WHERE NOT EXISTS 
 
-            	(SELECT 1 
-            	FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
-            	WHERE 
-            		"SRC"."{{ hashkey_column }}" = "TGT"."{{ hashkey_column }}")		
+              (SELECT 1 
+              FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
+              WHERE 
+                "SRC"."{{ hashkey_column }}" = "TGT"."{{ hashkey_column }}")    
 
-            	QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
+              QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
             )
 
 
-            	SELECT * FROM new_records
+              SELECT * FROM new_records
 
             {% endfor %}
 
             {% if config.postSQL %}
-            	{{ stage('Post-SQL') }}
-            	{{ config.postSQL }}
+              {{ stage('Post-SQL') }}
+              {{ config.postSQL }}
             {% endif %}
 
             {% if config.testsEnabled %}
@@ -1850,7 +1850,7 @@ stepTypes:
                 {#--USE AGAIN WHEN COLUMNDROPDOWNSELECTOR IS USED%- set link_hashkey = config.is_Link_hk.name -%#}
 
                 {%- set link_hashkey = get_value_by_column_attribute("is_Link_hk") -%}
-            	
+              
 
                 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
@@ -1969,28 +1969,28 @@ stepTypes:
 
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
-            	{% for col in columns %}
-            		"{{ col.name }}" {{ col.dataType }}
-            		{%- if not col.nullable %} NOT NULL
-            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            		{% endif %}
-            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-            		{%- if not loop.last -%}, {% endif %}
-            	{% endfor %}
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
             )
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
           templateString: |+
             {% if config.preSQL %}
-            	{{ stage('Pre-SQL') }}
-            	{{ config.preSQL }}
+              {{ stage('Pre-SQL') }}
+              {{ config.preSQL }}
             {% endif %}
 
             {% for test in node.tests if config.testsEnabled %}
-            	{% if test.runOrder == 'Before' %}
-            		{{ test_stage(test.name, test.continueOnFailure) }}
-            		{{ test.templateString }}
-            	{% endif %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
             {% endfor %}
 
             {{ stage('Insert New Rows') }}
@@ -1998,20 +1998,20 @@ stepTypes:
 
             WITH latest_entries_in_sat AS (
 
-            	{#/* USE THIS again when ColumnDropdownSelector is used!
-            	{%- set hashkey_column = config.is_hk.name -%}
-            	{%- set hashdiff_column = config.is_hd.name -%}
-            	*/#}
+              {#/* USE THIS again when ColumnDropdownSelector is used!
+              {%- set hashkey_column = config.is_hk.name -%}
+              {%- set hashdiff_column = config.is_hd.name -%}
+              */#}
 
-            	{%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
-            	{%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
+              {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
+              {%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
 
-            	/* get current rows from satellite */
-            	SELECT 
-            		"{{ hashkey_column }}",
-            		"{{ hashdiff_column }}"
-            	FROM {{ ref_no_link(node.location.name, node.name) }} 
-            	QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
+              /* get current rows from satellite */
+              SELECT 
+                "{{ hashkey_column }}",
+                "{{ hashdiff_column }}"
+              FROM {{ ref_no_link(node.location.name, node.name) }} 
+              QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
 
             ),
 
@@ -2020,22 +2020,22 @@ stepTypes:
                 {% for source in sources %}
 
                     SELECT
-            		{% for col in source.columns %}
-            			{{ get_source_transform(col) }} AS {{ col.name }},
-            		{% endfor %}
+                {% for col in source.columns %}
+                  {{ get_source_transform(col) }} AS {{ col.name }},
+                {% endfor %}
                     ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
                     
                     {{ source.join }}
 
 
-            		{% if not config.disable_hwm -%}
-            		WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
-            			SELECT 
-            				COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
-            			FROM {{ ref_no_link(node.location.name, node.name) }}
-            			WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
-            			)
-            		{%- endif %}	
+                {% if not config.disable_hwm -%}
+                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                  SELECT 
+                    COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                  FROM {{ ref_no_link(node.location.name, node.name) }}
+                  WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                  )
+                {%- endif %}  
 
                     QUALIFY
                     CASE
@@ -2047,43 +2047,43 @@ stepTypes:
 
             )
 
-            	{% for source in sources %}
-            		SELECT DISTINCT
-            		{% for col in source.columns %}
-            			{{ col.name }}
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
+              {% for source in sources %}
+                SELECT DISTINCT
+                {% for col in source.columns %}
+                  {{ col.name }}
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
 
-            		FROM deduplicated_numbered_source
-            	WHERE NOT EXISTS (
-            		SELECT 1 FROM latest_entries_in_sat
-            		WHERE 
-            			deduplicated_numbered_source."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
-            		AND deduplicated_numbered_source."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
+                FROM deduplicated_numbered_source
+              WHERE NOT EXISTS (
+                SELECT 1 FROM latest_entries_in_sat
+                WHERE 
+                  deduplicated_numbered_source."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
+                AND deduplicated_numbered_source."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
                     AND deduplicated_numbered_source.rn = 1
-            	)
+              )
 
-            	{% endfor %}
+              {% endfor %}
 
             {% if config.postSQL %}
-            	{{ stage('Post-SQL') }}
-            	{{ config.postSQL }}
+              {{ stage('Post-SQL') }}
+              {{ config.postSQL }}
             {% endif %}
 
             {% if config.testsEnabled %}
-            	{% for test in node.tests %}
-            		{% if test.runOrder == 'After' %}
-            			{{ test_stage(test.name, test.continueOnFailure) }}
-            			{{ test.templateString }}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
                     {% endif %}
-            	{% endfor %}
+              {% endfor %}
 
-            	{% for column in columns %}
-            		{% for test in column.tests %}
-            			{{ test_stage(column.name + ": " + test.name) }}
-            			{{ test.templateString }}
-            		{% endfor %}
-            	{% endfor %}
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
 
     name: "Datavault by Scalefree: Satellite v0"
@@ -2160,11 +2160,11 @@ stepTypes:
             (
                 {% for col in columns %}
                    "{{ col.name }}"
-            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
                     {%- if not loop.last -%}, {% endif %}
                 {% endfor %}
             )
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+              {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
 
             AS
             {% for source in sources %}
@@ -2227,21 +2227,21 @@ stepTypes:
 
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
-            	{% for col in columns %}
-            		"{{ col.name }}" {{ col.dataType }}
-            		{%- if not col.nullable %} NOT NULL
-            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            		{% endif %}
-            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-            		{%- if not loop.last -%}, {% endif %}
-            	{% endfor %}
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
             )
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
           templateString: |-
             {% if config.preSQL %}
-            	{{ stage('Pre-SQL') }}
-            	{{ config.preSQL }}
+              {{ stage('Pre-SQL') }}
+              {{ config.preSQL }}
             {% endif %}
 
             {{ stage('Insert New Rows') }}
@@ -2249,22 +2249,22 @@ stepTypes:
             INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
             WITH latest_entries_in_sat AS (
-            	/* get current rows from satellite */
+              /* get current rows from satellite */
 
-            	{# /* USE THIS again when ColumnDropdownSelector is used
-            	{%- set hashkey_column = config.is_hk.name -%}
-            	{%- set hashdiff_column = config.is_hd.name -%} */ #}
-            	
-            	{%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
-            	{%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
+              {# /* USE THIS again when ColumnDropdownSelector is used
+              {%- set hashkey_column = config.is_hk.name -%}
+              {%- set hashdiff_column = config.is_hd.name -%} */ #}
+              
+              {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
+              {%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
 
-            	SELECT 
-            		"{{ hashkey_column }}",
-            		"{{ hashdiff_column }}"
+              SELECT 
+                "{{ hashkey_column }}",
+                "{{ hashdiff_column }}"
 
-            	FROM {{ ref_no_link(node.location.name, node.name) }} 
+              FROM {{ ref_no_link(node.location.name, node.name) }} 
 
-            	QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
+              QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
 
             ),
 
@@ -2273,21 +2273,21 @@ stepTypes:
                 {% for source in sources %}
 
                     SELECT
-            		{% for col in source.columns %}
-            			{{ get_source_transform(col) }} AS {{ col.name }},
-            		{% endfor %}
+                {% for col in source.columns %}
+                  {{ get_source_transform(col) }} AS {{ col.name }},
+                {% endfor %}
                     ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
                     
                     {{ source.join }}
 
-            		{% if not config.disable_hwm -%}
-            		WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
-            			SELECT 
-            				COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
-            			FROM {{ ref_no_link(node.location.name, node.name) }}
-            			WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
-            			)
-            		{% endif %}	
+                {% if not config.disable_hwm -%}
+                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                  SELECT 
+                    COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                  FROM {{ ref_no_link(node.location.name, node.name) }}
+                  WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                  )
+                {% endif %}  
 
                     QUALIFY
                     CASE
@@ -2299,27 +2299,27 @@ stepTypes:
 
             )
 
-            	{% for source in sources %}
-            		SELECT DISTINCT
-            		{% for col in source.columns %}
-            			{{ col.name }}
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
+              {% for source in sources %}
+                SELECT DISTINCT
+                {% for col in source.columns %}
+                  {{ col.name }}
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
 
-            		FROM deduplicated_numbered_source
-            	WHERE NOT EXISTS (
-            		SELECT 1 FROM latest_entries_in_sat
-            		WHERE 
-            			deduplicated_numbered_source.{{ hashdiff_column }} = latest_entries_in_sat."{{ hashdiff_column }}"
-            		AND deduplicated_numbered_source.{{ hashkey_column }} = latest_entries_in_sat."{{ hashkey_column }}"
+                FROM deduplicated_numbered_source
+              WHERE NOT EXISTS (
+                SELECT 1 FROM latest_entries_in_sat
+                WHERE 
+                  deduplicated_numbered_source.{{ hashdiff_column }} = latest_entries_in_sat."{{ hashdiff_column }}"
+                AND deduplicated_numbered_source.{{ hashkey_column }} = latest_entries_in_sat."{{ hashkey_column }}"
                     AND deduplicated_numbered_source.rn = 1
-            	)
+              )
 
-            	{% endfor %}
+              {% endfor %}
 
             {% if config.postSQL %}
-            	{{ stage('Post-SQL') }}
-            	{{ config.postSQL }}
+              {{ stage('Post-SQL') }}
+              {{ config.postSQL }}
             {% endif %}
     name: "Datavault by Scalefree: Multi-active Satellite V0"
     version: 1
@@ -2394,11 +2394,11 @@ stepTypes:
             (
                 {% for col in columns %}
                    "{{ col.name }}"
-            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
                     {%- if not loop.last -%}, {% endif %}
                 {% endfor %}
             )
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+              {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
 
             AS
             {% for source in sources %}
@@ -2594,14 +2594,14 @@ stepTypes:
 
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
-            	{% for col in columns %}
-            		"{{ col.name }}" {{ col.dataType }}
-            		{%- if not col.nullable %} NOT NULL
-            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            		{% endif %}
-            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-            		{%- if not loop.last -%}, {% endif %}
-            	{% endfor %}
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
             )
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
@@ -2636,7 +2636,7 @@ stepTypes:
                         SELECT 
                             COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}) 
                         FROM {{ ref_no_link(node.location.name, node.name) }}
-            			WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                  WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
                         )
                     {%- endif %}
 
@@ -2720,21 +2720,21 @@ stepTypes:
             
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
-            	{% for col in columns %}
-            		"{{ col.name }}" {{ col.dataType }}
-            		{%- if not col.nullable %} NOT NULL
-            			{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            		{% endif %}
-            		{%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-            		{%- if not loop.last -%}, {% endif %}
-            	{% endfor %}
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
             )
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
           templateString: |-
             {% if config.preSQL %}
-            	{{ stage('Pre-SQL') }}
-            	{{ config.preSQL }}
+              {{ stage('Pre-SQL') }}
+              {{ config.preSQL }}
             {% endif %}
             
             
@@ -2751,7 +2751,7 @@ stepTypes:
                     ) AS "concat"
                     FROM {{ this }}
                 ),
-            	{% for source in sources %}
+              {% for source in sources %}
                 src_new_{{ loop.index }} AS (
                         SELECT DISTINCT
                             "{{ hashkey_column }}",
@@ -2790,8 +2790,8 @@ stepTypes:
             FROM records_to_insert
             
             {% if config.postSQL %}
-            	{{ stage('Post-SQL') }}
-            	{{ config.postSQL }}
+              {{ stage('Post-SQL') }}
+              {{ config.postSQL }}
             {% endif %}
     name: "Datavault by Scalefree: Record-Tracking Satellite"
     version: 1
@@ -2892,55 +2892,55 @@ stepTypes:
         create:
           templateString: |
             {% if node.materializationType == 'table' %}
-            	{{ stage('Create Dimension Table') }}
+              {{ stage('Create Dimension Table') }}
 
-            	CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            	(
-            		{% for col in columns %}
-            			"{{ col.name }}" {{ col.dataType }}
-            			{% if col.isSurrogateKey %}
-            		        identity
-            			{% endif %}
-            			{%- if not col.nullable %} NOT NULL
-            				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            			{% endif %}
-            			{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	)
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
+              CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+              (
+                {% for col in columns %}
+                  "{{ col.name }}" {{ col.dataType }}
+                  {% if col.isSurrogateKey %}
+                        identity
+                  {% endif %}
+                  {%- if not col.nullable %} NOT NULL
+                    {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                  {% endif %}
+                  {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+              )
+              {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
 
 
             {% elif node.materializationType == 'view' %}
-            	{{ stage('Create Dimension View') }}
+              {{ stage('Create Dimension View') }}
 
-            	CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
-            	(
-            		{% for col in columns %}
-            			"{{ col.name }}"
-            			{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
-            			{%- if not loop.last -%},{% endif %}
-            		{% endfor %}
-            	)
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
-            	AS
-            	{% for source in sources %}
+              CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+              (
+                {% for col in columns %}
+                  "{{ col.name }}"
+                  {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
+                  {%- if not loop.last -%},{% endif %}
+                {% endfor %}
+              )
+              {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
+              AS
+              {% for source in sources %}
 
-            		{% if loop.first %}SELECT {% endif %}
+                {% if loop.first %}SELECT {% endif %}
 
-            		{% for col in source.columns %}
-            			{% if col.isSurrogateKey or col.isSystemUpdateDate or col.isSystemCreateDate %}
+                {% for col in source.columns %}
+                  {% if col.isSurrogateKey or col.isSystemUpdateDate or col.isSystemCreateDate %}
                             NULL
-            			{% else %}
+                  {% else %}
                             {{ get_source_transform(col) }}
-            			{% endif %}
-            			AS "{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            		{{ source.join }}
+                  {% endif %}
+                  AS "{{ col.name }}"
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+                {{ source.join }}
 
-            		{% if not loop.last %} UNION ALL {% endif %}
-            	{% endfor %}
+                {% if not loop.last %} UNION ALL {% endif %}
+              {% endfor %}
 
             {% endif %}
         run:
@@ -2957,11 +2957,11 @@ stepTypes:
 
             {% if node.materializationType == 'table' %}
 
-            	{% if config.preSQL %}			
-            		{{ stage('Pre-SQL') }}
-            		{{ config.preSQL }}
-            	{% endif %}
-            	
+              {% if config.preSQL %}      
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+              {% endif %}
+              
                 {% if is_type_2 %}
 
                     {% for source in sources %}
@@ -3155,9 +3155,9 @@ stepTypes:
                             SELECT
                             {% for col in source.columns if not col.isSurrogateKey %}
                                 {% if col.isSystemVersion %}
-                                	1
+                                  1
                                 {% elif col.isSystemCurrentFlag %}
-                                	'Y'
+                                  'Y'
                                 {% else %}
                                     {{ get_source_transform(col) }}
                                 {% endif %}
@@ -3218,27 +3218,27 @@ stepTypes:
                         )
                     {% endfor %}
                 {% endif %}
-            	
-            	{% if config.postSQL %}			
-            		{{ stage('Post-SQL') }}
-            		{{ config.postSQL }}
-            	{% endif %}
+              
+              {% if config.postSQL %}      
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}
+              {% endif %}
             {% endif %}
 
             {% if config.testsEnabled %}
-            	{% for test in node.tests %}
-            		{% if test.runOrder == 'After' %}
-            			{{ test_stage(test.name, test.continueOnFailure) }}
-            			{{ test.templateString }}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
                     {% endif %}
-            	{% endfor %}
+              {% endfor %}
 
-            	{% for column in columns %}
-            		{% for test in column.tests %}
-            			{{ test_stage(column.name + ": " + test.name) }}
-            			{{ test.templateString }}
-            		{% endfor %}
-            	{% endfor %}
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
     name: Dimension
     version: 1
@@ -3526,22 +3526,22 @@ stepTypes:
         create:
           templateString: |-
             {% if node.materializationType == 'table' %}
-            				{{ stage('Create Hub Table') }}
-            			
-            				CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            				(
-            					{% for col in columns %}
-            						"{{ col.name }}" {{ col.dataType }}
-            						{%- if not col.nullable %} NOT NULL
-            							{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            						{% endif %}
-            						{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
-            						{%- if not loop.last -%}, {% endif %}
-            					{% endfor %}
-            				)
-            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
-            			
-            			{% endif %}
+                    {{ stage('Create Hub Table') }}
+                  
+                    CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+                    (
+                      {% for col in columns %}
+                        "{{ col.name }}" {{ col.dataType }}
+                        {%- if not col.nullable %} NOT NULL
+                          {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                        {% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
+                        {%- if not loop.last -%}, {% endif %}
+                      {% endfor %}
+                    )
+                    {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
+                  
+                  {% endif %}
         run:
           templateString: |2-
 
@@ -3553,79 +3553,79 @@ stepTypes:
                 {% endfor %}
 
             {% if node.materializationType == 'table' %}
-            	{% if config.preSQL %}
-            		{{ stage('Pre-SQL') }}
-            		{{ config.preSQL }}
-            	{% endif %}
+              {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+              {% endif %}
 
 
-            	{{ stage('Merge Hub') }}
-            	MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
-            	(
-            		{% for source in sources %}
-            		SELECT
-            		{% for col in source.columns %}
+              {{ stage('Merge Hub') }}
+              MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
+              (
+                {% for source in sources %}
+                SELECT
+                {% for col in source.columns %}
                         {{ get_source_transform(col) }} AS "{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
 
-            		{{ source.join }}
+                {{ source.join }}
 
-            		{% if not loop.last %}
-            			{{ config.insertStrategy }}
-            		{% endif %}
-            	{% endfor %}
-            	)
-            	AS "SRC"
-            	ON
-            	{% for col in sources[0].columns if (col.sourceColumns[0] 
+                {% if not loop.last %}
+                  {{ config.insertStrategy }}
+                {% endif %}
+              {% endfor %}
+              )
+              AS "SRC"
+              ON
+              {% for col in sources[0].columns if (col.sourceColumns[0] 
                                                     and col.sourceColumns[0].column 
                                                     and col.sourceColumns[0].column.isHubHash
                                                     ) -%}
-            		{% if not loop.first %}
-            			AND
-            		{% endif %}
-            		"SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
-            	{% endfor %}
-            	WHEN NOT MATCHED THEN
-            	INSERT
-            	(
-            		{% for col in columns %}
-            			"{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	) VALUES
-            	(
-            		{% for col in columns %}
-            			"SRC"."{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	)
+                {% if not loop.first %}
+                  AND
+                {% endif %}
+                "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+              {% endfor %}
+              WHEN NOT MATCHED THEN
+              INSERT
+              (
+                {% for col in columns %}
+                  "{{ col.name }}"
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+              ) VALUES
+              (
+                {% for col in columns %}
+                  "SRC"."{{ col.name }}"
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+              )
 
 
-            	{% if config.postSQL %}
-            		{{ stage('Post-SQL') }}
-            		{{ config.postSQL }}
-            	{% endif %}
-            	
+              {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}
+              {% endif %}
+              
             {% endif %}
 
             {% if config.testsEnabled %}
-            	{% for test in node.tests %}
-            		{% if test.runOrder == 'After' %}
-            			{{ test_stage(test.name, test.continueOnFailure) }}
-            			{{ test.templateString }}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
                     {% endif %}
-            	{% endfor %}
+              {% endfor %}
 
-            	{% for column in columns %}
-            		{% for test in column.tests %}
-            			{{ test_stage(column.name + ": " + test.name) }}
-            			{{ test.templateString }}
-            		{% endfor %}
-            	{% endfor %}
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
-            			
+                  
     name: Hub
     version: 1
   StepType-Link:
@@ -3692,22 +3692,22 @@ stepTypes:
         create:
           templateString: |-
             {% if node.materializationType == 'table' %}
-            				{{ stage('Create Link Table') }}
-            			
-            				CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            				(
-            					{% for col in columns %}
-            						"{{ col.name }}" {{ col.dataType }}
-            						{%- if not col.nullable %} NOT NULL
-            							{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            						{% endif %}
-            						{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
-            						{%- if not loop.last -%}, {% endif %}
-            					{% endfor %}
-            				)
-            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
-            			
-            			{% endif %}
+                    {{ stage('Create Link Table') }}
+                  
+                    CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+                    (
+                      {% for col in columns %}
+                        "{{ col.name }}" {{ col.dataType }}
+                        {%- if not col.nullable %} NOT NULL
+                          {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                        {% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
+                        {%- if not loop.last -%}, {% endif %}
+                      {% endfor %}
+                    )
+                    {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
+                  
+                  {% endif %}
         run:
           templateString: |2-
 
@@ -3719,78 +3719,78 @@ stepTypes:
                 {% endfor %}
 
             {% if node.materializationType == 'table' %}
-            	{% if config.preSQL %}
-            		{{ stage('Pre-SQL') }}
-            		{{ config.preSQL }}
-            	
-            	{% endif %}
+              {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+              
+              {% endif %}
 
-            			
-            	{{ stage('Merge Link') }}
-            	MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
-            	(
-            		{% for source in sources %}
-            		SELECT
-            		{% for col in source.columns %}
+                  
+              {{ stage('Merge Link') }}
+              MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
+              (
+                {% for source in sources %}
+                SELECT
+                {% for col in source.columns %}
                         {{ get_source_transform(col) }} AS "{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
 
-            		{{ source.join }}
+                {{ source.join }}
 
-            		{% if not loop.last %}
-            			{{ config.insertStrategy }}
-            		{% endif %}
-            	{% endfor %}
-            	)
-            	AS "SRC"
-            	ON
-            	{% for col in sources[0].columns if (col.sourceColumns[0] 
+                {% if not loop.last %}
+                  {{ config.insertStrategy }}
+                {% endif %}
+              {% endfor %}
+              )
+              AS "SRC"
+              ON
+              {% for col in sources[0].columns if (col.sourceColumns[0] 
                                                     and col.sourceColumns[0].column 
                                                     and col.sourceColumns[0].column.isLinkHash
                                                     ) -%}
-            		{% if not loop.first %}
-            			AND
-            		{% endif %}
-            		"SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
-            	{% endfor %}
-            	WHEN NOT MATCHED THEN
-            	INSERT
-            	(
-            		{% for col in columns %}
-            			"{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	) VALUES
-            	(
-            		{% for col in columns %}
-            			"SRC"."{{ col.name }}"
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	)
+                {% if not loop.first %}
+                  AND
+                {% endif %}
+                "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+              {% endfor %}
+              WHEN NOT MATCHED THEN
+              INSERT
+              (
+                {% for col in columns %}
+                  "{{ col.name }}"
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+              ) VALUES
+              (
+                {% for col in columns %}
+                  "SRC"."{{ col.name }}"
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+              )
 
-            	{% if config.postSQL %}
-            		{{ stage('Post-SQL') }}
-            		{{ config.postSQL }}	
-            	{% endif %}
+              {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}  
+              {% endif %}
             {% endif %}
 
             {% if config.testsEnabled %}
-            	{% for test in node.tests %}
-            		{% if test.runOrder == 'After' %}
-            			{{ test_stage(test.name, test.continueOnFailure) }}
-            			{{ test.templateString }}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
                     {% endif %}
-            	{% endfor %}
+              {% endfor %}
 
-            	{% for column in columns %}
-            		{% for test in column.tests %}
-            			{{ test_stage(column.name + ": " + test.name) }}
-            			{{ test.templateString }}
-            		{% endfor %}
-            	{% endfor %}
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
-            			
+                  
     name: Link
     version: 1
   StepType-Satellite:
@@ -3857,22 +3857,22 @@ stepTypes:
         create:
           templateString: |-
             {% if node.materializationType == 'table' %}
-            				{{ stage('Create Satellite Table') }}
-            			
-            				CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            				(
-            					{% for col in columns %}
-            						"{{ col.name }}" {{ col.dataType }}
-            						{%- if not col.nullable %} NOT NULL
-            							{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            						{% endif %}
-            						{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
-            						{%- if not loop.last -%}, {% endif %}
-            					{% endfor %}
-            				)
-            				{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
-            			
-            			{% endif %}
+                    {{ stage('Create Satellite Table') }}
+                  
+                    CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+                    (
+                      {% for col in columns %}
+                        "{{ col.name }}" {{ col.dataType }}
+                        {%- if not col.nullable %} NOT NULL
+                          {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                        {% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
+                        {%- if not loop.last -%}, {% endif %}
+                      {% endfor %}
+                    )
+                    {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
+                  
+                  {% endif %}
         run:
           templateString: |2-
 
@@ -3884,77 +3884,77 @@ stepTypes:
                 {% endfor %}
 
             {% if node.materializationType == 'table' %}
-            		{% if config.preSQL %}
-            			{{ stage('Pre-SQL') }}
-            			{{ config.preSQL }}
-            		{% endif %}
-            	
-            		{{ stage('Merge Satellite') }}
-            		MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
-            		(
-            			{% for source in sources %}
-            			SELECT
-            			{% for col in source.columns %}
+                {% if config.preSQL %}
+                  {{ stage('Pre-SQL') }}
+                  {{ config.preSQL }}
+                {% endif %}
+              
+                {{ stage('Merge Satellite') }}
+                MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT" USING
+                (
+                  {% for source in sources %}
+                  SELECT
+                  {% for col in source.columns %}
                             {{ get_source_transform(col) }} AS "{{ col.name }}"
-            				{%- if not loop.last -%}, {% endif %}
-            			{% endfor %}
-            	
-            			{{ source.join }}
-            	
-            			{% if not loop.last %}
-            				{{ config.insertStrategy }}
-            			{% endif %}
-            		{% endfor %}
-            		)
-            		AS "SRC"
-            		ON
-            		{% for col in sources[0].columns if (col.sourceColumns[0] 
+                    {%- if not loop.last -%}, {% endif %}
+                  {% endfor %}
+              
+                  {{ source.join }}
+              
+                  {% if not loop.last %}
+                    {{ config.insertStrategy }}
+                  {% endif %}
+                {% endfor %}
+                )
+                AS "SRC"
+                ON
+                {% for col in sources[0].columns if (col.sourceColumns[0] 
                                                         and col.sourceColumns[0].column 
                                                         and col.sourceColumns[0].column.isChangeHash
                                                         ) -%}
-            			{% if not loop.first %}
-            				AND
-            			{% endif %}
-            			"SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
-            		{% endfor %}
-            		WHEN NOT MATCHED THEN
-            		INSERT
-            		(
-            			{% for col in columns %}
-            				"{{ col.name }}"
-            				{%- if not loop.last -%}, {% endif %}
-            			{% endfor %}
-            		) VALUES
-            		(
-            			{% for col in columns %}
-            				"SRC"."{{ col.name }}"
-            				{%- if not loop.last -%}, {% endif %}
-            			{% endfor %}
-            		)
-            	
-            	{% if config.postSQL %}
-            		{{ stage('Post-SQL') }}
-            		{{ config.postSQL }}	
-            	{% endif %}
-            	
+                  {% if not loop.first %}
+                    AND
+                  {% endif %}
+                  "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+                {% endfor %}
+                WHEN NOT MATCHED THEN
+                INSERT
+                (
+                  {% for col in columns %}
+                    "{{ col.name }}"
+                    {%- if not loop.last -%}, {% endif %}
+                  {% endfor %}
+                ) VALUES
+                (
+                  {% for col in columns %}
+                    "SRC"."{{ col.name }}"
+                    {%- if not loop.last -%}, {% endif %}
+                  {% endfor %}
+                )
+              
+              {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}  
+              {% endif %}
+              
             {% endif %}
 
             {% if config.testsEnabled %}
-            	{% for test in node.tests %}
-            		{% if test.runOrder == 'After' %}
-            			{{ test_stage(test.name, test.continueOnFailure) }}
-            			{{ test.templateString }}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
                     {% endif %}
-            	{% endfor %}
+              {% endfor %}
 
-            	{% for column in columns %}
-            		{% for test in column.tests %}
-            			{{ test_stage(column.name + ": " + test.name) }}
-            			{{ test.templateString }}
-            		{% endfor %}
-            	{% endfor %}
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
-            			
+                  
     name: Satellite
     version: 1
   StepType-Source:
@@ -4043,24 +4043,24 @@ stepTypes:
         create:
           templateString: |
             {% if node.override.create.enabled %}
-            	
-            	{{ node.override.create.script }}
+              
+              {{ node.override.create.script }}
 
             {% elif node.materializationType == 'table' %}
-            	{{ stage('Create Stage Table') }}
+              {{ stage('Create Stage Table') }}
 
-            	CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            	(
-            		{% for col in columns %}
-            			"{{ col.name }}" {{ col.dataType }}
-            			{%- if not col.nullable %} NOT NULL
-            				{%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-            			{% endif %}
-            			{%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
-            			{%- if not loop.last -%}, {% endif %}
-            		{% endfor %}
-            	)
-            	{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
+              CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+              (
+                {% for col in columns %}
+                  "{{ col.name }}" {{ col.dataType }}
+                  {%- if not col.nullable %} NOT NULL
+                    {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                  {% endif %}
+                  {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+              )
+              {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
 
 
             {% elif node.materializationType == 'view' %}
@@ -4106,81 +4106,81 @@ stepTypes:
                 {% endfor %}
 
             {% if node.materializationType == 'table' %}
-            	{% if config.preSQL %}
-            		{{ stage('Pre-SQL') }}
-            		{{ config.preSQL }}
-            	{% endif %}
-            	
-            	
-            	
-            		{% if config.truncateBefore %}
-            	
-            			{{ stage('Truncate Stage Table') }}
-            			TRUNCATE IF EXISTS {{ ref_no_link(node.location.name, node.name) }}
-            	
-            		{% endif %}
-            	
-            	
-            		{% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
-            			{{ stage( config.insertStrategy + ' Sources' | string ) }}
-            			INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-            				(
-            					{% for col in columns %}
-            						"{{ col.name }}"
-            						{%- if not loop.last -%},{% endif %}
-            					{% endfor %}
-            				)
-            		{% endif %}
-            	
-            	
-            		{% for source in sources %}
-            	
-            			{% if config.insertStrategy == 'INSERT' %}
-            				{{ stage('Insert ' + source.name | string ) }}
-            	
-            				INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-            				(
-            					{% for col in source.columns %}
-            						"{{ col.name }}"
-            						{%- if not loop.last -%},{% endif %}
-            					{% endfor %}
-            				)
-            			{% endif %}
-            	
-            			SELECT
-            			{% for col in source.columns %}
+              {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+              {% endif %}
+              
+              
+              
+                {% if config.truncateBefore %}
+              
+                  {{ stage('Truncate Stage Table') }}
+                  TRUNCATE IF EXISTS {{ ref_no_link(node.location.name, node.name) }}
+              
+                {% endif %}
+              
+              
+                {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
+                  {{ stage( config.insertStrategy + ' Sources' | string ) }}
+                  INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+                    (
+                      {% for col in columns %}
+                        "{{ col.name }}"
+                        {%- if not loop.last -%},{% endif %}
+                      {% endfor %}
+                    )
+                {% endif %}
+              
+              
+                {% for source in sources %}
+              
+                  {% if config.insertStrategy == 'INSERT' %}
+                    {{ stage('Insert ' + source.name | string ) }}
+              
+                    INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+                    (
+                      {% for col in source.columns %}
+                        "{{ col.name }}"
+                        {%- if not loop.last -%},{% endif %}
+                      {% endfor %}
+                    )
+                  {% endif %}
+              
+                  SELECT
+                  {% for col in source.columns %}
                             {{ get_source_transform(col) }} AS "{{ col.name }}"
-            				{%- if not loop.last -%}, {% endif %}
-            			{% endfor %}
-            	
-            			{{ source.join }}
-            	
-            			{% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
-            				{{config.insertStrategy}}
-            			{% endif %}
-            	
-            		{% endfor %}
-            	
-            	{% if config.postSQL %}
-            		{{ stage('Post-SQL') }}
-            		{{ config.postSQL }}
-            	{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                  {% endfor %}
+              
+                  {{ source.join }}
+              
+                  {% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+                    {{config.insertStrategy}}
+                  {% endif %}
+              
+                {% endfor %}
+              
+              {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}
+              {% endif %}
             {% endif %}
 
             {% if config.testsEnabled %}
-            	{% for test in node.tests %}
-            		{% if test.runOrder == 'After' %}
-            			{{ test_stage(test.name, test.continueOnFailure) }}
-            			{{ test.templateString }}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
                     {% endif %}
-            	{% endfor %}
+              {% endfor %}
 
-            	{% for column in columns %}
-            		{% for test in column.tests %}
-            			{{ test_stage(column.name + ": " + test.name) }}
-            			{{ test.templateString }}
-            		{% endfor %}
-            	{% endfor %}
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
     name: Stage
     version: 1
@@ -4366,7 +4366,7 @@ stepTypes:
                     {% for col in columns %}
                         "{{ col.name }}" {{ col.dataType }}
                         {% if col.isSurrogateKey %}
-            		        identity
+                        identity
                         {% endif %}
                         {%- if not col.nullable %} NOT NULL
                             {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
@@ -4393,8 +4393,8 @@ stepTypes:
                 AS
                 {% for source in sources %}
 
-            		{% if not loop.last %} UNION ALL {% endif %}
-            	{% endfor %}
+                {% if not loop.last %} UNION ALL {% endif %}
+              {% endfor %}
 
                     {% for col in source.columns %}
                         {% if col.isSurrogateKey or col.isSystemUpdateDate or col.isSystemCreateDate %}
@@ -4422,11 +4422,11 @@ stepTypes:
                 {% endfor %}
 
             {% if node.materializationType == 'table' %}
-            	{% if config.preSQL %}
-            		{{ stage('Pre-SQL') }}
-            		{{ config.preSQL }}
-            	{% endif %}
-            	
+              {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+              {% endif %}
+              
                 {% if has_business_key and is_type_2 %}
 
                     {% for source in sources %}
@@ -4618,9 +4618,9 @@ stepTypes:
                             SELECT
                             {% for col in source.columns if not col.isSurrogateKey %}
                                 {% if col.isSystemVersion %}
-                                	1
+                                  1
                                 {% elif col.isSystemCurrentFlag %}
-                                	'Y'
+                                  'Y'
                                 {% else %}
                                     {{ get_source_transform(col) }}
                                 {% endif %}
@@ -4708,28 +4708,28 @@ stepTypes:
                         {{ source.join }}
                     {% endfor %}            
                 {% endif %}
-            	
-            	{% if config.postSQL %}
-            		{{ stage('Post-SQL') }}
-            		{{ config.postSQL }}
-            	{% endif %}
-            	
+              
+              {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}
+              {% endif %}
+              
             {% endif %}
 
             {% if config.testsEnabled %}
-            	{% for test in node.tests %}
-            		{% if test.runOrder == 'After' %}
-            			{{ test_stage(test.name, test.continueOnFailure) }}
-            			{{ test.templateString }}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
                     {% endif %}
-            	{% endfor %}
+              {% endfor %}
 
-            	{% for column in columns %}
-            		{% for test in column.tests %}
-            			{{ test_stage(column.name + ": " + test.name) }}
-            			{{ test.templateString }}
-            		{% endfor %}
-            	{% endfor %}
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
             {% endif %}
     name: Persistent Stage
     version: 1
