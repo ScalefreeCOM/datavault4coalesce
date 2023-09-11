@@ -170,7 +170,6 @@ macros:
 
            {%- if ghost_record_type == 'unknown' -%}
            {%- if datatype.upper().startswith('TIMESTAMP') or datatype.upper().startswith('DATE') -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
-           {%- if datatype.upper().startswith('TIMESTAMP') or datatype.upper().startswith('DATE') -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
            {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
                 {%- if datatype.upper().startswith('VARCHAR') and datatype[8:-1]|int >= unknown_value__STRING|length -%} {{unknown_value__STRING}} AS {{ column_name }}
                 {%- elif datatype.upper().startswith('STRING') -%} {{unknown_value__STRING}} AS {{ column_name }}
