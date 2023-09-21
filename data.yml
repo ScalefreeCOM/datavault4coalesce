@@ -2492,7 +2492,7 @@ stepTypes:
                         
                 {{ stage('INSERT INTO Non-Historized Link - ' ~ source.name) }}
 
-                {%#--USE AGAIN WHEN COLUMNDROPDOWNSELECTOR IS USED  set link_hashkey = config.is_Link_hk.name -%#}
+                {#--USE AGAIN WHEN COLUMNDROPDOWNSELECTOR IS USED  set link_hashkey = config.is_Link_hk.name -#}
                 {%- set link_hashkey = get_value_by_column_attribute("is_Link_hk") -%}
 
                 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
