@@ -418,8 +418,8 @@ macros:
       {#--                       hashing calculation of multi-active                           --#}
       {#--                       satellite's hash diff attribute.                              --#}
       {%- if is_hashdiff and multi_active_key is defined and multi_active_key|length>0 -%}
-           {%- set multi_active_key = multi_active_key|join(", ") -%}
-        {%- set listagg_closing = " WITHIN GROUP (ORDER BY {}) OVER (PARTITION BY {}, {}))".format(multi_active_key, main_hashkey_col, ldts_alias) -%}
+          {%- set multi_active_key = multi_active_key|join(", ") -%}
+          {%- set listagg_closing = ' WITHIN GROUP (ORDER BY "{}") OVER (PARTITION BY "{}", "{}"))'.format(multi_active_key, main_hashkey_col, ldts_alias) -%}
       {%- endif -%}
 
       {%- if 'VARCHAR' in datatype or 'CHAR' in datatype or 'STRING' in datatype or 'TEXT' in datatype %}
@@ -1416,7 +1416,7 @@ stepTypes:
         tagColor: '#AED6F1'
 
         config:
-        - groupName: Options
+        - groupName: Data Vault
           items:
           - type: materializationSelector
             default: view
@@ -1425,12 +1425,16 @@ stepTypes:
             isRequired: true
             enableIf: "false"
 
-          - displayName: Enable Tests
-            attributeName: testsEnabled
+          - displayName: Generate Ghost Records
+            attributeName: generate_ghost_records
             type: toggleButton
             default: true
-        - groupName: Data Vault
-          items:
+
+          - displayName: Contains Multi-active Data
+            attributeName: contains_multiactive_data
+            type: toggleButton
+            isRequired: false
+
           - displayName: Hash Key Columns
             type: columnSelector
             enableIf: "{{ config.contains_multiactive_data }}"
@@ -1441,16 +1445,6 @@ stepTypes:
             type: columnSelector
             enableIf: "{{ config.contains_multiactive_data }}"
             attributeName: is_hd
-            isRequired: false
-
-          - displayName: Generate Ghost Records
-            attributeName: generate_ghost_records
-            type: toggleButton
-            default: true
-
-          - displayName: Contains Multi-active Data
-            attributeName: contains_multiactive_data
-            type: toggleButton
             isRequired: false
 
         - groupName: Multi-Activity Config
@@ -1517,11 +1511,9 @@ stepTypes:
                     {%- if config.contains_multiactive_data -%}
                         {%- for col in source.columns -%}
                             {%- if col.multi_active_key -%}{%- set multi_active_key = multi_active_key.append(col.name) -%}{%- endif %}
-                            {%- if col.main_hk_col == true -%}{%- set main_hashkey_col.hk_col = col.name -%}{%- endif -%}
+                            {%- if col.id == config.main_hk_col.id -%}{%- set main_hashkey_col.hk_col = col.name -%}{%- endif -%}
                         {%- endfor -%}
                     {%- endif %}
-                    {# REMOVEME after changing Main HK Column config to ColumnDropdownSelector (single choice selector) #}
-                    {#%- set main_hashkey_col = main_hashkey_col.hk_col -%#}
                     SELECT
                     {% for col in source.columns %}
                         {#- Print DV hash calculations -#}
