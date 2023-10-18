@@ -1672,7 +1672,7 @@ stepTypes:
             {% for source in sources %}
 
               {{ stage('INSERT INTO Hub - ' ~ source.name) }}
-
+              
               {%- set hashkey_column = get_value_by_column_attribute("is_Hub_hk") -%}
               
               {#-- enable when ColumnDropDownSelector is used again
@@ -2004,6 +2004,7 @@ stepTypes:
               FROM {{ ref_no_link(node.location.name, node.name) }} 
               QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
 
+
             ),
 
             deduplicated_numbered_source AS (
@@ -2014,7 +2015,9 @@ stepTypes:
                 {% for col in source.columns %}
                   {{ get_source_transform(col) }} AS {{ col.name }},
                 {% endfor %}
+
                     ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
+
                     
                     {{ source.join }}
 
@@ -2051,6 +2054,7 @@ stepTypes:
                 WHERE 
                   deduplicated_numbered_source."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
                 AND deduplicated_numbered_source."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
+
                     AND deduplicated_numbered_source.rn = 1
               )
 
@@ -2756,6 +2760,7 @@ stepTypes:
                 {% endfor %}
                 records_to_insert AS (
                 {% for source in sources %}
+                
                 SELECT
                         "{{ hashkey_column }}",
                         "{{ datavault4coalesce.config.ldts_alias }}",
