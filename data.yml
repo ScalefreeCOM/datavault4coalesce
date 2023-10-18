@@ -12,21 +12,29 @@ locations:
 macros:
   Macro-1:
     id: "1"
-    macroString: |+
+    macroString: |-
+      {#------------------------------------------------------------------------------------------------------#}
+      {#-- Global variables of datavault4coalesce                                                           --#}
+      {#--                                                                                                  --#}
+      {#-- The following variables can be customized to implement your own DV standard definition.          --#}
+      {#-- They will be used in the macros found below.                                                     --#}
+      {#-- Refer to official wiki: https://github.com/ScalefreeCOM/datavault4coalesce/wiki/Global-variables --#}
+      {#------------------------------------------------------------------------------------------------------#}
       {%- set datavault4coalesce = namespace(
-
            config = {
            "ldts_alias": "LDTS",
            "rsrc_alias": "RSRC", 
-           "ledts_alias": "LEDTS", 
+           "ledts_alias": "LEDTS",
+           "stg_alias": "STG", 
            "snapshot_trigger_column": "IS_ACTIVE",
+           "use_object_name_prefix": TRUE,
            "sdts_alias": "SDTS",
            "is_current_col_alias": "IS_CURRENT", 
            "hash": "MD5", 
            "hash_datatype": "STRING", 
            "hash_input_case_sensitive": "TRUE",
            "hash_passthrough_input_transformations": "TRUE",
-           "beginning_of_all_times": "0001-01-01T00:00:01", 
+           "beginning_of_all_times": "0001-01-01T00:00:01",
            "end_of_all_times": "8888-12-31T23:59:59",
            "timestamp_format": "YYYY-MM-DDTHH24:MI:SS", 
            "default_unknown_rsrc": "SYSTEM", 
@@ -38,18 +46,79 @@ macros:
            "unknown_value__STRING": "'(unknown)'",
            "unknown_value_alt__STRING": "'u'"
            }
-
       ) -%}
 
-
-      {%- macro datavault4coalesce__string_to_timestamp(format, timestamp) -%}
-          TO_TIMESTAMP('{{ timestamp }}', '{{ format }}')
+      {%- macro ref_raw(location_name, node_name) -%}
+          {% raw %}{{ ref('{% endraw %}{{ location_name }}{% raw %}', '{% endraw %}{{ node_name }}{% raw %}') }}{% endraw %}
       {%- endmacro -%}
 
+      {%- macro ref_no_link_raw(location_name, node_name) -%}
+          {% raw %}{{ ref_no_link('{% endraw %}{{ location_name }}{% raw %}', '{% endraw %}{{ node_name }}{% raw %}') }}{% endraw %}
+      {%- endmacro -%}
 
-      {%-macro record_source()-%}
-      {#--USAGE:{{record_source()}}#}
-      {#--NOTES:Adds a Record Source (name of qualified previous table/view)#}
+      {%- macro ref_link_raw(location_name, node_name) -%}
+          {% raw %}{{ ref_link('{% endraw %}{{ location_name }}{% raw %}', '{% endraw %}{{ node_name }}{% raw %}') }}{% endraw %}
+      {%- endmacro -%}
+
+      {#-- Utility macro: outputs a SQL function to convert input string into a timestamp of dynamic format. --#}
+      {%- macro datavault4coalesce__string_to_timestamp(format, timestamp) -%}
+      TO_TIMESTAMP('{{ timestamp }}', '{{ format }}')
+      {%- endmacro -%}
+
+      {#-- Utility macro: check if string object is an expression --#}
+      {%- macro datavault4coalesce__is_expression(obj) -%}
+          {%- if obj is string -%}
+              {%- if (obj|first == "'" and obj|last == "'") or ("(" in obj and ")" in obj) or "::" in obj or "||" in obj -%}
+                  {{ true }}
+              {%- else -%}
+                  {{ false }}
+              {%- endif -%}
+          {%- else -%}
+              {{ false }}
+          {%- endif -%}
+      {%- endmacro -%}
+
+      {#-- Utility macro: check if object exists, is defined and not empty --#}
+      {%- macro datavault4coalesce__is_something(obj) -%}
+          {%- if obj is not none and obj is defined and obj -%}
+              {{ true }}
+          {%- else -%}
+              {{ false }}
+          {%- endif -%}
+      {%- endmacro -%}
+
+      {#-- Utility macro: wrap string input between escape characters --#}
+      {%- macro datavault4coalesce__escape_column_name(column) -%}
+          {%- set escape_char_left  = '"' -%}
+          {%- set escape_char_right = '"' -%}
+          {%- set escaped_column_name = escape_char_left ~ column|upper|replace(escape_char_left, '')|replace(escape_char_right, '')|trim ~ escape_char_right|indent(4) -%}
+          
+        {{ escaped_column_name }}
+      {%- endmacro -%}
+
+      {#-- Utility macro: wrap input between escape characters --#}
+      {%- macro datavault4coalesce__as_constant(column_str) -%}
+          {%- if column_str is not none and column_str is string and column_str -%}
+              {%- if column_str|first == "!" -%}
+                  {{- "'" ~ column_str[1:] ~ "'" -}}
+              {%- else -%}
+                  {%- if datavault4coalesce__is_expression(column_str) -%}
+                      {{- column_str -}}
+                  {%- else -%}
+                      {{- datavault4coalesce__escape_column_name(column_str) -}}
+                  {%- endif -%}
+              {%- endif -%}
+          {%- endif -%}
+      {%- endmacro -%}
+
+      {#-----------------------------------------------------------------------------------------------#}
+      {#-- DV Utility macro: generates a string as the record source.                                --#}
+      {#--                                                                                           --#}
+      {#-- The record source is a standard, technical attribute in Data Vault 2.0 object structures. --#}
+      {#-- It is used to identify the origin of a data record and should contain a detailed path     --#}
+      {#--    to trace a record back to its source table and source system.                          --#}
+      {#-----------------------------------------------------------------------------------------------#}
+      {%- macro record_source() -%}
       {%- if sources[0].dependencies -%}
            {% set src = storageLocations | selectattr('name', "equalto", sources[0].dependencies[0].node.location.name) | list | first %} 
            '"{{src.database}}"."{{src.schema}}"."{{sources[0].dependencies[0].node.name}}"'
@@ -58,50 +127,22 @@ macros:
       {%- endif -%}
       {%- endmacro -%}
 
-
-      {%- macro datavault4coalesce__is_expression(obj) -%}
-
-           {%- if obj is string -%}
-                {%- if (obj|first == "'" and obj|last == "'") or ("(" in obj and ")" in obj) or "::" in obj or "||" in obj -%}
-                     {{ true }}
-                {%- else -%}
-                     {{ false }}
-                {%- endif -%}
-           {%- else -%}
-                {{ false }}
-           {%- endif -%}
-
-      {%- endmacro -%}
-
-
-      {%- macro datavault4coalesce__escape_column_name(column) -%}
-
-           {%- set escape_char_left  = '"' -%}
-           {%- set escape_char_right = '"' -%}
-
-           {%- set escaped_column_name = escape_char_left ~ column|upper|replace(escape_char_left, '')|replace(escape_char_right, '')|trim ~ escape_char_right|indent(4) -%}
-
-           {{ escaped_column_name }}
-
-      {%- endmacro -%}
-
-
-      {%- macro datavault4coalesce__as_constant(column_str) -%}
-
-           {%- if column_str is not none and column_str is string and column_str -%}
-                {%- if column_str|first == "!" -%}
-                     {{- "'" ~ column_str[1:] ~ "'" -}}
-                {%- else -%}
-                     {%- if datavault4coalesce__is_expression(column_str) -%}
-                          {{- column_str -}}
-                     {%- else -%}
-                          {{- datavault4coalesce__escape_column_name(column_str) -}}
-                     {%- endif -%}
-                {%- endif -%}
-           {%- endif -%}
-      {%- endmacro -%}
-
-
+      {#--------------------------------------------------------------------------------------------------#}
+      {#-- DV Utility macro: Generate default values for ghost record.                                  --#}
+      {#--                                                                                              --#}
+      {#-- As part of the INSERT statements for DV2.0 ghost records, the output of this macro processes --#}
+      {#-- table columns and generate default values based on the column data types.                    --#}
+      {#-- Usage: create template for node type DataVault by Scalefree: Stage.                          --#}
+      {#--                                                                                              --#}
+      {#-- Parameters:                                                                                  --#}
+      {#--     column_name: name of table column to be processed.                                       --#}
+      {#--     datatype: datatype of table column.                                                      --#}
+      {#--     ghost_record_type : type of the ghost record being generated.                            --#}
+      {#--                         By default, Datavault4coalesce uses 2 types: 'unknown' and 'error'.  --#}
+      {#--     hash: indicates if the table column being process is either a hash key or a change hash. --#}
+      {#--           Values: true | false                                                                 --#}
+      {#--     hash_algo: hash algorithm being used for the hashing function.                           --#}
+      {#--------------------------------------------------------------------------------------------------#}
       {%- macro datavault4coalesce__ghost_record_per_datatype(column_name, datatype, ghost_record_type, hash, hash_algo=none) -%}
 
       {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times -%}
@@ -138,6 +179,7 @@ macros:
            {% elif datatype == 'BOOLEAN' %}CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
            {% else %}NULL AS {{ column_name }}
            {% endif %}
+           
            {%- elif ghost_record_type == 'error' -%}
            {%- if datatype.upper().startswith('TIMESTAMP') or datatype.upper().startswith('DATE') -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, end_of_all_times) }} AS {{ column_name }}
            {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
@@ -152,47 +194,19 @@ macros:
            {%- endif -%}
 
       {%- endif -%}
-
       {%- endmacro -%}
 
-
-      {%- macro datavault4coalesce__hash_algorithm(hash_function=none, hash_datatype=none) -%}
-
-           {%- if hash_function is none -%}
-                {%- set hash_function = datavault4coalesce.config.hash -%}
-           {%- endif -%}
-           {%- if hash_datatype is none -%}
-                {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
-           {%- endif -%}  
-
-           {%- set dict_result = {} -%}
-           {%- set hash_alg = '' -%}
-
-           {%- if hash_function == 'MD5' -%}
-                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
-                     {%- set hash_alg = 'MD5' -%}
-                {%- elif 'BINARY' in hash_datatype -%}
-                     {%- set hash_alg = 'MD5_BINARY' -%}       
-                {%- endif -%}
-           {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
-                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
-                     {%- set hash_alg = 'SHA1' -%}
-                {%- elif 'BINARY' in hash_datatype -%}
-                     {%- set hash_alg = 'SHA1_BINARY' -%}       
-                {%- endif -%}
-           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' or hash_function == 'SHA256' -%}
-                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
-                     {%- set hash_alg = 'SHA2' -%}
-                {%- elif 'BINARY' in hash_datatype -%}
-                     {%- set hash_alg = 'SHA2_BINARY' -%}       
-                {%- endif -%}   
-           {%- endif -%}
-
-           {{ hash_alg }}
-
-      {%- endmacro -%}
-
-
+      {#---------------------------------------------------------------------------------------------#}
+      {#-- DV Utility macro: Output unknown zero key for ghost record.                             --#}
+      {#--                                                                                         --#}
+      {#-- Generates unknown zero key based on the hashing algorithm being used for ghost records. --#}
+      {#-- Usage: main hashing macro datavault4coalesce__hash                                      --#}
+      {#--        and macro for ghost record datavault4coalesce__ghost_record_per_datatype         --#}
+      {#--                                                                                         --#}
+      {#-- Parameters:                                                                             --#}
+      {#--     hash_function: hashing algorithm.                                                   --#}
+      {#--     hash_datatype: datatype of hash column.                                             --#}
+      {#---------------------------------------------------------------------------------------------#}
       {%- macro datavault4coalesce__unknown_key(hash_function=none, hash_datatype=none) -%}
            {%- if hash_function is none -%}
                 {%- set hash_function = datavault4coalesce.config.hash -%}
@@ -229,7 +243,17 @@ macros:
 
       {%- endmacro -%}
 
-
+      {#---------------------------------------------------------------------------------------------#}
+      {#-- DV Utility macro: Output error zero key for ghost record.                               --#}
+      {#--                                                                                         --#}
+      {#-- Generates error zero key based on the hashing algorithm being used for ghost records.   --#}
+      {#-- Usage: main hashing macro datavault4coalesce__hash                                      --#}
+      {#--        and macro for ghost record datavault4coalesce__ghost_record_per_datatype         --#}
+      {#--                                                                                         --#}
+      {#-- Parameters:                                                                             --#}
+      {#--     hash_function: hashing algorithm.                                                   --#}
+      {#--     hash_datatype: datatype of hash column.                                             --#}
+      {#---------------------------------------------------------------------------------------------#}
       {%- macro datavault4coalesce__error_key(hash_function=none, hash_datatype=none) -%}
            {%- if hash_function is none -%}
                 {%- set hash_function = datavault4coalesce.config.hash -%}
@@ -263,186 +287,276 @@ macros:
 
            {% set error_key = datavault4coalesce__as_constant(error_key) %}
            {{ error_key }}
-
       {%- endmacro -%}
 
+      {#---------------------------------------------------------------------------------------------#}
+      {#-- DV Utility macro: Hashing algorithm.                                                    --#}
+      {#--                                                                                         --#}
+      {#-- Outputs hashing algorithm and Snowflake function to calculate hashes based on  --#}
+      {#-- If parameters are empty, default options in global variables will be used. --#}
+      {#-- Usage: main hashing macro datavault4coalesce__hash                                      --#}
+      {#--        and macro for ghost record datavault4coalesce__ghost_record_per_datatype         --#}
+      {#--                                                                                         --#}
+      {#-- Parameters:                                                                             --#}
+      {#--     hash_function: hashing algorithm.                                                   --#}
+      {#--     hash_datatype: datatype of hash column.                                             --#}
+      {#---------------------------------------------------------------------------------------------#}
+      {%- macro datavault4coalesce__hash_algorithm(hash_function=none, hash_datatype=none) -%}
 
-      {%- macro datavault4coalesce__is_something(obj) -%}
+           {%- if hash_function is none -%}
+                {%- set hash_function = datavault4coalesce.config.hash -%}
+           {%- endif -%}
+           {%- if hash_datatype is none -%}
+                {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
+           {%- endif -%}  
 
-          {%- if obj is not none and obj is defined and obj -%}
-              {{ true }}
-          {%- else -%}
-              {{ false }}
-          {%- endif -%}
+           {%- set dict_result = {} -%}
+           {%- set hash_alg = '' -%}
+
+           {%- if hash_function == 'MD5' -%}
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set hash_alg = 'MD5' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set hash_alg = 'MD5_BINARY' -%}       
+                {%- endif -%}
+           {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set hash_alg = 'SHA1' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set hash_alg = 'SHA1_BINARY' -%}       
+                {%- endif -%}
+           {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' or hash_function == 'SHA256' -%}
+                {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                     {%- set hash_alg = 'SHA2' -%}
+                {%- elif 'BINARY' in hash_datatype -%}
+                     {%- set hash_alg = 'SHA2_BINARY' -%}       
+                {%- endif -%}   
+           {%- endif -%}
+
+           {{ hash_alg }}
 
       {%- endmacro -%}
-
 
       {%- macro datavault4coalesce__attribute_standardise() -%}
-
       CONCAT('\"', REPLACE(REPLACE(REPLACE(TRIM(CAST([EXPRESSION] AS STRING)), '\\', '\\\\'), '[QUOTE]', '\"'), '[NULL_PLACEHOLDER_STRING]', '--'), '\"')
-
       {%- endmacro -%}
 
-
-      {%- macro datavault4coalesce__standardise_prefix(case_sensitive, hash_alg, datatype, zero_key, alias) -%}
-
+      {#---------------------------------------------------------------------------------------------------------#}
+      {#-- Generate the first part of wrapper for hash inputs in DV hashing calculation                        --#}
+      {#-- Usage: in main hashing macro datavault4coalesce__hash.                                                --#}
+      {#--                                                                                                     --#}
+      {#-- Parameters:                                                                                         --#}
+      {#--     case_sensitive  : determines if hash input(s) should be treated with case sensitive.            --#}
+      {#--                       If set to true, all hash inputs will be uppercased before hash operation.     --#}
+      {#--     hash_alg        : overwrites default hash algorithm from global variables.                      --#}
+      {#--                       REMOVEME not needed here                                                      --#}
+      {#--     is_hashdiff     : determines if hash calculation is for a change hash a.k.a. hash difference    --#}
+      {#--                       If set to TRUE, return patterns for hash diff calculation.                    --#}
+      {#--                       If set to FALSE, return patterns for hash key calculation.                    --#}
+      {#--     datatype        : data type of hash input attribute.                                            --#}
+      {#--     zero_key        : default value for zero key - by default, set under the global variables       --#}
+      {#--     alias           : alias for attribute name.                                                     --#}
+      {#--     multi_active_key: list of multi-active keys, if available (i.e. hash in multi-active satellite) --#}
+      {#--     main_hashkey_col: name of the main hash key column, if target is a multi-active satellite.      --#}
+      {#---------------------------------------------------------------------------------------------------------#}
+      {%- macro datavault4coalesce__standardise_prefix(case_sensitive, hash_alg, is_hashdiff, datatype, zero_key, alias, multi_active_key, main_hashkey_col) -%}
       {%- set dict_result = {} -%}
-
       {%- set zero_key = datavault4coalesce__as_constant(column_str=zero_key) -%}
+      {%- set listagg_opening = "" -%}
+
+      {#-- If definition of multi-active key(s) is found, prep string variables:                      --#}
+      {#--     multi_active_key: list of multi-active keys, concatenated with comma delimiter.        --#}
+      {#--     listagg_opening : 1st part of LISTAGG window function, used in                         --#}
+      {#--                       hashing calculation of multi-active satellite's hash diff attribute. --#}
+      {%- if is_hashdiff and multi_active_key is defined and multi_active_key|length>0 -%}
+          {%- set listagg_opening = "LISTAGG(" -%}
+      {%- endif -%}
 
       {%- if 'VARCHAR' in datatype or 'CHAR' in datatype or 'STRING' in datatype or 'TEXT' in datatype %}
-
           {%- if case_sensitive -%}
-              
-              {%- set standardise_prefix = "COALESCE(LOWER({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
-
+              {%- set standardise_prefix = "IFNULL(LOWER({}({}NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg, listagg_opening)-%}
           {%- else -%}
-              
-              {%- set standardise_prefix = "COALESCE(LOWER({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg)-%}
-
+              {%- set standardise_prefix = "IFNULL(LOWER({}({}NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg, listagg_opening)-%}
           {%- endif -%}
 
       {%- else -%}
-
           {%- if case_sensitive -%}
-              
-              {%- set standardise_prefix = "COALESCE({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
-
+              {%- set standardise_prefix = "IFNULL({}({}NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg, listagg_opening)-%}
           {%- else -%}
-              
-              {%- set standardise_prefix = "COALESCE({}(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg)-%}
-
+              {%- set standardise_prefix = "IFNULL({}({}NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg, listagg_opening)-%}
           {%- endif -%}
-
       {%- endif -%}
 
       {{ standardise_prefix }}
-
       {%- endmacro -%}
 
-
-      {%- macro datavault4coalesce__standardise_suffix(case_sensitive, hash_alg, datatype, zero_key, alias) -%}
-
+      {#---------------------------------------------------------------------------------------------------------#}
+      {#-- Generate the second part of wrapper for hash inputs in DV hashing calculation                       --#}
+      {#-- Used in main hashing macro datavault4coalesce__hash.                                                --#}
+      {#--     case_sensitive  : determines if hash input(s) should be treated with case sensitive.            --#}
+      {#--                       If set to true, all hash inputs will be uppercased before hash operation.     --#}
+      {#--     hash_alg        : overwrites default hash algorithm from global variables.                      --#}
+      {#--                       REMOVEME not needed here                                                      --#}
+      {#--     is_hashdiff     : determines if hash calculation is for a change hash a.k.a. hash difference    --#}
+      {#--                       If set to TRUE, return patterns for hash diff calculation.                    --#}
+      {#--                       If set to FALSE, return patterns for hash key calculation.                    --#}
+      {#--     datatype        : data type of hash input attribute.                                            --#}
+      {#--     zero_key        : default value for zero key - by default, set under the global variables       --#}
+      {#--     alias           : alias for attribute name.                                                     --#}
+      {#--     multi_active_key: list of multi-active keys, if available (i.e. hash in multi-active satellite) --#}
+      {#--     main_hashkey_col: name of the main hash key column, if target is a multi-active satellite.      --#}
+      {#--------------------------------------------------------------------------------------------------------#}
+      {%- macro datavault4coalesce__standardise_suffix(case_sensitive, hash_alg, is_hashdiff, datatype, zero_key, alias, multi_active_key, main_hashkey_col) -%}
       {%- set dict_result = {} -%}
-
+      {%- set ldts_alias = datavault4coalesce.config.ldts_alias -%}
       {%- set zero_key = datavault4coalesce__as_constant(column_str=zero_key) -%}
+      {%- set listagg_closing = "" -%}
+
+      {#-- If definition of multi-active key(s) is found, prep the following string variables: --#}
+      {#--     multi_active_key: list of multi-active keys, concatenated with comma delimiter. --#}
+      {#--     listagg_closing : 2nd part of LISTAGG window function, used in                  --#}
+      {#--                       hashing calculation of multi-active                           --#}
+      {#--                       satellite's hash diff attribute.                              --#}
+      {%- if is_hashdiff and multi_active_key is defined and multi_active_key|length>0 -%}
+          {%- set multi_active_key = multi_active_key|join(", ") -%}
+          {%- set listagg_closing = ' WITHIN GROUP (ORDER BY "{}") OVER (PARTITION BY "{}", "{}"))'.format(multi_active_key, main_hashkey_col, ldts_alias) -%}
+      {%- endif -%}
 
       {%- if 'VARCHAR' in datatype or 'CHAR' in datatype or 'STRING' in datatype or 'TEXT' in datatype %}
-
           {%- if case_sensitive -%}
-       
               {%- if alias is not none -%}
-                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]'))), {}) AS {}".format(zero_key, alias)-%}
+            {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}      
               {%- else -%}
-                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]'))), {})".format(zero_key)-%}
+            {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
               {%- endif -%}
-
           {%- else -%}
-       
               {%- if alias is not none -%}
-                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]'))), {}) AS {}".format(zero_key, alias)-%}
+                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}
               {%- else -%}
-                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]'))), {})".format(zero_key)-%}
+            {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
               {%- endif -%}
-
           {%- endif -%}
 
       {%- else -%}
-
           {%- if case_sensitive -%}
-
               {%- if alias is not none -%}
-                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')), {}) AS {}".format(zero_key, alias)-%}
+                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}
               {%- else -%}
-                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')), {})".format(zero_key)-%}
+                  {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
               {%- endif -%}
-
           {%- else -%}
-
               {%- if alias is not none -%}
-                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')), {}) AS {}".format(zero_key, alias)-%}
+                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}
               {%- else -%}
-                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')), {})".format(zero_key)-%}
+                  {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
               {%- endif -%}
-
           {%- endif -%}
-
       {%- endif -%}
-
       {{ standardise_suffix }}
-
       {%- endmacro -%}
 
-
-      {%- macro datavault4coalesce__hash(columns, alias=none, datatype='STRING', algo='MD5') -%}
-
+      {#---------------------------------------------------------------------------------#}
+      {#-- Main macro for DV2.0 hashing.                                               --#}
+      {#---------------------------------------------------------------------------------#}
+      {%- macro datavault4coalesce__hash(columns, alias=none, is_hashdiff=false, datatype='STRING', algo='MD5', multi_active_key=[], main_hashkey_col='') -%}
+      {#-- Setup DV2.0 standards for hashing                                           --#}
+      {#--                                                                             --#}
+      {#-- Modify the following settings to implement your DV2.0 hashing standards.    --#}
+      {#--   concat_string: string used to concatenate hash input fields.              --#}
+      {#--                  Recommended: || (double pipes) or _ (underscore)           --#}
+      {#--   quote: character used to quote around hash input fields.                  --#}
+      {#--          Recommended: '"' (double quotes)                                   --#}
+      {#--  null_placeholder_string: ???                                               --#}
+      {#--  hash_input_case_sensitive: case sensitivity settings for hash input.       --#}
       {%- set concat_string = '||' -%}
       {%- set quote = '"' -%}
       {%- set null_placeholder_string = '^^' -%}
-
       {%- set hash_input_case_sensitive = datavault4coalesce.config.hash_input_case_sensitive -%}
 
-      {#- Select hashing algorithm -#}
+      {#-- Select hashing algorithm from global variables. --#}
       {%- set datatype = datatype|upper -%}
       {%- set hash_alg = datavault4coalesce__hash_algorithm(hash_function=algo, hash_datatype=datatype) -%}
       {%- set unknown_key = datavault4coalesce__unknown_key(hash_function=algo, hash_datatype=datatype) -%}
       {%- set error_key = datavault4coalesce__error_key(hash_function=algo, hash_datatype=datatype) -%}
 
-      {%- set ns = namespace(columns=[], all_null=[]) -%}
-
       {%- set attribute_standardise = datavault4coalesce__attribute_standardise() %}
 
+      {#-- Set up a list of columns going into hashing calculation --#}
+      {%- set ns = namespace(columns=[], all_null=[]) -%}
       {%- set columns_input = columns -%}
 
       {%- for column in columns_input -%}
            {%- set ns.columns = ns.columns + [column.name] -%}
       {%- endfor -%}
 
+      {%- set standardise_prefix = datavault4coalesce__standardise_prefix(case_sensitive=hash_input_case_sensitive, 
+                                                                          hash_alg=hash_alg,
+                                   is_hashdiff=is_hashdiff,
+                                                                          datatype=hash_dtype,
+                                                                          alias=alias, 
+                                                                          zero_key=unknown_key,
+                                                                          multi_active_key=multi_active_key,
+                                                                          main_hashkey_col=main_hashkey_col) -%}
+      {%- set standardise_suffix = datavault4coalesce__standardise_suffix(case_sensitive=hash_input_case_sensitive, 
+                                                                          hash_alg=hash_alg,
+                                                is_hashdiff=is_hashdiff,
+                                                                          datatype=hash_dtype, 
+                                                                          alias=alias, 
+                                                                          zero_key=unknown_key,
+                                                                          multi_active_key=multi_active_key,
+                                                                          main_hashkey_col=main_hashkey_col) -%}    
 
-      {%- set standardise_prefix = datavault4coalesce__standardise_prefix(case_sensitive=hash_input_case_sensitive, hash_alg=hash_alg, datatype=hash_dtype, alias=alias, zero_key=unknown_key) -%}
-      {%- set standardise_suffix = datavault4coalesce__standardise_suffix(case_sensitive=hash_input_case_sensitive, hash_alg=hash_alg, datatype=hash_dtype, alias=alias, zero_key=unknown_key) -%}    
-
+      {#-- Start printing SQL for hash calculation --#}
       {{ standardise_prefix }}
-
       {%- for column in columns -%}
-
           {%- set ns.all_null = ns.all_null + [null_placeholder_string] -%}
-
-           {%- if datavault4coalesce.config.hash_passthrough_input_transformations -%}
-
-                {%- set column_str = datavault4coalesce__as_constant(get_source_transform(column)) -%}
-
-           {%- else -%}
-
-                {%- if '.' in column.name %}
-                     {% set column_str = column.name -%}
-                {%- else -%}
-                     {%- set column_str = datavault4coalesce__as_constant(column.name) -%}
-                {%- endif -%}
-           {%- endif -%}
+          {%- if datavault4coalesce.config.hash_passthrough_input_transformations -%}
+              {%- set column_str = datavault4coalesce__as_constant(get_source_transform(column)) -%}
+          {%- else -%}
+              {%- if '.' in column.name %}
+                  {% set column_str = column.name -%}
+              {%- else -%}
+                  {%- set column_str = datavault4coalesce__as_constant(column.name) -%}
+              {%- endif -%}
+          {%- endif -%}
 
           {{- "\nCOALESCE(({}), '{}')".format(attribute_standardise | replace('[EXPRESSION]', column_str) | replace('[QUOTE]', quote) | replace('[NULL_PLACEHOLDER_STRING]', null_placeholder_string), null_placeholder_string) | indent(4) -}}
           {{- ",'{}',".format(concat_string) if not loop.last -}}
 
           {%- if loop.last -%}
-
               {{ standardise_suffix | replace('[ALL_NULL]', ns.all_null | join("")) | indent(4) }}
-
           {%- else -%}
-
               {%- set ns.all_null = ns.all_null + [concat_string] -%}
-
           {%- endif -%}
-
       {%- endfor -%}
-
       {%- endmacro -%}
 
+      {#----------------------------------------------------------------------#}
+      {#-- Outputs name of a single hash key from the direct parent object. --#}
+      {#-- Usage: Node definition of Satellite v1                           --#}
+      {#----------------------------------------------------------------------#}
+      {%- macro get_source_hash_key_column() -%}
+           {%- set srcCols = sources[0].dependencies[0].columns -%}
+           {%- set result = namespace(name='') -%}
+           {% for srcHKCol in srcCols if srcHKCol.is_hk %}
+                {%- set result.name = srcHKCol.name -%}
+           {%- endfor -%}
+           {{- result.name -}}
+      {%- endmacro -%}
 
-
-
-
+      {#-------------------------------------------------------------------------#}
+      {#-- Outputs list of multi-active keys from the direct parent object     --#}
+      {#-- Usage: Node definition of multi-active satellite v1                 --#}
+      {#--   delimiter: delimiter character to be used in string concatenation --#}
+      {#-------------------------------------------------------------------------#}
+      {%- macro get_source_ma_keys(delimiter=',') -%}
+           {%- set srcCols = sources[0].dependencies[0].columns -%}
+           {%- set result = [] -%}
+           {% for srcMAKey in srcCols if srcMAKey.is_ma_key %}
+                {%- set result = result.append(srcMAKey.name) -%}
+           {%- endfor -%}
+           {{- result|join(delimiter) -}}
+      {%- endmacro -%}
 packages: {}
 projects:
   "1":
@@ -1302,7 +1416,7 @@ stepTypes:
         tagColor: '#AED6F1'
 
         config:
-        - groupName: Options
+        - groupName: Data Vault
           items:
           - type: materializationSelector
             default: view
@@ -1311,12 +1425,41 @@ stepTypes:
             isRequired: true
             enableIf: "false"
 
-        - groupName: Data Vault
-          items:
           - displayName: Generate Ghost Records
             attributeName: generate_ghost_records
             type: toggleButton
             default: true
+
+          - displayName: Contains Multi-active Data
+            attributeName: contains_multiactive_data
+            type: toggleButton
+            isRequired: false
+
+          - displayName: Hash Key Columns
+            type: columnSelector
+            enableIf: "{{ config.contains_multiactive_data }}"
+            attributeName: is_hk
+            isRequired: false
+
+          - displayName: Hash Difference Columns
+            type: columnSelector
+            enableIf: "{{ config.contains_multiactive_data }}"
+            attributeName: is_hd
+            isRequired: false
+
+        - groupName: Multi-Activity Config
+          enableIf: "{{ config.contains_multiactive_data }}"
+          items:
+          - displayName: Multi-active Key column
+            attributeName: multi_active_key
+            type: columnSelector
+            enableIf: "{{ config.contains_multiactive_data }}"
+            isRequired: false
+          - displayName: Main Hash Key column
+            attributeName: main_hk_col
+            type: columnDropdownSelector
+            enableIf: "{{ config.contains_multiactive_data }}"
+            isRequired: false
 
         systemColumns:
         - displayName: "LDTS"
@@ -1361,10 +1504,22 @@ stepTypes:
                 {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
                 AS
                 {% for source in sources %}
+                    {#-------------------- Process multi-activity config --------------------#}
+                    {#----------------------- FIXME explain variables -----------------------#}
+                    {%- set multi_active_key = [] -%}
+                    {%- set main_hashkey_col = namespace(hk_col='') -%}
+                    {%- if config.contains_multiactive_data -%}
+                        {%- for col in source.columns -%}
+                            {%- if col.multi_active_key -%}{%- set multi_active_key = multi_active_key.append(col.name) -%}{%- endif %}
+                            {%- if col.id == config.main_hk_col.id -%}{%- set main_hashkey_col.hk_col = col.name -%}{%- endif -%}
+                        {%- endfor -%}
+                    {%- endif %}
                     SELECT
                     {% for col in source.columns %}
+                        {#- Print DV hash calculations -#}
                         {% if col.hashDetails %}
-                            {{ datavault4coalesce__hash(columns=col.hashDetails.columns, datatype=col.dataType, algo=col.hashDetails.algorithm) }} AS "{{ col.name }}"
+                            {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=col.hashDetails.algorithm, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}"
+                        {#- Print other table columns -#}
                         {% else %}
                             {{ get_source_transform(col) }} AS "{{ col.name }}"
                         {% endif %}
@@ -1464,16 +1619,25 @@ stepTypes:
         - groupName: Data Vault
           items:
 
-          - displayName: Hub Hashkey Column
+          - displayName: Hub Hash Key column
             type: columnSelector
             attributeName: is_Hub_hk
             isRequired: true
-
+            enableIf: 'true'
+            
           - displayName: Hub LoadDateTimestamp Column
             enableIf: 'false'
             type: columnSelector
             attributeName: is_Hub_ldts
             isRequired: false
+
+          - displayName: Disable High-Water-Mark?
+            type: toggleButton
+            isRequired: false
+            enableIf: 'false'
+            attributeName: disable_hwm   
+            default: true
+            
       templates:
         create:
           templateString: |
@@ -1508,8 +1672,18 @@ stepTypes:
             {% for source in sources %}
 
               {{ stage('INSERT INTO Hub - ' ~ source.name) }}
-
+              
               {%- set hashkey_column = get_value_by_column_attribute("is_Hub_hk") -%}
+              
+              {#-- enable when ColumnDropDownSelector is used again
+              {%- if 'is_Hub_hk' not in config.keys() -%}
+
+              {%- else -%}
+                
+                {%- set hashkey_column = config.is_Hub_hk.name -%}
+              
+              {%- endif -%}
+              #}
 
               INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
               
@@ -1523,6 +1697,15 @@ stepTypes:
 
               {{ source.join }}
 
+                {% if not config.disable_hwm -%}
+                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                    SELECT 
+                        COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                    FROM {{ ref_no_link(node.location.name, node.name) }}
+                 WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                    )
+                {%- endif %}  
+
             ), 
 
             new_records AS (
@@ -1535,7 +1718,7 @@ stepTypes:
               (SELECT 1 
               FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
               WHERE 
-                "SRC"."{{ hashkey_column }}" = "TGT"."{{ hashkey_column }}")
+                "SRC"."{{ hashkey_column }}" = "TGT"."{{ hashkey_column }}")    
 
               QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
             )
@@ -1612,6 +1795,13 @@ stepTypes:
             type: columnSelector
             attributeName: is_Link_hk
             isRequired: true 
+
+          - displayName: Disable High-Water-Mark?
+            type: toggleButton
+            isRequired: false
+            enableIf: 'false'
+            attributeName: disable_hwm   
+            default: true    
       templates:
         create:
           templateString: |-
@@ -1648,7 +1838,10 @@ stepTypes:
                         
                 {{ stage('INSERT INTO Link - ' ~ source.name) }}
 
+                {#--USE AGAIN WHEN COLUMNDROPDOWNSELECTOR IS USED%- set link_hashkey = config.is_Link_hk.name -%#}
+
                 {%- set link_hashkey = get_value_by_column_attribute("is_Link_hk") -%}
+              
 
                 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
@@ -1661,6 +1854,15 @@ stepTypes:
                     {% endfor %}
 
                     {{ source.join }}
+
+                    
+                {% if not config.disable_hwm -%}
+                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                    SELECT 
+                        COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                    FROM {{ ref_no_link(node.location.name, node.name) }}
+                    )
+                {%- endif %}
                 ),
 
             new_records AS (
@@ -1673,6 +1875,7 @@ stepTypes:
                     FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
                     WHERE "SRC"."{{ link_hashkey }}" = "TGT"."{{ link_hashkey }}"
                 )
+
                 QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ link_hashkey }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
             )
 
@@ -1714,6 +1917,7 @@ stepTypes:
         plural: 'DATAVAULT BY SCALEFREE: SATELLITES V0'
         tagColor: 'Yellow'
 
+
         config:
         - groupName: Data Vault
           items:
@@ -1726,6 +1930,12 @@ stepTypes:
             type: columnSelector
             attributeName: is_hd
             isRequired: true
+
+          - displayName: Disable High-Water-Mark?
+            type: toggleButton
+            isRequired: true
+            attributeName: disable_hwm   
+            default: false    
 
           - displayName: Enable Tests
             attributeName: testsEnabled
@@ -1761,12 +1971,12 @@ stepTypes:
             )
             {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
         run:
-          templateString: |-
+          templateString: |+
             {% if config.preSQL %}
               {{ stage('Pre-SQL') }}
               {{ config.preSQL }}
             {% endif %}
-            
+
             {% for test in node.tests if config.testsEnabled %}
               {% if test.runOrder == 'Before' %}
                 {{ test_stage(test.name, test.continueOnFailure) }}
@@ -1776,17 +1986,25 @@ stepTypes:
 
             {{ stage('Insert New Rows') }}
             INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
             WITH latest_entries_in_sat AS (
+
+              {#/* USE THIS again when ColumnDropdownSelector is used!
+              {%- set hashkey_column = config.is_hk.name -%}
+              {%- set hashdiff_column = config.is_hd.name -%}
+              */#}
+
+              {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
+              {%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
+
               /* get current rows from satellite */
-              {% for col in columns if col.is_hk or col.is_hd %}
-                {%- if loop.first -%}SELECT {% endif %} 
-                "{{col.name}}"
-                {%- if not loop.last -%}, {% endif %}
-                {%- if loop.last %} 
-                  FROM {{ ref_no_link(node.location.name, node.name) }} 
-                  QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
-                {% endif %}
-              {% endfor %}
+              SELECT 
+                "{{ hashkey_column }}",
+                "{{ hashdiff_column }}"
+              FROM {{ ref_no_link(node.location.name, node.name) }} 
+              QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
+
+
             ),
 
             deduplicated_numbered_source AS (
@@ -1797,12 +2015,25 @@ stepTypes:
                 {% for col in source.columns %}
                   {{ get_source_transform(col) }} AS {{ col.name }},
                 {% endfor %}
-                    ROW_NUMBER() OVER(PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
+
+                    ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
+
                     
                     {{ source.join }}
+
+
+                {% if not config.disable_hwm -%}
+                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                  SELECT 
+                    COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                  FROM {{ ref_no_link(node.location.name, node.name) }}
+                  WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                  )
+                {%- endif %}  
+
                     QUALIFY
                     CASE
-                        WHEN "{{ get_value_by_column_attribute("is_hd") }}" = LAG("{{ get_value_by_column_attribute("is_hd") }}") OVER(PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
+                        WHEN "{{ hashdiff_column }}" = LAG("{{ hashdiff_column }}") OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
                         ELSE TRUE
                     END
 
@@ -1821,12 +2052,9 @@ stepTypes:
               WHERE NOT EXISTS (
                 SELECT 1 FROM latest_entries_in_sat
                 WHERE 
-                {% for col in source.columns if col.is_hk or col.is_hd %}
-                  {% if not loop.first %}
-                    AND
-                  {% endif %}
-                  deduplicated_numbered_source.{{ col.name }} = latest_entries_in_sat."{{ col.name }}"
-                {% endfor %}
+                  deduplicated_numbered_source."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
+                AND deduplicated_numbered_source."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
+
                     AND deduplicated_numbered_source.rn = 1
               )
 
@@ -1852,6 +2080,7 @@ stepTypes:
                 {% endfor %}
               {% endfor %}
             {% endif %}
+
     name: "Datavault by Scalefree: Satellite v0"
     version: 1
   StepType-9:
@@ -1876,13 +2105,6 @@ stepTypes:
             options:
             - view
 
-        - groupName: Data Vault
-          items:
-          - displayName: Hashkey Column
-            type: columnSelector
-            attributeName: is_hk
-            isRequired: true
-
         - groupName: Pre/Post SQL
           items:
           - displayName: Pre-SQL
@@ -1894,6 +2116,13 @@ stepTypes:
             attributeName: postSQL
             type: textBox
             isRequired: false
+
+        - groupName: Data Vault
+          items:
+          - displayName: Hashkey Column
+            type: columnSelector
+            attributeName: is_hk
+            isRequired: true    
 
         systemColumns:
         - displayName: "LEDTS"
@@ -1944,6 +2173,623 @@ stepTypes:
         run:
           templateString: ""
     name: "Datavault by Scalefree: Satellite v1"
+    version: 1
+  StepType-18:
+    id: "18"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: MULTI-ACTIVE SATELLITE V0'
+        short: 'SATMV0'
+        plural: 'DATAVAULT BY SCALEFREE: MULTI-ACTIVE SATELLITES V0'
+        tagColor: '#dfdf1f'
+
+        config:
+        - groupName: Data Vault
+          items:
+          - displayName: Hashkey Column
+            type: columnSelector
+            attributeName: is_hk
+            isRequired: true
+          
+          - displayName: Multi-Active Key Column
+            type: columnSelector
+            attributeName: is_ma_key
+            isRequired: true
+
+          - displayName: Hashdiff Column
+            type: columnSelector
+            attributeName: is_hd
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+      templates:
+        create:
+          templateString: |
+            {{ stage('Create Satellite Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+              {{ stage('Pre-SQL') }}
+              {{ config.preSQL }}
+            {% endif %}
+
+            {{ stage('Insert New Rows') }}
+
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
+            WITH latest_entries_in_sat AS (
+              /* get current rows from satellite */
+
+              {# /* USE THIS again when ColumnDropdownSelector is used
+              {%- set hashkey_column = config.is_hk.name -%}
+              {%- set hashdiff_column = config.is_hd.name -%} */ #}
+              
+              {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
+              {%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
+
+              SELECT 
+                "{{ hashkey_column }}",
+                "{{ hashdiff_column }}"
+
+              FROM {{ ref_no_link(node.location.name, node.name) }} 
+
+              QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
+
+            ),
+
+            deduplicated_numbered_source AS (
+                
+                {% for source in sources %}
+
+                    SELECT
+                {% for col in source.columns %}
+                  {{ get_source_transform(col) }} AS {{ col.name }},
+                {% endfor %}
+                    ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
+                    
+                    {{ source.join }}
+
+                {% if not config.disable_hwm -%}
+                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                  SELECT 
+                    COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                  FROM {{ ref_no_link(node.location.name, node.name) }}
+                  WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                  )
+                {% endif %}  
+
+                    QUALIFY
+                    CASE
+                        WHEN "{{ hashdiff_column }}" = LAG("{{ hashdiff_column }}") OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
+                        ELSE TRUE
+                    END
+
+                {% endfor %}
+
+            )
+
+              {% for source in sources %}
+                SELECT DISTINCT
+                {% for col in source.columns %}
+                  {{ col.name }}
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+
+                FROM deduplicated_numbered_source
+              WHERE NOT EXISTS (
+                SELECT 1 FROM latest_entries_in_sat
+                WHERE 
+                  deduplicated_numbered_source.{{ hashdiff_column }} = latest_entries_in_sat."{{ hashdiff_column }}"
+                AND deduplicated_numbered_source.{{ hashkey_column }} = latest_entries_in_sat."{{ hashkey_column }}"
+                    AND deduplicated_numbered_source.rn = 1
+              )
+
+              {% endfor %}
+
+            {% if config.postSQL %}
+              {{ stage('Post-SQL') }}
+              {{ config.postSQL }}
+            {% endif %}
+    name: "Datavault by Scalefree: Multi-active Satellite V0"
+    version: 1
+  StepType-21:
+    id: "21"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: MULTI-ACTIVE SATELLITE V1'
+        short: 'SATMV1'
+        plural: 'DATAVAULT BY SCALEFREE: MULTI-ACTIVE SATELLITES V1'
+        tagColor: '#e39103'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'true'
+            default: view
+            options:
+            - view
+        - groupName: Data Vault
+          items:
+          - displayName: Hashkey Column
+            type: columnSelector
+            attributeName: is_hk
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LEDTS"
+          transform: |-
+            COALESCE(LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+            OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}", "{{ get_source_ma_keys(delimiter=',') }}"  
+            ORDER BY "{{ datavault4coalesce.config.ldts_alias }}"), {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: is_system_ledts
+        - displayName: "IS_CURRENT"
+          transform: |-
+            CASE 
+              WHEN 
+                LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+                OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}", "{{ get_source_ma_keys(delimiter=',') }}"
+                ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
+              THEN TRUE 
+              ELSE FALSE 
+            END
+          dataType: BOOLEAN
+          placement: end
+          attributeName: is_system_current_col
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Satellite View') }}
+
+            CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                   "{{ col.name }}"
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+            )
+              {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+            AS
+            {% for source in sources %}
+                SELECT
+                {% for col in source.columns %}
+                    {{ get_source_transform(col) }} AS "{{ col.name }}"
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+                {{ source.join }}
+            {% endfor %}
+        run:
+          templateString: ""
+    name: "Datavault by Scalefree: Multi-active Satellite v1"
+    version: 1
+  StepType-23:
+    id: "23"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: NON-HISTORIZED LINK'
+        short: 'NHLINK'
+        tagColor: '#F88379'
+        plural: 'DATAVAULT BY SCALEFREE: NON-HISTORIZED LINKS'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+            
+          - type: multisourceToggle
+          
+        - groupName: Data Vault
+          items:
+          - displayName: Link Hashkey Column
+            type: columnSelector
+            attributeName: is_Link_hk
+            isRequired: true 
+          - displayName: Source is Single Batch?
+            type: toggleButton
+            isRequired: true
+            attributeName: source_is_single_batch
+            default: false
+          - displayName: Disable High-Water-Mark?
+            type: toggleButton
+            isRequired: false
+            enableIf: 'false'
+            attributeName: disable_hwm   
+            default: true
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Link Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                    "{{ col.name }}" {{ col.dataType }}
+                    {%- if not col.nullable %} NOT NULL
+                        {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                    {% endif %}
+                    {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+
+            {% endif %}
+
+            {% for source in sources %}
+                        
+                {{ stage('INSERT INTO Non-Historized Link - ' ~ source.name) }}
+
+                {#--USE AGAIN WHEN COLUMNDROPDOWNSELECTOR IS USED  set link_hashkey = config.is_Link_hk.name -#}
+                {%- set link_hashkey = get_value_by_column_attribute("is_Link_hk") -%}
+
+                INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
+            WITH incoming AS 
+                (
+                    SELECT DISTINCT
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+                ),
+
+            new_records AS (
+                SELECT
+                    "SRC".*
+                FROM incoming "SRC"
+                WHERE NOT EXISTS (
+                    SELECT
+                        1
+                    FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
+                    WHERE "SRC"."{{ link_hashkey }}" = "TGT"."{{ link_hashkey }}"
+                )
+
+                {% if not config.disable_hwm -%}
+                AND "SRC"."{{ datavault4coalesce.config.ldts_alias }}" > (
+                    SELECT 
+                        COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                    FROM {{ ref_no_link(node.location.name, node.name) }}
+                    WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                    )
+                {%- endif %}
+
+                {% if not config.source_is_single_batch %}
+                QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ link_hashkey }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
+                {%- endif %}
+            )
+
+            SELECT * FROM new_records
+
+            {% endfor %}
+
+            {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}    
+            {% endif %}
+    name: "Datavault by Scalefree: Non-Historized Link"
+    version: 1
+  StepType-24:
+    id: "24"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: NON-HISTORIZED SATELLITE'
+        short: 'NHSAT'
+        plural: 'DATAVAULT BY SCALEFREE: NON-HISTORIZED SATELLITES'
+        tagColor: '#FFFF8F'
+
+        config:
+        - groupName: Data Vault
+          items:
+          - displayName: Hashkey Column
+            type: columnSelector
+            attributeName: is_hk
+            isRequired: true
+
+          - displayName: Source is Single Batch?
+            type: toggleButton
+            isRequired: true
+            attributeName: source_is_single_batch
+            default: false
+            
+          - displayName: Disable High-Water-Mark?
+            type: toggleButton
+            isRequired: true
+            attributeName: disable_hwm   
+            default: false
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+      templates:
+        create:
+          templateString: |
+            {{ stage('Create Satellite Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+
+            {% endif %}
+
+            {% for source in sources %}
+                        
+                {{ stage('INSERT INTO Non-Historized Satellite - ' ~ source.name) }}
+
+                {#%-- USE again when ColumnDropdownSelector is used! set link_hashkey = config.is_hk.name -%#}
+                {%- set link_hashkey = get_value_by_column_attribute("is_hk") -%}
+
+                INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
+            WITH incoming AS 
+                (
+                    SELECT DISTINCT
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+                    
+                    {% if not config.disable_hwm -%}
+                    WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                        SELECT 
+                            COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}) 
+                        FROM {{ ref_no_link(node.location.name, node.name) }}
+                  WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                        )
+                    {%- endif %}
+
+                    {% if not config.source_is_single_batch %}
+                    QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ link_hashkey }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
+                    {%- endif %}
+
+                ),
+
+            new_records AS (
+                SELECT
+                    "SRC".*
+                FROM incoming "SRC"
+                WHERE NOT EXISTS (
+                    SELECT
+                        1
+                    FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
+                    WHERE "SRC"."{{ link_hashkey }}" = "TGT"."{{ link_hashkey }}"
+                )
+            )
+
+            SELECT * FROM new_records
+
+            {% endfor %}
+
+            {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}    
+            {% endif %}
+    name: "Datavault by Scalefree: Non-Historized Satellite"
+    version: 1
+  StepType-27:
+    id: "27"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: RECORD TRACKING SATELLITE'
+        short: 'RTS'
+        plural: 'DATAVAULT BY SCALEFREE: RECORD TRACKING SATELLITES'
+        tagColor: 'gold'
+
+        joinTemplate: |-
+          FROM {{ ref_raw(sources[0].dependencies[0].node.location.name,sources[0].dependencies[0].node.name) }} "{{ sources[0].dependencies[0].node.name }}"
+          WHERE "{{ sources[0].dependencies[0].node.name }}"."{{ datavault4coalesce.config.ldts_alias }}" > 
+          (SELECT COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),{{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+          FROM {{ this }}
+          WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
+        config:
+        - groupName: Data Vault
+          items:
+          - displayName: Hashkey Column
+            type: columnDropdownSelector
+            attributeName: is_hk
+            isRequired: false
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "STG"
+          transform: "'{{ sources[0].dependencies[0].node.location.name }}.{{ sources[0].dependencies[0].node.name }}'"
+          dataType: STRING
+          placement: end
+          attributeName: is_stg    
+          description: "The Stage (STG) references the exact source of this data, specific for record tracking."
+      templates:
+        create:
+          templateString: |
+            {{ stage('Create Record Tracking Satellite Table') }}
+            
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+              {{ stage('Pre-SQL') }}
+              {{ config.preSQL }}
+            {% endif %}
+            
+            
+            {%- set hashkey_column = config.is_hk.name -%}
+            
+            {{ stage('Insert New Rows') }}
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+            WITH distinct_concated_target AS (
+                    SELECT
+                    CONCAT_WS('||',
+                    "{{ hashkey_column }}",
+                    "{{ datavault4coalesce.config.ldts_alias }}",
+                    "{{ datavault4coalesce.config.rsrc_alias }}"
+                    ) AS "concat"
+                    FROM {{ this }}
+                ),
+              {% for source in sources %}
+                src_new_{{ loop.index }} AS (
+                        SELECT DISTINCT
+                            "{{ hashkey_column }}",
+                            "{{ datavault4coalesce.config.ldts_alias }}",
+                            "{{ datavault4coalesce.config.rsrc_alias }}",
+                        {%- for col in source.columns if col.is_stg -%}
+                            {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- endfor %}
+                        {{ source.join }}
+                    ),
+                {% endfor %}
+                records_to_insert AS (
+                {% for source in sources %}
+                
+                SELECT
+                        "{{ hashkey_column }}",
+                        "{{ datavault4coalesce.config.ldts_alias }}",
+                        "{{ datavault4coalesce.config.rsrc_alias }}",
+                        "{{ datavault4coalesce.config.stg_alias }}" 
+                    FROM src_new_{{ loop.index }}
+                    WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                    AND "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}
+                        AND CONCAT_WS('||',
+                            "{{ hashkey_column }}",
+                            "{{ datavault4coalesce.config.ldts_alias }}",
+                            "{{ datavault4coalesce.config.rsrc_alias }}"
+                            ) NOT IN (SELECT "concat" FROM distinct_concated_target)
+                    {% if not loop.last %}UNION ALL{% endif %}
+                {% endfor %}
+                    
+                )
+            SELECT
+                {%- for col in columns %}
+                    "{{ col.name }}"
+                    {%- if not loop.last %},{% endif %}
+                {%- endfor -%}
+            FROM records_to_insert
+            
+            {% if config.postSQL %}
+              {{ stage('Post-SQL') }}
+              {{ config.postSQL }}
+            {% endif %}
+    name: "Datavault by Scalefree: Record-Tracking Satellite"
     version: 1
   StepType-Dimension:
     id: Dimension
