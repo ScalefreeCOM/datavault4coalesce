@@ -7,6 +7,8 @@
 The following documentation sheds some light on the node types that have been developed by Scalefree to make your Coalesce-Experience more comfortable!
 The documentation can be found by clicking the links in the sidebar on the right side. In the documentation, the macros and their parameters are explained and further exemplified.
 
+> **_NOTE:_**  Coalesce has released a Hands-On Guide for using Datavault4Coalesce. Check it our [here](https://guides.coalesce.io/data-vault/index.html#0)!
+
 ### Included node types
 - Staging Area 
 - Hubs, Links & Satellites 
