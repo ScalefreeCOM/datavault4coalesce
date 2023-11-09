@@ -1,14 +1,7 @@
 defaultStorageMapping: CORE
+installedPackages: {}
 jobs: {}
-locations:
-  CORE:
-    mappingDefinitions: {}
-  EXTERNAL_TABLES:
-    mappingDefinitions: {}
-  RAW_STAGE:
-    mappingDefinitions: {}
-  TPCH_SF1:
-    mappingDefinitions: {}
+locations: {}
 macros:
   Macro-1:
     id: "1"
@@ -558,9 +551,7 @@ macros:
            {{- result|join(delimiter) -}}
       {%- endmacro -%}
 packages: {}
-projects:
-  "1":
-    name: SCALEFREE-DATAVAULT4COALESCE
+projects: {}
 stepTypes:
   StepType-12:
     id: "12"
@@ -616,7 +607,7 @@ stepTypes:
               {{ stage('Pre-SQL') }}
               {{ config.preSQL }}
             {% endif %}
-            
+
             {% for test in node.tests if config.testsEnabled %}
               {% if test.runOrder == 'Before' %}
                 {{ test_stage(test.name, test.continueOnFailure) }}
@@ -898,7 +889,7 @@ stepTypes:
                 {{ test.templateString }}
               {% endif %}
             {% endfor %}
-            
+
             {{ stage('Insert New Rows') }}
 
             {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
@@ -1403,777 +1394,6 @@ stepTypes:
           templateString: ""
     name: "Datavault by Scalefree: Snapshot v1"
     version: 1
-  StepType-4:
-    id: "4"
-    isDisabled: false
-    metadata:
-      defaultStorageLocation: null
-      error: null
-      nodeMetadataSpec: |-
-        capitalized: 'DATAVAULT BY SCALEFREE: STAGE'
-        short: DVSTG
-        plural: 'DATAVAULT BY SCALEFREE: STAGES'
-        tagColor: '#AED6F1'
-
-        config:
-        - groupName: Data Vault
-          items:
-          - type: materializationSelector
-            default: view
-            options:
-            - view
-            isRequired: true
-            enableIf: "false"
-
-          - displayName: Generate Ghost Records
-            attributeName: generate_ghost_records
-            type: toggleButton
-            default: true
-
-          - displayName: Contains Multi-active Data
-            attributeName: contains_multiactive_data
-            type: toggleButton
-            isRequired: false
-
-          - displayName: Hash Key Columns
-            type: columnSelector
-            enableIf: "{{ config.contains_multiactive_data }}"
-            attributeName: is_hk
-            isRequired: false
-
-          - displayName: Hash Difference Columns
-            type: columnSelector
-            enableIf: "{{ config.contains_multiactive_data }}"
-            attributeName: is_hd
-            isRequired: false
-
-        - groupName: Multi-Activity Config
-          enableIf: "{{ config.contains_multiactive_data }}"
-          items:
-          - displayName: Multi-active Key column
-            attributeName: multi_active_key
-            type: columnSelector
-            enableIf: "{{ config.contains_multiactive_data }}"
-            isRequired: false
-          - displayName: Main Hash Key column
-            attributeName: main_hk_col
-            type: columnDropdownSelector
-            enableIf: "{{ config.contains_multiactive_data }}"
-            isRequired: false
-
-        systemColumns:
-        - displayName: "LDTS"
-          transform: SYSDATE()
-          dataType: TIMESTAMP
-          placement: end
-          attributeName: is_system_ldts    
-          description: "The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse."
-        - displayName: "RSRC"
-          transform: "{{record_source()}}"
-          dataType: STRING
-          placement: end
-          attributeName: is_system_rsrc    
-          description: "The Record Source (RSRC) describes the source of this data."  
-      templates:
-        create:
-          templateString: |-
-            {% if node.override.create.enabled %}
-              
-              {{ node.override.create.script }}
-
-            {% elif node.materializationType == 'table' %}
-
-            {% elif node.materializationType == 'view' %}
-                {{ stage('Create Stage View') }}
-
-                CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
-                (
-                    {% for col in columns %}
-                        {%- if col.is_rsrc_column -%}
-                            "{{datavault4coalesce.config.rsrc_alias}}"
-                        {%- elif col.is_ldts_column -%}
-                            "{{datavault4coalesce.config.ldts_alias}}"
-                        {% else %}
-                            "{{ col.name }}"
-                        {% endif %}
-                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-                        {%- if not loop.last -%}, {% endif %}
-                    {% endfor %}
-
-                )
-                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-                AS
-                {% for source in sources %}
-                    {#-------------------- Process multi-activity config --------------------#}
-                    {#----------------------- FIXME explain variables -----------------------#}
-                    {%- set multi_active_key = [] -%}
-                    {%- set main_hashkey_col = namespace(hk_col='') -%}
-                    {%- if config.contains_multiactive_data -%}
-                        {%- for col in source.columns -%}
-                            {%- if col.multi_active_key -%}{%- set multi_active_key = multi_active_key.append(col.name) -%}{%- endif %}
-                            {%- if col.id == config.main_hk_col.id -%}{%- set main_hashkey_col.hk_col = col.name -%}{%- endif -%}
-                        {%- endfor -%}
-                    {%- endif %}
-                    SELECT
-                    {% for col in source.columns %}
-                        {#- Print DV hash calculations -#}
-                        {% if col.hashDetails %}
-                            {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=col.hashDetails.algorithm, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}"
-                        {#- Print other table columns -#}
-                        {% else %}
-                            {{ get_source_transform(col) }} AS "{{ col.name }}"
-                        {% endif %}
-                        {%- if not loop.last -%}, {% endif %}
-                    {% endfor %}
-
-                    {{ source.join }}
-
-                    {% if not loop.last %}
-                        {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
-                            {{ config.insertStrategy }}
-                        {% else %}
-                            UNION
-                        {% endif %}
-                    {% endif %}
-
-                    {%- if config.generate_ghost_records -%}
-
-                        UNION ALL 
-
-                        SELECT
-
-                        {% for source in sources %}
-                            {% for col in source.columns %}
-                                {%- if "hashDetails" in col.keys() %}
-                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true, hash_algo=col.hashDetails.algorithm) }}
-                                {%- else -%}
-                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=false) }}
-                                {%- endif -%}
-                            {% if not loop.last %},{% endif %}
-                            {% endfor %}
-                        {% endfor %}
-
-                        UNION ALL 
-
-                        SELECT
-
-                        {% for source in sources %}
-                            {% for col in source.columns %}
-                                {%- if "hashDetails" in col.keys() %}
-                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true, hash_algo=col.hashDetails.algorithm) }}
-                                {%- else -%}
-                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=false) }}
-                                {%- endif -%}
-                            {% if not loop.last %},{% endif %}
-                            {% endfor %}
-                        {% endfor %}
-
-                    {%- endif -%}
-
-                {% endfor %}
-
-            {% endif %}
-        run:
-          templateString: ""
-    name: "Datavault by Scalefree: Stage"
-    version: 1
-  StepType-6:
-    id: "6"
-    isDisabled: false
-    metadata:
-      defaultStorageLocation: null
-      error: null
-      nodeMetadataSpec: |-
-        capitalized: 'DATAVAULT BY SCALEFREE: HUB'
-        short: 'HUB'
-        tagColor: blue
-        plural: 'DATAVAULT BY SCALEFREE: HUBS'
-
-        config:
-        - groupName: Options
-          items:
-          - type: materializationSelector
-            isRequired: true
-            enableIf: 'true'
-            options: 
-            - table
-            default: table
-         
-          - displayName: Pre-SQL
-            attributeName: preSQL
-            type: textBox
-            isRequired: false
-
-          - displayName: Post-SQL
-            attributeName: postSQL
-            type: textBox
-            isRequired: false
-
-          - displayName: Enable Tests
-            attributeName: testsEnabled
-            type: toggleButton
-            default: true
-
-          - type: multisourceToggle
-
-        - groupName: Data Vault
-          items:
-
-          - displayName: Hub Hash Key column
-            type: columnSelector
-            attributeName: is_Hub_hk
-            isRequired: true
-            enableIf: 'true'
-            
-          - displayName: Hub LoadDateTimestamp Column
-            enableIf: 'false'
-            type: columnSelector
-            attributeName: is_Hub_ldts
-            isRequired: false
-
-          - displayName: Disable High-Water-Mark?
-            type: toggleButton
-            isRequired: false
-            enableIf: 'false'
-            attributeName: disable_hwm   
-            default: true
-            
-      templates:
-        create:
-          templateString: |
-            {{ stage('Create Hub Table') }}
-
-            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            (
-              {% for col in columns %}
-                "{{ col.name }}" {{ col.dataType }}
-                {%- if not col.nullable %} NOT NULL
-                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-                {% endif %}
-                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-                {%- if not loop.last -%}, {% endif %}
-              {% endfor %}
-            )
-            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-        run:
-          templateString: |-
-            {% if config.preSQL %}
-              {{ stage('Pre-SQL') }}
-              {{ config.preSQL }}
-            {% endif %}
-            
-            {% for test in node.tests if config.testsEnabled %}
-              {% if test.runOrder == 'Before' %}
-                {{ test_stage(test.name, test.continueOnFailure) }}
-                {{ test.templateString }}
-              {% endif %}
-            {% endfor %}
-
-            {% for source in sources %}
-
-              {{ stage('INSERT INTO Hub - ' ~ source.name) }}
-              
-              {%- set hashkey_column = get_value_by_column_attribute("is_Hub_hk") -%}
-              
-              {#-- enable when ColumnDropDownSelector is used again
-              {%- if 'is_Hub_hk' not in config.keys() -%}
-
-              {%- else -%}
-                
-                {%- set hashkey_column = config.is_Hub_hk.name -%}
-              
-              {%- endif -%}
-              #}
-
-              INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-              
-            WITH incoming AS (
-
-              SELECT DISTINCT
-              {% for col in source.columns %}
-                {{ get_source_transform(col) }} AS "{{ col.name }}"
-                {%- if not loop.last -%}, {% endif %}
-              {% endfor %}
-
-              {{ source.join }}
-
-                {% if not config.disable_hwm -%}
-                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
-                    SELECT 
-                        COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
-                    FROM {{ ref_no_link(node.location.name, node.name) }}
-                 WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
-                    )
-                {%- endif %}  
-
-            ), 
-
-            new_records AS (
-
-              SELECT 
-              "SRC".* 
-              FROM incoming "SRC"
-              WHERE NOT EXISTS 
-
-              (SELECT 1 
-              FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
-              WHERE 
-                "SRC"."{{ hashkey_column }}" = "TGT"."{{ hashkey_column }}")    
-
-              QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
-            )
-
-
-              SELECT * FROM new_records
-
-            {% endfor %}
-
-            {% if config.postSQL %}
-              {{ stage('Post-SQL') }}
-              {{ config.postSQL }}
-            {% endif %}
-
-            {% if config.testsEnabled %}
-              {% for test in node.tests %}
-                {% if test.runOrder == 'After' %}
-                  {{ test_stage(test.name, test.continueOnFailure) }}
-                  {{ test.templateString }}
-                    {% endif %}
-              {% endfor %}
-
-              {% for column in columns %}
-                {% for test in column.tests %}
-                  {{ test_stage(column.name + ": " + test.name) }}
-                  {{ test.templateString }}
-                {% endfor %}
-              {% endfor %}
-            {% endif %}
-    name: "Datavault by Scalefree: Hub"
-    version: 1
-  StepType-7:
-    id: "7"
-    isDisabled: false
-    metadata:
-      defaultStorageLocation: null
-      error: null
-      nodeMetadataSpec: |-
-        capitalized: 'DATAVAULT BY SCALEFREE: LINK'
-        short: 'LINK'
-        tagColor: 'Red'
-        plural: 'DATAVAULT BY SCALEFREE: LINKS'
-
-        config:
-        - groupName: Options
-          items:
-          - type: materializationSelector
-            isRequired: true
-            enableIf: 'false'
-            default: table
-            options:
-            - table
-
-          - displayName: Pre-SQL
-            attributeName: preSQL
-            type: textBox
-            isRequired: false
-
-          - displayName: Post-SQL
-            attributeName: postSQL
-            type: textBox
-            isRequired: false
-
-          - displayName: Enable Tests
-            attributeName: testsEnabled
-            type: toggleButton
-            default: true
-            
-          - type: multisourceToggle
-          
-        - groupName: Data Vault
-          items:
-          - displayName: Link Hashkey Column
-            type: columnSelector
-            attributeName: is_Link_hk
-            isRequired: true 
-
-          - displayName: Disable High-Water-Mark?
-            type: toggleButton
-            isRequired: false
-            enableIf: 'false'
-            attributeName: disable_hwm   
-            default: true    
-      templates:
-        create:
-          templateString: |-
-            {{ stage('Create Link Table') }}
-
-            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            (
-                {% for col in columns %}
-                    "{{ col.name }}" {{ col.dataType }}
-                    {%- if not col.nullable %} NOT NULL
-                        {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-                    {% endif %}
-                    {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-                    {%- if not loop.last -%}, {% endif %}
-                {% endfor %}
-            )
-            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-        run:
-          templateString: |-
-            {% if config.preSQL %}
-                {{ stage('Pre-SQL') }}
-                {{ config.preSQL }}
-
-            {% endif %}
-            
-            {% for test in node.tests if config.testsEnabled %}
-              {% if test.runOrder == 'Before' %}
-                {{ test_stage(test.name, test.continueOnFailure) }}
-                {{ test.templateString }}
-              {% endif %}
-            {% endfor %}
-
-            {% for source in sources %}
-                        
-                {{ stage('INSERT INTO Link - ' ~ source.name) }}
-
-                {#--USE AGAIN WHEN COLUMNDROPDOWNSELECTOR IS USED%- set link_hashkey = config.is_Link_hk.name -%#}
-
-                {%- set link_hashkey = get_value_by_column_attribute("is_Link_hk") -%}
-              
-
-                INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-
-            WITH incoming AS 
-                (
-                    SELECT DISTINCT
-                    {% for col in source.columns %}
-                        {{ get_source_transform(col) }} AS "{{ col.name }}"
-                        {%- if not loop.last -%}, {% endif %}
-                    {% endfor %}
-
-                    {{ source.join }}
-
-                    
-                {% if not config.disable_hwm -%}
-                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
-                    SELECT 
-                        COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
-                    FROM {{ ref_no_link(node.location.name, node.name) }}
-                    )
-                {%- endif %}
-                ),
-
-            new_records AS (
-                SELECT
-                    "SRC".*
-                FROM incoming "SRC"
-                WHERE NOT EXISTS (
-                    SELECT
-                        1
-                    FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
-                    WHERE "SRC"."{{ link_hashkey }}" = "TGT"."{{ link_hashkey }}"
-                )
-
-                QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ link_hashkey }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
-            )
-
-            SELECT * FROM new_records
-
-            {% endfor %}
-
-            {% if config.postSQL %}
-                {{ stage('Post-SQL') }}
-                {{ config.postSQL }}    
-            {% endif %}
-
-            {% if config.testsEnabled %}
-              {% for test in node.tests %}
-                {% if test.runOrder == 'After' %}
-                  {{ test_stage(test.name, test.continueOnFailure) }}
-                  {{ test.templateString }}
-                    {% endif %}
-              {% endfor %}
-
-              {% for column in columns %}
-                {% for test in column.tests %}
-                  {{ test_stage(column.name + ": " + test.name) }}
-                  {{ test.templateString }}
-                {% endfor %}
-              {% endfor %}
-            {% endif %}
-    name: "Datavault by Scalefree: Link"
-    version: 1
-  StepType-8:
-    id: "8"
-    isDisabled: false
-    metadata:
-      defaultStorageLocation: null
-      error: null
-      nodeMetadataSpec: |-
-        capitalized: 'DATAVAULT BY SCALEFREE: SATELLITE V0'
-        short: 'SATV0'
-        plural: 'DATAVAULT BY SCALEFREE: SATELLITES V0'
-        tagColor: 'Yellow'
-
-
-        config:
-        - groupName: Data Vault
-          items:
-          - displayName: Hashkey Column
-            type: columnSelector
-            attributeName: is_hk
-            isRequired: true
-
-          - displayName: Hashdiff Column
-            type: columnSelector
-            attributeName: is_hd
-            isRequired: true
-
-          - displayName: Disable High-Water-Mark?
-            type: toggleButton
-            isRequired: true
-            attributeName: disable_hwm   
-            default: false    
-
-          - displayName: Enable Tests
-            attributeName: testsEnabled
-            type: toggleButton
-            default: true
-
-        - groupName: Pre/Post SQL
-          items:
-          - displayName: Pre-SQL
-            attributeName: preSQL
-            type: textBox
-            isRequired: false
-
-          - displayName: Post-SQL
-            attributeName: postSQL
-            type: textBox
-            isRequired: false
-      templates:
-        create:
-          templateString: |
-            {{ stage('Create Satellite Table') }}
-
-            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-            (
-              {% for col in columns %}
-                "{{ col.name }}" {{ col.dataType }}
-                {%- if not col.nullable %} NOT NULL
-                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-                {% endif %}
-                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-                {%- if not loop.last -%}, {% endif %}
-              {% endfor %}
-            )
-            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-        run:
-          templateString: |+
-            {% if config.preSQL %}
-              {{ stage('Pre-SQL') }}
-              {{ config.preSQL }}
-            {% endif %}
-
-            {% for test in node.tests if config.testsEnabled %}
-              {% if test.runOrder == 'Before' %}
-                {{ test_stage(test.name, test.continueOnFailure) }}
-                {{ test.templateString }}
-              {% endif %}
-            {% endfor %}
-
-            {{ stage('Insert New Rows') }}
-            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-
-            WITH latest_entries_in_sat AS (
-
-              {#/* USE THIS again when ColumnDropdownSelector is used!
-              {%- set hashkey_column = config.is_hk.name -%}
-              {%- set hashdiff_column = config.is_hd.name -%}
-              */#}
-
-              {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
-              {%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
-
-              /* get current rows from satellite */
-              SELECT 
-                "{{ hashkey_column }}",
-                "{{ hashdiff_column }}"
-              FROM {{ ref_no_link(node.location.name, node.name) }} 
-              QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
-
-
-            ),
-
-            deduplicated_numbered_source AS (
-                
-                {% for source in sources %}
-
-                    SELECT
-                {% for col in source.columns %}
-                  {{ get_source_transform(col) }} AS {{ col.name }},
-                {% endfor %}
-
-                    ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
-
-                    
-                    {{ source.join }}
-
-
-                {% if not config.disable_hwm -%}
-                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
-                  SELECT 
-                    COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
-                  FROM {{ ref_no_link(node.location.name, node.name) }}
-                  WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
-                  )
-                {%- endif %}  
-
-                    QUALIFY
-                    CASE
-                        WHEN "{{ hashdiff_column }}" = LAG("{{ hashdiff_column }}") OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
-                        ELSE TRUE
-                    END
-
-                {% endfor %}
-
-            )
-
-              {% for source in sources %}
-                SELECT DISTINCT
-                {% for col in source.columns %}
-                  {{ col.name }}
-                  {%- if not loop.last -%}, {% endif %}
-                {% endfor %}
-
-                FROM deduplicated_numbered_source
-              WHERE NOT EXISTS (
-                SELECT 1 FROM latest_entries_in_sat
-                WHERE 
-                  deduplicated_numbered_source."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
-                AND deduplicated_numbered_source."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
-
-                    AND deduplicated_numbered_source.rn = 1
-              )
-
-              {% endfor %}
-
-            {% if config.postSQL %}
-              {{ stage('Post-SQL') }}
-              {{ config.postSQL }}
-            {% endif %}
-
-            {% if config.testsEnabled %}
-              {% for test in node.tests %}
-                {% if test.runOrder == 'After' %}
-                  {{ test_stage(test.name, test.continueOnFailure) }}
-                  {{ test.templateString }}
-                    {% endif %}
-              {% endfor %}
-
-              {% for column in columns %}
-                {% for test in column.tests %}
-                  {{ test_stage(column.name + ": " + test.name) }}
-                  {{ test.templateString }}
-                {% endfor %}
-              {% endfor %}
-            {% endif %}
-
-    name: "Datavault by Scalefree: Satellite v0"
-    version: 1
-  StepType-9:
-    id: "9"
-    isDisabled: false
-    metadata:
-      defaultStorageLocation: null
-      error: null
-      nodeMetadataSpec: |-
-        capitalized: 'DATAVAULT BY SCALEFREE: SATELLITE V1'
-        short: 'SATV1'
-        plural: 'DATAVAULT BY SCALEFREE: SATELLITES V1'
-        tagColor: '#FFAC1C'
-
-        config:
-        - groupName: Options
-          items:
-          - type: materializationSelector
-            isRequired: true
-            enableIf: 'true'
-            default: view
-            options:
-            - view
-
-        - groupName: Pre/Post SQL
-          items:
-          - displayName: Pre-SQL
-            attributeName: preSQL
-            type: textBox
-            isRequired: false
-
-          - displayName: Post-SQL
-            attributeName: postSQL
-            type: textBox
-            isRequired: false
-
-        - groupName: Data Vault
-          items:
-          - displayName: Hashkey Column
-            type: columnSelector
-            attributeName: is_hk
-            isRequired: true    
-
-        systemColumns:
-        - displayName: "LEDTS"
-          transform: |-
-            COALESCE(LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
-            OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" 
-            ORDER BY "{{ datavault4coalesce.config.ldts_alias }}"), {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
-          dataType: TIMESTAMP
-          placement: end
-          attributeName: is_system_ledts
-        - displayName: "IS_CURRENT"
-          transform: |-
-            CASE 
-              WHEN 
-                LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
-                OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" 
-                ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
-              THEN TRUE 
-              ELSE FALSE 
-            END
-          dataType: BOOLEAN
-          placement: end
-          attributeName: is_system_current_col
-      templates:
-        create:
-          templateString: |-
-            {{ stage('Create Satellite View') }}
-
-            CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
-            (
-                {% for col in columns %}
-                   "{{ col.name }}"
-                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
-                    {%- if not loop.last -%}, {% endif %}
-                {% endfor %}
-            )
-              {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-
-            AS
-            {% for source in sources %}
-                SELECT
-                {% for col in source.columns %}
-                    {{ get_source_transform(col) }} AS "{{ col.name }}"
-                    {%- if not loop.last -%}, {% endif %}
-                {% endfor %}
-                {{ source.join }}
-            {% endfor %}
-        run:
-          templateString: ""
-    name: "Datavault by Scalefree: Satellite v1"
-    version: 1
   StepType-18:
     id: "18"
     isDisabled: false
@@ -2282,8 +1502,9 @@ stepTypes:
                   FROM {{ ref_no_link(node.location.name, node.name) }}
                   WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
                   )
+                  OR "{{ hashkey_column }}" = {{ datavault4coalesce__unknown_key() }}
+                  OR "{{ hashkey_column }}" = {{ datavault4coalesce__error_key() }}
                 {% endif %}  
-
                     QUALIFY
                     CASE
                         WHEN "{{ hashdiff_column }}" = LAG("{{ hashdiff_column }}") OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
@@ -2712,7 +1933,7 @@ stepTypes:
         create:
           templateString: |
             {{ stage('Create Record Tracking Satellite Table') }}
-            
+
             CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
             (
               {% for col in columns %}
@@ -2731,10 +1952,10 @@ stepTypes:
               {{ stage('Pre-SQL') }}
               {{ config.preSQL }}
             {% endif %}
-            
-            
+
+
             {%- set hashkey_column = config.is_hk.name -%}
-            
+
             {{ stage('Insert New Rows') }}
             INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
             WITH distinct_concated_target AS (
@@ -2784,12 +2005,783 @@ stepTypes:
                     {%- if not loop.last %},{% endif %}
                 {%- endfor -%}
             FROM records_to_insert
-            
+
             {% if config.postSQL %}
               {{ stage('Post-SQL') }}
               {{ config.postSQL }}
             {% endif %}
     name: "Datavault by Scalefree: Record-Tracking Satellite"
+    version: 1
+  StepType-4:
+    id: "4"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: STAGE'
+        short: DVSTG
+        plural: 'DATAVAULT BY SCALEFREE: STAGES'
+        tagColor: '#AED6F1'
+
+        config:
+        - groupName: Data Vault
+          items:
+          - type: materializationSelector
+            default: view
+            options:
+            - view
+            isRequired: true
+            enableIf: "false"
+
+          - displayName: Generate Ghost Records
+            attributeName: generate_ghost_records
+            type: toggleButton
+            default: true
+
+          - displayName: Contains Multi-active Data
+            attributeName: contains_multiactive_data
+            type: toggleButton
+            isRequired: false
+
+          - displayName: Hash Key Columns
+            type: columnSelector
+            enableIf: "{{ config.contains_multiactive_data }}"
+            attributeName: is_hk
+            isRequired: false
+
+          - displayName: Hash Difference Columns
+            type: columnSelector
+            enableIf: "{{ config.contains_multiactive_data }}"
+            attributeName: is_hd
+            isRequired: false
+
+        - groupName: Multi-Activity Config
+          enableIf: "{{ config.contains_multiactive_data }}"
+          items:
+          - displayName: Multi-active Key column
+            attributeName: multi_active_key
+            type: columnSelector
+            enableIf: "{{ config.contains_multiactive_data }}"
+            isRequired: false
+          - displayName: Main Hash Key column
+            attributeName: main_hk_col
+            type: columnDropdownSelector
+            enableIf: "{{ config.contains_multiactive_data }}"
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LDTS"
+          transform: SYSDATE()
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: is_system_ldts    
+          description: "The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse."
+        - displayName: "RSRC"
+          transform: "{{record_source()}}"
+          dataType: STRING
+          placement: end
+          attributeName: is_system_rsrc    
+          description: "The Record Source (RSRC) describes the source of this data."  
+      templates:
+        create:
+          templateString: |-
+            {% if node.override.create.enabled %}
+              
+              {{ node.override.create.script }}
+
+            {% elif node.materializationType == 'table' %}
+
+            {% elif node.materializationType == 'view' %}
+                {{ stage('Create Stage View') }}
+
+                CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+                (
+                    {% for col in columns %}
+                        {%- if col.is_rsrc_column -%}
+                            "{{datavault4coalesce.config.rsrc_alias}}"
+                        {%- elif col.is_ldts_column -%}
+                            "{{datavault4coalesce.config.ldts_alias}}"
+                        {% else %}
+                            "{{ col.name }}"
+                        {% endif %}
+                        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                )
+                {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+                AS
+                {% for source in sources %}
+                    {#-------------------- Process multi-activity config --------------------#}
+                    {#----------------------- FIXME explain variables -----------------------#}
+                    {%- set multi_active_key = [] -%}
+                    {%- set main_hashkey_col = namespace(hk_col='') -%}
+                    {%- if config.contains_multiactive_data -%}
+                        {%- for col in source.columns -%}
+                            {%- if col.multi_active_key -%}{%- set multi_active_key = multi_active_key.append(col.name) -%}{%- endif %}
+                            {%- if col.id == config.main_hk_col.id -%}{%- set main_hashkey_col.hk_col = col.name -%}{%- endif -%}
+                        {%- endfor -%}
+                    {%- endif %}
+                    SELECT
+                    {% for col in source.columns %}
+                        {#- Print DV hash calculations -#}
+                        {% if col.hashDetails %}
+                            {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=col.hashDetails.algorithm, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}"
+                        {#- Print other table columns -#}
+                        {% else %}
+                            {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {% endif %}
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+
+                    {% if not loop.last %}
+                        {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
+                            {{ config.insertStrategy }}
+                        {% else %}
+                            UNION
+                        {% endif %}
+                    {% endif %}
+
+                    {%- if config.generate_ghost_records -%}
+
+                        UNION ALL 
+
+                        SELECT
+
+                        {% for source in sources %}
+                            {% for col in source.columns %}
+                                {%- if "hashDetails" in col.keys() %}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true, hash_algo=col.hashDetails.algorithm) }}
+                                {%- else -%}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=false) }}
+                                {%- endif -%}
+                            {% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        {% endfor %}
+
+                        UNION ALL 
+
+                        SELECT
+
+                        {% for source in sources %}
+                            {% for col in source.columns %}
+                                {%- if "hashDetails" in col.keys() %}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true, hash_algo=col.hashDetails.algorithm) }}
+                                {%- else -%}
+                                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=false) }}
+                                {%- endif -%}
+                            {% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        {% endfor %}
+
+                    {%- endif -%}
+
+                {% endfor %}
+
+            {% endif %}
+        run:
+          templateString: ""
+    name: "Datavault by Scalefree: Stage"
+    version: 1
+  StepType-6:
+    id: "6"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: HUB'
+        short: 'HUB'
+        tagColor: blue
+        plural: 'DATAVAULT BY SCALEFREE: HUBS'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'true'
+            options: 
+            - table
+            default: table
+         
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+
+          - type: multisourceToggle
+
+        - groupName: Data Vault
+          items:
+
+          - displayName: Hub Hash Key column
+            type: columnSelector
+            attributeName: is_Hub_hk
+            isRequired: true
+            enableIf: 'true'
+            
+          - displayName: Hub LoadDateTimestamp Column
+            enableIf: 'false'
+            type: columnSelector
+            attributeName: is_Hub_ldts
+            isRequired: false
+
+          - displayName: Disable High-Water-Mark?
+            type: toggleButton
+            isRequired: false
+            enableIf: 'false'
+            attributeName: disable_hwm   
+            default: true
+            
+      templates:
+        create:
+          templateString: |
+            {{ stage('Create Hub Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+              {{ stage('Pre-SQL') }}
+              {{ config.preSQL }}
+            {% endif %}
+
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
+
+            {% for source in sources %}
+
+              {{ stage('INSERT INTO Hub - ' ~ source.name) }}
+              
+              {%- set hashkey_column = get_value_by_column_attribute("is_Hub_hk") -%}
+              
+              {#-- enable when ColumnDropDownSelector is used again
+              {%- if 'is_Hub_hk' not in config.keys() -%}
+
+              {%- else -%}
+                
+                {%- set hashkey_column = config.is_Hub_hk.name -%}
+              
+              {%- endif -%}
+              #}
+
+              INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+              
+            WITH incoming AS (
+
+              SELECT DISTINCT
+              {% for col in source.columns %}
+                {{ get_source_transform(col) }} AS "{{ col.name }}"
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
+
+              {{ source.join }}
+
+                {% if not config.disable_hwm -%}
+                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                    SELECT 
+                        COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                    FROM {{ ref_no_link(node.location.name, node.name) }}
+                 WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                    )
+                {%- endif %}  
+
+            ), 
+
+            new_records AS (
+
+              SELECT 
+              "SRC".* 
+              FROM incoming "SRC"
+              WHERE NOT EXISTS 
+
+              (SELECT 1 
+              FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
+              WHERE 
+                "SRC"."{{ hashkey_column }}" = "TGT"."{{ hashkey_column }}")    
+
+              QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
+            )
+
+
+              SELECT * FROM new_records
+
+            {% endfor %}
+
+            {% if config.postSQL %}
+              {{ stage('Post-SQL') }}
+              {{ config.postSQL }}
+            {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+    name: "Datavault by Scalefree: Hub"
+    version: 1
+  StepType-7:
+    id: "7"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: LINK'
+        short: 'LINK'
+        tagColor: 'Red'
+        plural: 'DATAVAULT BY SCALEFREE: LINKS'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+            
+          - type: multisourceToggle
+          
+        - groupName: Data Vault
+          items:
+          - displayName: Link Hashkey Column
+            type: columnSelector
+            attributeName: is_Link_hk
+            isRequired: true 
+
+          - displayName: Disable High-Water-Mark?
+            type: toggleButton
+            isRequired: false
+            enableIf: 'false'
+            attributeName: disable_hwm   
+            default: true    
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Link Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                    "{{ col.name }}" {{ col.dataType }}
+                    {%- if not col.nullable %} NOT NULL
+                        {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                    {% endif %}
+                    {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |-
+            {% if config.preSQL %}
+                {{ stage('Pre-SQL') }}
+                {{ config.preSQL }}
+
+            {% endif %}
+
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
+
+            {% for source in sources %}
+                        
+                {{ stage('INSERT INTO Link - ' ~ source.name) }}
+
+                {#--USE AGAIN WHEN COLUMNDROPDOWNSELECTOR IS USED%- set link_hashkey = config.is_Link_hk.name -%#}
+
+                {%- set link_hashkey = get_value_by_column_attribute("is_Link_hk") -%}
+              
+
+                INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
+            WITH incoming AS 
+                (
+                    SELECT DISTINCT
+                    {% for col in source.columns %}
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+
+                    
+                {% if not config.disable_hwm -%}
+                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                    SELECT 
+                        COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                    FROM {{ ref_no_link(node.location.name, node.name) }}
+                    )
+                {%- endif %}
+                ),
+
+            new_records AS (
+                SELECT
+                    "SRC".*
+                FROM incoming "SRC"
+                WHERE NOT EXISTS (
+                    SELECT
+                        1
+                    FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
+                    WHERE "SRC"."{{ link_hashkey }}" = "TGT"."{{ link_hashkey }}"
+                )
+
+                QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ link_hashkey }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) = 1
+            )
+
+            SELECT * FROM new_records
+
+            {% endfor %}
+
+            {% if config.postSQL %}
+                {{ stage('Post-SQL') }}
+                {{ config.postSQL }}    
+            {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+    name: "Datavault by Scalefree: Link"
+    version: 1
+  StepType-8:
+    id: "8"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: SATELLITE V0'
+        short: 'SATV0'
+        plural: 'DATAVAULT BY SCALEFREE: SATELLITES V0'
+        tagColor: 'Yellow'
+
+
+        config:
+        - groupName: Data Vault
+          items:
+          - displayName: Hashkey Column
+            type: columnSelector
+            attributeName: is_hk
+            isRequired: true
+
+          - displayName: Hashdiff Column
+            type: columnSelector
+            attributeName: is_hd
+            isRequired: true
+
+          - displayName: Disable High-Water-Mark?
+            type: toggleButton
+            isRequired: true
+            attributeName: disable_hwm   
+            default: false    
+
+          - displayName: Enable Tests
+            attributeName: testsEnabled
+            type: toggleButton
+            default: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+      templates:
+        create:
+          templateString: |
+            {{ stage('Create Satellite Table') }}
+
+            CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+            (
+              {% for col in columns %}
+                "{{ col.name }}" {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                  {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+              {% endfor %}
+            )
+            {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+        run:
+          templateString: |+
+            {% if config.preSQL %}
+              {{ stage('Pre-SQL') }}
+              {{ config.preSQL }}
+            {% endif %}
+
+            {% for test in node.tests if config.testsEnabled %}
+              {% if test.runOrder == 'Before' %}
+                {{ test_stage(test.name, test.continueOnFailure) }}
+                {{ test.templateString }}
+              {% endif %}
+            {% endfor %}
+
+            {{ stage('Insert New Rows') }}
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
+            WITH latest_entries_in_sat AS (
+
+              {#/* USE THIS again when ColumnDropdownSelector is used!
+              {%- set hashkey_column = config.is_hk.name -%}
+              {%- set hashdiff_column = config.is_hd.name -%}
+              */#}
+
+              {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
+              {%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
+
+              /* get current rows from satellite */
+              SELECT 
+                "{{ hashkey_column }}",
+                "{{ hashdiff_column }}"
+              FROM {{ ref_no_link(node.location.name, node.name) }} 
+              QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
+
+
+            ),
+
+            deduplicated_numbered_source AS (
+                
+                {% for source in sources %}
+
+                    SELECT
+                {% for col in source.columns %}
+                  {{ get_source_transform(col) }} AS {{ col.name }},
+                {% endfor %}
+
+                    ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
+
+                    
+                    {{ source.join }}
+
+
+                {% if not config.disable_hwm -%}
+                WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+                  SELECT 
+                    COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+                  FROM {{ ref_no_link(node.location.name, node.name) }}
+                  WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+                  )
+                {%- endif %}  
+
+                    QUALIFY
+                    CASE
+                        WHEN "{{ hashdiff_column }}" = LAG("{{ hashdiff_column }}") OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
+                        ELSE TRUE
+                    END
+
+                {% endfor %}
+
+            )
+
+              {% for source in sources %}
+                SELECT DISTINCT
+                {% for col in source.columns %}
+                  {{ col.name }}
+                  {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+
+                FROM deduplicated_numbered_source
+              WHERE NOT EXISTS (
+                SELECT 1 FROM latest_entries_in_sat
+                WHERE 
+                  deduplicated_numbered_source."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
+                AND deduplicated_numbered_source."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
+
+                    AND deduplicated_numbered_source.rn = 1
+              )
+
+              {% endfor %}
+
+            {% if config.postSQL %}
+              {{ stage('Post-SQL') }}
+              {{ config.postSQL }}
+            {% endif %}
+
+            {% if config.testsEnabled %}
+              {% for test in node.tests %}
+                {% if test.runOrder == 'After' %}
+                  {{ test_stage(test.name, test.continueOnFailure) }}
+                  {{ test.templateString }}
+                    {% endif %}
+              {% endfor %}
+
+              {% for column in columns %}
+                {% for test in column.tests %}
+                  {{ test_stage(column.name + ": " + test.name) }}
+                  {{ test.templateString }}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+
+    name: "Datavault by Scalefree: Satellite v0"
+    version: 1
+  StepType-9:
+    id: "9"
+    isDisabled: false
+    metadata:
+      defaultStorageLocation: null
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: 'DATAVAULT BY SCALEFREE: SATELLITE V1'
+        short: 'SATV1'
+        plural: 'DATAVAULT BY SCALEFREE: SATELLITES V1'
+        tagColor: '#FFAC1C'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'true'
+            default: view
+            options:
+            - view
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        - groupName: Data Vault
+          items:
+          - displayName: Hashkey Column
+            type: columnSelector
+            attributeName: is_hk
+            isRequired: true    
+
+        systemColumns:
+        - displayName: "LEDTS"
+          transform: |-
+            COALESCE(LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+            OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" 
+            ORDER BY "{{ datavault4coalesce.config.ldts_alias }}"), {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: is_system_ledts
+        - displayName: "IS_CURRENT"
+          transform: |-
+            CASE 
+              WHEN 
+                LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+                OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" 
+                ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
+              THEN TRUE 
+              ELSE FALSE 
+            END
+          dataType: BOOLEAN
+          placement: end
+          attributeName: is_system_current_col
+      templates:
+        create:
+          templateString: |-
+            {{ stage('Create Satellite View') }}
+
+            CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+            (
+                {% for col in columns %}
+                   "{{ col.name }}"
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+            )
+              {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+            AS
+            {% for source in sources %}
+                SELECT
+                {% for col in source.columns %}
+                    {{ get_source_transform(col) }} AS "{{ col.name }}"
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+                {{ source.join }}
+            {% endfor %}
+        run:
+          templateString: ""
+    name: "Datavault by Scalefree: Satellite v1"
     version: 1
   StepType-Dimension:
     id: Dimension
@@ -4731,19 +4723,19 @@ stepTypes:
     version: 1
 subgraphs:
   Subgraph-2:
-    id: 2
+    id: "2"
     name: Line Item
     steps: []
   Subgraph-3:
-    id: 3
+    id: "3"
     name: Orders
     steps: []
   Subgraph-4:
-    id: 4
+    id: "4"
     name: Demo
     steps: []
   Subgraph-5:
-    id: 5
+    id: "5"
     name: Demo
     steps:
       - "162"
@@ -4752,7 +4744,7 @@ subgraphs:
       - "168"
       - "180"
   Subgraph-6:
-    id: 6
+    id: "6"
     name: Only Sources
     steps:
       - "162"
@@ -4765,7 +4757,7 @@ subgraphs:
       - "234"
       - "236"
   Subgraph-7:
-    id: 7
+    id: "7"
     name: Webinar
     steps:
       - "162"
@@ -4779,7 +4771,7 @@ subgraphs:
       - "303"
       - "304"
   Subgraph-8:
-    id: 8
+    id: "8"
     name: New Subgraph
     steps: []
-version: 1
+version: 2
