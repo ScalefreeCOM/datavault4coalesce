@@ -551,7 +551,9 @@ macros:
            {{- result|join(delimiter) -}}
       {%- endmacro -%}
 packages: {}
-projects: {}
+projects:
+   "1":
+     name: SCALEFREE-DATAVAULT4COALESCE
 stepTypes:
   StepType-12:
     id: "12"
