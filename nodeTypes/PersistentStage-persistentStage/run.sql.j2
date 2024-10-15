@@ -10,11 +10,11 @@
     {% endfor %}
 
 {% if node.materializationType == 'table' %}
-	{% if config.preSQL %}
-		{{ stage('Pre-SQL') }}
-		{{ config.preSQL }}
-	{% endif %}
-	
+  {% if config.preSQL %}
+    {{ stage('Pre-SQL') }}
+    {{ config.preSQL }}
+  {% endif %}
+  
     {% if has_business_key and is_type_2 %}
 
         {% for source in sources %}
@@ -206,9 +206,15 @@
                 SELECT
                 {% for col in source.columns if not col.isSurrogateKey %}
                     {% if col.isSystemVersion %}
+<<<<<<< HEAD
                     	1
                     {% elif col.isSystemCurrentFlag %}
                     	'Y'
+=======
+                      1
+                    {% elif col.isSystemCurrentFlag %}
+                      'Y'
+>>>>>>> main
                     {% else %}
                         {{ get_source_transform(col) }}
                     {% endif %}
@@ -296,6 +302,7 @@
             {{ source.join }}
         {% endfor %}            
     {% endif %}
+<<<<<<< HEAD
 	
 	{% if config.postSQL %}
 		{{ stage('Post-SQL') }}
@@ -318,4 +325,28 @@
 			{{ test.templateString }}
 		{% endfor %}
 	{% endfor %}
+=======
+  
+  {% if config.postSQL %}
+    {{ stage('Post-SQL') }}
+    {{ config.postSQL }}
+  {% endif %}
+  
+{% endif %}
+
+{% if config.testsEnabled %}
+  {% for test in node.tests %}
+    {% if test.runOrder == 'After' %}
+      {{ test_stage(test.name, test.continueOnFailure) }}
+      {{ test.templateString }}
+        {% endif %}
+  {% endfor %}
+
+  {% for column in columns %}
+    {% for test in column.tests %}
+      {{ test_stage(column.name + ": " + test.name) }}
+      {{ test.templateString }}
+    {% endfor %}
+  {% endfor %}
+>>>>>>> main
 {% endif %}

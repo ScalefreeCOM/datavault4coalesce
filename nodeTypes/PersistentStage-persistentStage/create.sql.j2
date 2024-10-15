@@ -33,8 +33,13 @@
     AS
     {% for source in sources %}
 
+<<<<<<< HEAD
 		{% if not loop.last %} UNION ALL {% endif %}
 	{% endfor %}
+=======
+    {% if not loop.last %} UNION ALL {% endif %}
+  {% endfor %}
+>>>>>>> main
 
         {% for col in source.columns %}
             {% if col.isSurrogateKey or col.isSystemUpdateDate or col.isSystemCreateDate %}
