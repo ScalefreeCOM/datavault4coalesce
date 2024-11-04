@@ -52,7 +52,10 @@ WITH incoming AS (
 new_records AS (
 
   SELECT 
-  "SRC".* 
+  {% for col in source.columns %}
+    "SRC"."{{ col.name }}"
+    {%- if not loop.last -%}, {% endif %}
+  {% endfor %}
   FROM incoming "SRC"
   WHERE NOT EXISTS 
 
@@ -65,7 +68,12 @@ new_records AS (
 )
 
 
-  SELECT * FROM new_records
+  SELECT 
+  {% for col in source.columns %}
+    "SRC"."{{ col.name }}"
+    {%- if not loop.last -%}, {% endif %}
+  {% endfor %}
+  FROM new_records "SRC"
 
 {% endfor %}
 
