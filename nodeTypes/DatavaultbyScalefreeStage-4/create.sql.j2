@@ -39,7 +39,7 @@
         {% for col in source.columns %}
             {#- Print DV hash calculations -#}
             {% if col.hashDetails %}
-                {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=col.hashDetails.algorithm, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}"
+                {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}"
             {#- Print other table columns -#}
             {% else %}
                 {{ get_source_transform(col) }} AS "{{ col.name }}"
