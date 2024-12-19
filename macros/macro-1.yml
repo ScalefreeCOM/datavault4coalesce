@@ -15,6 +15,7 @@ macroString: |-
        "ledts_alias": "LEDTS",
        "stg_alias": "STG", 
        "snapshot_trigger_column": "IS_ACTIVE",
+       "is_active_alias": "IS_ACTIVE",
        "use_object_name_prefix": TRUE,
        "sdts_alias": "SDTS",
        "is_current_col_alias": "IS_CURRENT", 
