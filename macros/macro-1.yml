@@ -22,9 +22,9 @@ macroString: |-
        "hash_datatype": "STRING", 
        "hash_input_case_sensitive": "TRUE",
        "hash_passthrough_input_transformations": "TRUE",
-       "beginning_of_all_times": "0001-01-01T00:00:01",
-       "end_of_all_times": "8888-12-31T23:59:59",
-       "timestamp_format": "YYYY-MM-DDTHH24:MI:SS", 
+       "beginning_of_all_times": "0001-01-01 00:00:01",
+       "end_of_all_times": "8888-12-31 23:59:59",
+       "timestamp_format": "yyyy-MM-dd HH:mm:ss", 
        "default_unknown_rsrc": "SYSTEM", 
        "default_error_rsrc": "ERROR", 
        "rsrc_default_dtype": "STRING", 
@@ -77,8 +77,8 @@ macroString: |-
 
   {#-- Utility macro: wrap string input between escape characters --#}
   {%- macro datavault4coalesce__escape_column_name(column) -%}
-      {%- set escape_char_left  = '"' -%}
-      {%- set escape_char_right = '"' -%}
+      {%- set escape_char_left  = '`' -%}
+      {%- set escape_char_right = '`' -%}
       {%- set escaped_column_name = escape_char_left ~ column|upper|replace(escape_char_left, '')|replace(escape_char_right, '')|trim ~ escape_char_right|indent(4) -%}
       
     {{ escaped_column_name }}
@@ -109,7 +109,7 @@ macroString: |-
   {%- macro record_source() -%}
   {%- if sources[0].dependencies -%}
        {% set src = storageLocations | selectattr('name', "equalto", sources[0].dependencies[0].node.location.name) | list | first %} 
-       '"{{src.database}}"."{{src.schema}}"."{{sources[0].dependencies[0].node.name}}"'
+       '`{{src.database}}`.`{{src.schema}}`.`{{sources[0].dependencies[0].node.name}}`'
   {%- else -%}
        'Missing Dependencies!'
   {%- endif -%}

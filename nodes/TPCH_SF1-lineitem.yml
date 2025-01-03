@@ -1,0 +1,20 @@
+fileVersion: 1
+id: 23c318e4-32c2-4ce8-9225-778efdf61a8b
+name: lineitem
+operation:
+  database: ""
+  dataset: ""
+  deployEnabled: true
+  description: ""
+  locationName: TPCH_SF1
+  metadata:
+    columns: []
+    join:
+      joinCondition: FROM {{ ref('TPCH_SF1', 'lineitem') }}
+  name: lineitem
+  schema: ""
+  sqlType: Source
+  table: lineitem
+  type: sourceInput
+  version: 1
+type: Node

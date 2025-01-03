@@ -1,5 +1,17 @@
+{#
+    Copyright (c) 2023 Coalesce. All rights reserved.
+This script and its associated documentation are confidential and proprietary to Coalesce.
+Unauthorized reproduction, distribution, or disclosure of this material is strictly prohibited.
+Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
+does not permit copying or modification for any other purpose.
+#}
+{# == Node Type Version        : 1  == #}
+{# == Node Type Name           : Fact  == #}
+{# == Node Type Description    : This node loads data into work table using config options distinct,groupby all,order by ,multi-source  == #}
 
-    {% for test in node.tests if config.testsEnabled %}
+{# == To run data quality tests before data insertion == #}
+
+{% for test in node.tests if config.testsEnabled %}
         {% if test.runOrder == 'Before' %}
             {{ test_stage(test.name, test.continueOnFailure) }}
             {{ test.templateString }}
@@ -7,36 +19,63 @@
     {% endfor %}
 
     {% if node.materializationType == 'table' %}
+
+    {# == Queries to be executed before data insertion  == #}
+
         {% if config.preSQL %}
             {{ stage('Pre-SQL') }}
             {{ config.preSQL }}
         {% endif %}
+    
+    {# == Truncate data before data insertion  == #}
+
+        {% if config.truncateBefore %}
+            {{ stage('Truncate Fact Table') }}
+            TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
+        {% endif %}
         
-        {% set has_business_key = columns | selectattr("isBusinessKey") | list | length > 0 %}
-        
-        {% for source in sources %}
+    {# == Check if business key is specified  == #}
+
+        {% set has_business_key = columns | selectattr("isBusinessKey") | list | length > 0 %}    
         
             {% if has_business_key %}
+
+            {# == Executed if business key is specified  == #}
+
         
-                {{ stage('MERGE ' + source.name | string ) }}
-                MERGE INTO {{ ref_no_link(node.location.name, node.name) }} "TGT"
+                {{ stage('MERGE ' + ' Sources' | string ) }}
+                MERGE INTO {{ ref_no_link(node.location.name, node.name) }} `TGT`
                 USING (
-                    SELECT
+                
+                {% for source in sources %}
+                    (SELECT
+                    {% if config.selectDistinct %}
+                    DISTINCT
+                    {% endif %}
                     {% for col in source.columns %}
-                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {{ get_source_transform(col) }} AS `{{ col.name }}`
                         {%- if not loop.last %}, {% endif %}
                     {% endfor %}
-                    {{ source.join }})
-                    AS "SRC"
+                    {{ source.join }}
+                    {% if config.groupByAll %}
+                        GROUP BY ALL
+                    {% endif %}
+                    {{ sortorder_by_colv() }})
+                    {% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+                        {{config.insertStrategy}}
+                    {% endif %}
+                {% endfor %}   
+                    )
+                    AS `SRC`
                 ON
-                {% for col in source.columns if col.isBusinessKey -%}
+                {% for col in columns if col.isBusinessKey -%}
                     {% if not loop.first %}
                         AND
                     {% endif %}
-                    "SRC"."{{ col.name }}" = "TGT"."{{ col.name }}"
+                    `SRC`.`{{ col.name }}` = `TGT`.`{{ col.name }}`
                 {% endfor %}
                 WHEN MATCHED
-                {% for col in source.columns if not (   col.isBusinessKey or
+                {% for col in columns if not (   col.isBusinessKey or
                                                         col.isSystemUpdateDate or
                                                         col.isSystemCreateDate) %}
                     {% if loop.first %}
@@ -44,55 +83,73 @@
                     {% else %}
                         OR
                     {% endif %}
-                    NVL( CAST("SRC"."{{ col.name }}" as STRING), '**NULL**') <> NVL( CAST("TGT"."{{ col.name }}" as STRING), '**NULL**')
+                    NVL( CAST(`SRC`.`{{ col.name }}` as STRING), '**NULL**') <> NVL( CAST(`TGT`.`{{ col.name }}` as STRING), '**NULL**')
                     {% if loop.last %}
                         )
                     {% endif %}
                 {% endfor %}
+
                 THEN UPDATE SET
-                {%- for col in source.columns if not (col.isBusinessKey or col.isSystemCreateDate) %}
-                        "TGT"."{{ col.name }}" = "SRC"."{{ col.name }}"
+                {%- for col in columns if not (col.isBusinessKey or col.isSystemCreateDate) %}
+                        `TGT`.`{{ col.name }}` = `SRC`.`{{ col.name }}`
                     {% if not loop.last %}, {% endif %}
                 {% endfor %}
                 WHEN NOT MATCHED THEN
                 INSERT (
-                {%- for col in source.columns if not col.isSurrogateKey %}
-                    "{{ col.name }}"
+                {%- for col in columns if not col.isSurrogateKey %}
+                    `{{ col.name }}`
                     {% if not loop.last %}, {% endif %}
                 {% endfor -%}
                 )
                 VALUES (
-                {%- for col in source.columns if not col.isSurrogateKey %}
-                    "SRC"."{{ col.name }}"
+                {%- for col in columns if not col.isSurrogateKey %}
+                    `SRC`.`{{ col.name }}`
                     {% if not loop.last %}, {% endif %}
                 {% endfor -%}
                 )
         
             {% else %}
-        
-                {{ stage('Insert ' + source.name | string ) }}
+
+               {# == Executed if business key is not specified  == #}
+
+                {{ stage('Insert ' + ' Sources' | string ) }}
         
                     INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
                     (
-                        {% for col in source.columns %}
-                            "{{ col.name }}"
+                        {% for col in columns %}
+                            `{{ col.name }}`
                             {%- if not loop.last -%},{% endif %}
                         {% endfor %}
                     )
-        
-                    SELECT
+                {% for source in sources %}
+                    (SELECT
+                    {% if config.selectDistinct %}
+                    DISTINCT
+                    {% endif %}
                     {% for col in source.columns %}
-                        {{ get_source_transform(col) }} AS "{{ col.name }}"
+                        {{ get_source_transform(col) }} AS `{{ col.name }}`
                         {%- if not loop.last -%}, {% endif %}
                     {% endfor %}
                     {{ source.join }}
+                 {% if config.groupByAll %}
+                     GROUP BY ALL
+                 {% endif %}
+                 {{ sortorder_by_colv() }})
+                 {% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+                     {{config.insertStrategy}}
+                 {% endif %}
+                {% endfor %} 
             {% endif %}
-        {% endfor %}
+
+ {# == Queries to be executed post data insertion  == #}
+
         {% if config.postSQL %}
             {{ stage('Post-SQL') }}
             {{ config.postSQL }}
         {% endif %}
     {% endif %}
+
+{# == To run data quality tests after data insertion == #}
 
     {% if config.testsEnabled %}
         {% for test in node.tests %}
@@ -109,5 +166,3 @@
             {% endfor %}
         {% endfor %}
     {% endif %}
-    
-    

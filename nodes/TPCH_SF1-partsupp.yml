@@ -1,0 +1,20 @@
+fileVersion: 1
+id: 12abd3d1-9dce-45f0-90b4-5d23e6588ce0
+name: partsupp
+operation:
+  database: ""
+  dataset: ""
+  deployEnabled: true
+  description: ""
+  locationName: TPCH_SF1
+  metadata:
+    columns: []
+    join:
+      joinCondition: FROM {{ ref('TPCH_SF1', 'partsupp') }}
+  name: partsupp
+  schema: ""
+  sqlType: Source
+  table: partsupp
+  type: sourceInput
+  version: 1
+type: Node

@@ -1,46 +1,65 @@
+{#
+Copyright (c) 2023 Coalesce. All rights reserved.
+This script and its associated documentation are confidential and proprietary to Coalesce.
+Unauthorized reproduction, distribution, or disclosure of this material is strictly prohibited.
+Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
+does not permit copying or modification for any other purpose.  
+#}
+{# == Node Type Version        : 1  == #}
+{# == Node Type Name           : Fact  == #}
+{# == Node Type Description    : This node creates fact table,view and also override create sql for view  == #}
 
-    {% if node.materializationType == 'table' %}
-        {{ stage('Create Fact Table') }}
-    
-        CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
-        (
-            {% for col in columns %}
-                "{{ col.name }}" {{ col.dataType }}
-                {%- if not col.nullable %} NOT NULL
-                    {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
-                {% endif %}
-                {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
-                {%- if not loop.last -%}, {% endif %}
-            {% endfor %}
-        )
-        {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
-    
-    
-    {% elif node.materializationType == 'view' %}
-        {{ stage('Create Fact View') }}
-    
-        CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
-        (
-            {% for col in columns %}
-                "{{ col.name }}"
-                {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
-                {%- if not loop.last -%},{% endif %}
-            {% endfor %}
-        )
-        {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
-        AS
-        {% for source in sources %}
-    
-            {% if loop.first %}SELECT {% endif %}
-    
-            {% for col in source.columns %}
-                {{ get_source_transform(col) }} AS "{{ col.name }}"
-                {%- if not loop.last -%}, {% endif %}
-            {% endfor %}
-            {{ source.join }}
-    
-            {% if not loop.last %} UNION ALL {% endif %}
+{# Override CreateSQL for view #}
+
+{% if node.override.create.enabled %}
+
+{{ node.override.create.script }}
+
+{% elif node.materializationType == 'table' %}
+    {{ stage('Create Fact Table') }}
+
+{# CreateSQL for Table #}  
+
+    CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+    (
+        {% for col in columns %}
+            `{{ col.name }}` {{ col.dataType }}
+            {%- if not col.nullable %} NOT NULL
+            {% endif %}
+            {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
+            {%- if not loop.last -%}, {% endif %}
         {% endfor %}
-    
-    {% endif %}
-    
+    )
+    {%- if node.description | length > 0 %} COMMENT  '{{ node.description | escape }}'{% endif %}
+    TBLPROPERTIES('delta.columnMapping.mode' = 'name')
+
+
+{% elif node.materializationType == 'view' %}
+    {{ stage('Create Fact View') }}
+
+{# CreateSQL for View #}
+
+    CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+    (
+        {% for col in columns %}
+            `{{ col.name }}`
+            {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
+            {%- if not loop.last -%},{% endif %}
+        {% endfor %}
+    )
+    {%- if node.description | length > 0 %} COMMENT '{{ node.description | escape }}'{% endif %}
+    AS
+    {% for source in sources %}
+
+        {% if loop.first %}SELECT {% endif %}
+        {% if config.selectDistinct %}DISTINCT{% endif %}
+        {% for col in source.columns %}
+            {{ get_source_transform(col) }} AS `{{ col.name }}`
+            {%- if not loop.last -%}, {% endif %}
+        {% endfor %}
+        {{ source.join }}
+         {% if config.groupByAll %} GROUP BY ALL {% endif %}
+        {% if not loop.last %} UNION ALL {% endif %}
+    {% endfor %}
+
+{% endif %}

@@ -1,0 +1,20 @@
+fileVersion: 1
+id: 4bae96f4-3dbf-4921-ae01-93fbe4783160
+name: nation
+operation:
+  database: ""
+  dataset: ""
+  deployEnabled: true
+  description: ""
+  locationName: TPCH_SF1
+  metadata:
+    columns: []
+    join:
+      joinCondition: FROM {{ ref('TPCH_SF1', 'nation') }}
+  name: nation
+  schema: ""
+  sqlType: Source
+  table: nation
+  type: sourceInput
+  version: 1
+type: Node

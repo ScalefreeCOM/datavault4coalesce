@@ -1,0 +1,20 @@
+fileVersion: 1
+id: 45d5c7ca-db1f-4ac1-8674-4372d7ae2ba8
+name: part
+operation:
+  database: ""
+  dataset: ""
+  deployEnabled: true
+  description: ""
+  locationName: TPCH_SF1
+  metadata:
+    columns: []
+    join:
+      joinCondition: FROM {{ ref('TPCH_SF1', 'part') }}
+  name: part
+  schema: ""
+  sqlType: Source
+  table: part
+  type: sourceInput
+  version: 1
+type: Node
