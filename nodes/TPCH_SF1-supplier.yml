@@ -1,0 +1,20 @@
+fileVersion: 1
+id: a68842c0-aeb8-4609-8035-31908af2546e
+name: supplier
+operation:
+  database: ""
+  dataset: ""
+  deployEnabled: true
+  description: ""
+  locationName: TPCH_SF1
+  metadata:
+    columns: []
+    join:
+      joinCondition: FROM {{ ref('TPCH_SF1', 'supplier') }}
+  name: supplier
+  schema: ""
+  sqlType: Source
+  table: supplier
+  type: sourceInput
+  version: 1
+type: Node

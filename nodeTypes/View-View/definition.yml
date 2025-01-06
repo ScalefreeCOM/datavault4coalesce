@@ -6,27 +6,23 @@ metadata:
   error: null
   nodeMetadataSpec: |
     capitalized: View
-    short: V
+    short: v
     tagColor: '#C4C4C4'
     isDisabled: true
     plural: Views
 
     config:
       - groupName: Options
-        items: 
-        - type: materializationSelector
-          options:
-            - view
-          default: view
-          isRequired: true
+        items:
 
-        - type: toggleButton
-          attributeName: selectDistinct
-          displayName: Distinct
+        - displayName: OverrideCreateSQL
+          attributeName: OverrideSQLCreate
+          type: overrideSQLToggle
+          default: false
 
         - type: multisourceToggle
-
-        - type: overrideSQLToggle
+          enableIf: "{% if  node.override.create.enabled %} false {% else %} true {% endif %}"
+          default: false
 
         - displayName: Multi Source Strategy
           attributeName: insertStrategy
@@ -34,8 +30,30 @@ metadata:
           default: UNION
           options:
           - "UNION"
-          - "UNION ALL" 
-          isRequired: true
+          - "UNION ALL"
+          isRequired: false
           enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
+
+        - displayName: Distinct
+          attributeName: selectDistinct
+          type: toggleButton
+          enableIf: "{% if config.groupByAll or  node.override.create.enabled %} false {% else %} true {% endif %}"
+          default: false
+
+        - displayName: Group By All
+          attributeName: groupByAll
+          type: toggleButton
+          enableIf: "{% if config.selectDistinct or node.override.create.enabled %} false {% else %} true {% endif %}"
+          default: false
+
+      - groupName: Hidden Config
+        enableIf: "false"
+        items:
+        - displayName: Type
+          type: materializationSelector
+          default:  view
+          options:
+          - view
+          isRequired: false
 name: View
 type: NodeType

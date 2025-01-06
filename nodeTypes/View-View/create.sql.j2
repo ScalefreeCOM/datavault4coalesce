@@ -1,28 +1,46 @@
+{#
+    Copyright (c) 2023 Coalesce. All rights reserved.
+This script and its associated documentation are confidential and proprietary to Coalesce.
+Unauthorized reproduction, distribution, or disclosure of this material is strictly prohibited.
+Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
+does not permit copying or modification for any other purpose.
+#}
+{# == Node Type Version        : 1  == #}
+{# == Node Type Name           : View  == #}
+{# == Node Type Description    : This node creates a view and also runs override create sql for view  == #}
+
+
+{# Override CreateSQL for view #}
+
+
 {% if node.override.create.enabled %}
-    
+
     {{ node.override.create.script }}
 
 {% else %}
+
+{# CreateSQL for view #}
+
     {{ stage('Create View') }}
     CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
     (
         {% for col in columns %}
-            "{{ col.name }}"
+            `{{ col.name }}`
             {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             {%- if not loop.last -%}, {% endif %}
         {% endfor %}
     )
-    {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
+    {%- if node.description | length > 0 %} COMMENT  '{{ node.description | escape }}'{% endif %}
     AS
     {% for source in sources %}
         SELECT {% if config.selectDistinct %} DISTINCT {% endif %}
         {% for col in source.columns %}
-            {{ get_source_transform(col) }} AS "{{ col.name }}"
+            {{ get_source_transform(col) }} AS `{{ col.name }}`
             {%- if not loop.last -%}, {% endif %}
         {% endfor %}
 
         {{ source.join }}
-
+        {% if config.groupByAll %} GROUP BY ALL {% endif %}
         {% if not loop.last %}
             {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
                 {{ config.insertStrategy }}

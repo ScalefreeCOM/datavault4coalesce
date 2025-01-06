@@ -1,0 +1,20 @@
+fileVersion: 1
+id: ebba1840-4ef4-4991-aec0-2530e857040b
+name: region
+operation:
+  database: ""
+  dataset: ""
+  deployEnabled: true
+  description: ""
+  locationName: TPCH_SF1
+  metadata:
+    columns: []
+    join:
+      joinCondition: FROM {{ ref('TPCH_SF1', 'region') }}
+  name: region
+  schema: ""
+  sqlType: Source
+  table: region
+  type: sourceInput
+  version: 1
+type: Node
