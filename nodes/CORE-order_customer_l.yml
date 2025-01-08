@@ -1,0 +1,109 @@
+fileVersion: 1
+id: 77b69de1-7102-4939-b77c-987666ab01e2
+name: order_customer_l
+operation:
+  config:
+    disable_hwm: true
+    postSQL: ""
+    preSQL: ""
+    testsEnabled: true
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: CORE
+  materializationType: table
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: a8e6e454-2719-4df0-82b6-b5b8c05a00ab
+          stepCounter: 77b69de1-7102-4939-b77c-987666ab01e2
+        config:
+          is_Link_hk: true
+        dataType: STRING
+        description: ""
+        name: hk_order_customer_l
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: f5ec024d-d20c-421c-8554-2bc48b823f0e
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: aee0d98a-df32-43a6-afa8-37928b149e80
+          stepCounter: 77b69de1-7102-4939-b77c-987666ab01e2
+        config: {}
+        dataType: STRING
+        description: ""
+        name: hk_order_h
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: cbeb9eee-b624-4c2d-929e-85fbd18e054c
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: dad1a899-f974-419e-92da-21a3269a7183
+          stepCounter: 77b69de1-7102-4939-b77c-987666ab01e2
+        config: {}
+        dataType: STRING
+        description: ""
+        name: hk_customer_h
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: f1423589-aedd-484a-86c8-dc711c29efa4
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: d41ab819-6058-44e2-94aa-ea1759e3bfe6
+          stepCounter: 77b69de1-7102-4939-b77c-987666ab01e2
+        config: {}
+        dataType: TIMESTAMP
+        description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+        name: LDTS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 20b2728f-7800-49af-8ffe-e71126e48b3f
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 855d307a-4efb-4810-9462-bb556945dae3
+          stepCounter: 77b69de1-7102-4939-b77c-987666ab01e2
+        config: {}
+        dataType: STRING
+        description: The Record Source (RSRC) describes the source of this data.
+        name: RSRC
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 7a000eb2-c2fa-4448-b8da-272a8d7cec31
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
+            transform: ""
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases: {}
+        customSQL:
+          customSQL: ""
+        dependencies:
+          - locationName: RAW_STAGE
+            nodeName: DVSTG_orders
+        join:
+          joinCondition: FROM {{ ref('RAW_STAGE', 'DVSTG_orders') }} `DVSTG_orders`
+        name: order_customer_l
+        noLinkRefs: []
+  name: order_customer_l
+  overrideSQL: false
+  schema: ""
+  sqlType: "7"
+  type: sql
+  version: 1
+type: Node

@@ -1,6 +1,6 @@
 fileVersion: 1
 id: 56036675-69d2-4a6a-b78b-c4fa29951a36
-name: DVSTG_lineitem
+name: dvstg_lineitem
 operation:
   config:
     contains_multiactive_data: false
@@ -272,6 +272,86 @@ operation:
         sourceColumnReferences:
           - columnReferences: []
             transform: "{{record_source()}}"
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: d7d0708b-3281-4055-8b0a-a4745e5a1e15
+          stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: 8971d3fb-9120-4573-930d-fb9347c90d68
+            stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+          - columnCounter: 0f02f6e3-d733-43da-a453-58b6407ce57d
+            stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+          - columnCounter: 18e79130-e8eb-4dac-b6b0-62e52ab17a62
+            stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+        name: hk_orders_part_supplier_nl
+        nullable: true
+        sourceColumnReferences: []
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 1c14b6be-4ee9-451f-8daf-f23a5623a366
+          stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: 8971d3fb-9120-4573-930d-fb9347c90d68
+            stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+        name: hk_order_h
+        nullable: true
+        sourceColumnReferences: []
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: de944cf3-8db1-4a1e-a62d-cb0d3e0cb964
+          stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: 0f02f6e3-d733-43da-a453-58b6407ce57d
+            stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+        name: hk_part_h
+        nullable: true
+        sourceColumnReferences: []
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 9c41dfc7-c67a-44b6-a058-80e655e126e0
+          stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: 18e79130-e8eb-4dac-b6b0-62e52ab17a62
+            stepCounter: 56036675-69d2-4a6a-b78b-c4fa29951a36
+        name: hk_supplier_h
+        nullable: true
+        sourceColumnReferences: []
     cteString: ""
     enabledColumnTestIDs: []
     sourceMapping:
@@ -283,9 +363,9 @@ operation:
             nodeName: lineitem
         join:
           joinCondition: FROM {{ ref('TPCH_SF1', 'lineitem') }} `lineitem`
-        name: DVSTG_lineitem
+        name: dvstg_lineitem
         noLinkRefs: []
-  name: DVSTG_lineitem
+  name: dvstg_lineitem
   overrideSQL: false
   schema: ""
   sqlType: "4"
