@@ -1,5 +1,5 @@
 fileVersion: 1
-id: 12abd3d1-9dce-45f0-90b4-5d23e6588ce0
+id: 97b19df8-218d-4039-9151-8bdb6c1f8404
 name: partsupp
 operation:
   database: ""
@@ -8,7 +8,92 @@ operation:
   description: ""
   locationName: TPCH_SF1
   metadata:
-    columns: []
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 879479b1-61fd-43c2-bcb3-bd5e274ab06b
+          stepCounter: 97b19df8-218d-4039-9151-8bdb6c1f8404
+        config: {}
+        dataType: LONG
+        defaultValue: ""
+        description: ""
+        name: ps_partkey
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: d20b50d2-5b94-466e-a8c4-7bdbf9799e33
+          stepCounter: 97b19df8-218d-4039-9151-8bdb6c1f8404
+        config: {}
+        dataType: LONG
+        defaultValue: ""
+        description: ""
+        name: ps_suppkey
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: b4855bdc-0ff9-4df2-baff-118282426556
+          stepCounter: 97b19df8-218d-4039-9151-8bdb6c1f8404
+        config: {}
+        dataType: INT
+        defaultValue: ""
+        description: ""
+        name: ps_availqty
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: ba10dbad-549d-4238-b4fc-25f98e158170
+          stepCounter: 97b19df8-218d-4039-9151-8bdb6c1f8404
+        config: {}
+        dataType: DECIMAL
+        defaultValue: ""
+        description: ""
+        name: ps_supplycost
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: ff8d68bc-3339-44cc-9d37-92494d30ddf1
+          stepCounter: 97b19df8-218d-4039-9151-8bdb6c1f8404
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        name: ps_comment
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
     join:
       joinCondition: FROM {{ ref('TPCH_SF1', 'partsupp') }}
   name: partsupp

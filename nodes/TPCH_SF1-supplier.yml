@@ -1,5 +1,5 @@
 fileVersion: 1
-id: b1dbee4b-1fef-471e-b41a-bc8ecd77f5a5
+id: a68842c0-aeb8-4609-8035-31908af2546e
 name: supplier
 operation:
   database: ""
@@ -8,7 +8,126 @@ operation:
   description: ""
   locationName: TPCH_SF1
   metadata:
-    columns: []
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: b2f0eb6e-f810-4680-9378-f18218dbc744
+          stepCounter: a68842c0-aeb8-4609-8035-31908af2546e
+        config: {}
+        dataType: LONG
+        defaultValue: ""
+        description: ""
+        name: s_suppkey
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 53412e9e-f673-4552-81e1-058e4866fffa
+          stepCounter: a68842c0-aeb8-4609-8035-31908af2546e
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        name: s_name
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 490b7e68-1833-4f88-b89c-2b2657d77ed8
+          stepCounter: a68842c0-aeb8-4609-8035-31908af2546e
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        name: s_address
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 7271e2de-7595-4b7a-bc90-99e9aef09b40
+          stepCounter: a68842c0-aeb8-4609-8035-31908af2546e
+        config: {}
+        dataType: LONG
+        defaultValue: ""
+        description: ""
+        name: s_nationkey
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: af8ab659-26b3-4797-9c51-c26b092bffbf
+          stepCounter: a68842c0-aeb8-4609-8035-31908af2546e
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        name: s_phone
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 64aefefa-f97f-4470-bd9a-ba50cdbc5646
+          stepCounter: a68842c0-aeb8-4609-8035-31908af2546e
+        config: {}
+        dataType: DECIMAL
+        defaultValue: ""
+        description: ""
+        name: s_acctbal
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 0974952f-3fae-47dd-b4e9-8786546da7b0
+          stepCounter: a68842c0-aeb8-4609-8035-31908af2546e
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        name: s_comment
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
     join:
       joinCondition: FROM {{ ref('TPCH_SF1', 'supplier') }}
   name: supplier

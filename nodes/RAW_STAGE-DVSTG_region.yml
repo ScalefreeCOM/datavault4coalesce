@@ -1,0 +1,70 @@
+fileVersion: 1
+id: 7d84c131-a8be-454e-8eb2-65096a44b8f8
+name: DVSTG_region
+operation:
+  config:
+    contains_multiactive_data: false
+    generate_ghost_records: true
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: RAW_STAGE
+  materializationType: view
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 925e9b61-599b-4e25-8a31-478265861b62
+          stepCounter: 7d84c131-a8be-454e-8eb2-65096a44b8f8
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: ""
+        description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+        is_system_ldts: true
+        name: LDTS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: CURRENT_TIMESTAMP()
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 4188ba15-1755-4407-bfdd-42feba6286b2
+          stepCounter: 7d84c131-a8be-454e-8eb2-65096a44b8f8
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: The Record Source (RSRC) describes the source of this data.
+        is_system_rsrc: true
+        name: RSRC
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: "{{record_source()}}"
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases: {}
+        customSQL:
+          customSQL: ""
+        dependencies:
+          - locationName: TPCH_SF1
+            nodeName: region
+        join:
+          joinCondition: FROM {{ ref('TPCH_SF1', 'region') }} `region`
+        name: DVSTG_region
+        noLinkRefs: []
+  name: DVSTG_region
+  overrideSQL: false
+  schema: ""
+  sqlType: "4"
+  type: sql
+  version: 1
+type: Node

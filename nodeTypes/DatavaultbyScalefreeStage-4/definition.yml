@@ -2,7 +2,7 @@ fileVersion: 1
 id: "4"
 isDisabled: false
 metadata:
-  defaultStorageLocation: null
+  defaultStorageLocation: RAW_STAGE
   error: null
   nodeMetadataSpec: |-
     capitalized: 'DATAVAULT BY SCALEFREE: STAGE'

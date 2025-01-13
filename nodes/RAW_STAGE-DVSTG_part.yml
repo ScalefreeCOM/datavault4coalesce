@@ -1,0 +1,70 @@
+fileVersion: 1
+id: 6ef79bd3-7bee-4a68-be18-1a4642e52ae2
+name: DVSTG_part
+operation:
+  config:
+    contains_multiactive_data: false
+    generate_ghost_records: true
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: RAW_STAGE
+  materializationType: view
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 524427c6-9c6e-4707-aa09-7e90e36d9614
+          stepCounter: 6ef79bd3-7bee-4a68-be18-1a4642e52ae2
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: ""
+        description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+        is_system_ldts: true
+        name: LDTS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: CURRENT_TIMESTAMP()
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: cd5fe4c4-8788-4710-8d95-d6a998f1636d
+          stepCounter: 6ef79bd3-7bee-4a68-be18-1a4642e52ae2
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: The Record Source (RSRC) describes the source of this data.
+        is_system_rsrc: true
+        name: RSRC
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: "{{record_source()}}"
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases: {}
+        customSQL:
+          customSQL: ""
+        dependencies:
+          - locationName: TPCH_SF1
+            nodeName: part
+        join:
+          joinCondition: FROM {{ ref('TPCH_SF1', 'part') }} `part`
+        name: DVSTG_part
+        noLinkRefs: []
+  name: DVSTG_part
+  overrideSQL: false
+  schema: ""
+  sqlType: "4"
+  type: sql
+  version: 1
+type: Node
