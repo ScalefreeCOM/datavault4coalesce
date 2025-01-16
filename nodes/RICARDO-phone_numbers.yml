@@ -1,0 +1,71 @@
+fileVersion: 1
+id: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+name: phone_numbers
+operation:
+  database: ""
+  dataset: ""
+  deployEnabled: true
+  description: ""
+  locationName: RICARDO
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 26d1abb2-0a1b-4511-9b01-82516ef263a4
+          stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+        config: {}
+        dataType: LONG
+        defaultValue: ""
+        description: ""
+        name: CUSTOMER_ID
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 880bd5ca-1e50-4dba-93a0-761bcf0a570f
+          stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        name: PHONE_TYPE
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 9767bd4c-cecf-4b51-a20c-46d2dfc78b81
+          stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        name: PHONE_NUMBER
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+    join:
+      joinCondition: FROM {{ ref('RICARDO', 'phone_numbers') }}
+  name: phone_numbers
+  schema: ""
+  sqlType: Source
+  table: phone_numbers
+  type: sourceInput
+  version: 1
+type: Node
