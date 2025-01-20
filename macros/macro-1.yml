@@ -357,21 +357,21 @@ macroString: |-
   {#--     listagg_opening : 1st part of LISTAGG window function, used in                         --#}
   {#--                       hashing calculation of multi-active satellite's hash diff attribute. --#}
   {%- if is_hashdiff and multi_active_key is defined and multi_active_key|length>0 -%}
-      {%- set listagg_opening = "LISTAGG(" -%}
+      {%- set listagg_opening = "" -%}
   {%- endif -%}
 
   {%- if 'VARCHAR' in datatype or 'CHAR' in datatype or 'STRING' in datatype or 'TEXT' in datatype %}
       {%- if case_sensitive -%}
-          {%- set standardise_prefix = "IFNULL(LOWER({}({}NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg, listagg_opening)-%}
+         {%- set standardise_prefix = "IFNULL(LOWER({}(ARRAY_JOIN(SORT_ARRAY(ARRAY_AGG(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
       {%- else -%}
-          {%- set standardise_prefix = "IFNULL(LOWER({}({}NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg, listagg_opening)-%}
+          {%- set standardise_prefix = "IFNULL(LOWER({}(ARRAY_JOIN(SORT_ARRAY(ARRAY_AGG(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg) -%}
       {%- endif -%}
 
   {%- else -%}
       {%- if case_sensitive -%}
-          {%- set standardise_prefix = "IFNULL({}({}NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg, listagg_opening)-%}
+          {%- set standardise_prefix = "IFNULL(CAST({}(ARRAY_JOIN(SORT_ARRAY(ARRAY_AGG(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(UPPER(CONCAT(".format(hash_alg)-%}
       {%- else -%}
-          {%- set standardise_prefix = "IFNULL({}({}NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg, listagg_opening)-%}
+          {%- set standardise_prefix = "IFNULL(CAST({}(ARRAY_JOIN(SORT_ARRAY(ARRAY_AGG(NULLIF(CAST(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(".format(hash_alg)-%}
       {%- endif -%}
   {%- endif -%}
 
@@ -407,36 +407,36 @@ macroString: |-
   {#--                       satellite's hash diff attribute.                              --#}
   {%- if is_hashdiff and multi_active_key is defined and multi_active_key|length>0 -%}
       {%- set multi_active_key = multi_active_key|join(", ") -%}
-      {%- set listagg_closing = ' WITHIN GROUP (ORDER BY "{}") OVER (PARTITION BY "{}", "{}"))'.format(multi_active_key, main_hashkey_col, ldts_alias) -%}
+      {%- set listagg_closing = "" -%}
   {%- endif -%}
 
   {%- if 'VARCHAR' in datatype or 'CHAR' in datatype or 'STRING' in datatype or 'TEXT' in datatype %}
       {%- if case_sensitive -%}
           {%- if alias is not none -%}
-        {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}      
+              {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),','))), {}) AS {}".format(zero_key, alias)-%}
           {%- else -%}
-        {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
+              {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),','))), {})".format(zero_key)-%}
           {%- endif -%}
       {%- else -%}
           {%- if alias is not none -%}
-              {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}
+              {%- set standardise_suffix = "\n), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),','))), {}) AS {}".format(zero_key, alias)-%}
           {%- else -%}
-        {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
+              {%- set standardise_suffix = "\n), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),','))), {})".format(zero_key)-%}
           {%- endif -%}
       {%- endif -%}
 
   {%- else -%}
       {%- if case_sensitive -%}
           {%- if alias is not none -%}
-              {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}
+              {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),',')) AS {}), CAST({} AS {})) AS {}".format(datatype, zero_key, datatype, alias)-%}
           {%- else -%}
-              {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
+              {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),',')) AS {}), CAST({} AS {}))".format(datatype, zero_key, datatype)-%}
           {%- endif -%}
       {%- else -%}
           {%- if alias is not none -%}
-              {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}
+              {%- set standardise_suffix = "\n), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),',')) AS {}), CAST({} AS {})) AS {}".format(datatype, zero_key, datatype, alias)-%}
           {%- else -%}
-              {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
+              {%- set standardise_suffix = "\n), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),',')) AS {}), CAST({} AS {}))".format(datatype, zero_key, datatype)-%}
           {%- endif -%}
       {%- endif -%}
   {%- endif -%}
