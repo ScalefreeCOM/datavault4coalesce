@@ -6,7 +6,7 @@ operation:
     contains_multiactive_data: true
     generate_ghost_records: true
     main_hk_col:
-      columnCounter: 66ca9338-983b-4f60-9e09-56f1af1936d4
+      columnCounter: f7d41fca-8381-4b58-b844-666881b7985f
       stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
   database: ""
   deployEnabled: true
@@ -101,7 +101,8 @@ operation:
         columnReference:
           columnCounter: f45a0210-221c-49cd-979d-eca07d24858a
           stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        config: {}
+        config:
+          is_hk: true
         dataType: STRING
         defaultValue: ""
         description: ""
@@ -142,7 +143,8 @@ operation:
         columnReference:
           columnCounter: d6cf539b-3ed2-4e3c-b408-5de7cbce4db5
           stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        config: {}
+        config:
+          is_hd: true
         dataType: STRING
         defaultValue: ""
         description: ""
@@ -161,7 +163,8 @@ operation:
         columnReference:
           columnCounter: f7d41fca-8381-4b58-b844-666881b7985f
           stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        config: {}
+        config:
+          is_hk: true
         dataType: STRING
         defaultValue: ""
         description: ""

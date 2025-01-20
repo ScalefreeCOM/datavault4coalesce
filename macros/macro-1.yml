@@ -546,7 +546,9 @@ macroString: |-
   {%- for column in columns -%}
       {%- set ns.all_null = ns.all_null + [null_placeholder_string] -%}
       {%- if datavault4coalesce.config.hash_passthrough_input_transformations -%}
-          {%- set column_str = datavault4coalesce__as_constant(get_source_transform(column)) -%}
+          {# xxxx Databricks xxxx {%- set column_str = datavault4coalesce__as_constant(get_source_transform(column)) -%} #}
+            {%- set column_str = datavault4coalesce__as_constant(column.name) -%}
+
       {%- else -%}
           {%- if '.' in column.name %}
               {% set column_str = column.name -%}
