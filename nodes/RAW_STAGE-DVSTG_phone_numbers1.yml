@@ -1,13 +1,13 @@
 fileVersion: 1
-id: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-name: DVSTG_phone_numbers
+id: 42cf0530-93a1-4256-ab2a-d271050f031b
+name: DVSTG_phone_numbers1
 operation:
   config:
     contains_multiactive_data: true
     generate_ghost_records: true
     main_hk_col:
-      columnCounter: 66ca9338-983b-4f60-9e09-56f1af1936d4
-      stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+      columnCounter: 7b4254ab-46a5-4ad5-869d-ea9ae8a763f5
+      stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
   database: ""
   deployEnabled: true
   description: ""
@@ -19,8 +19,8 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 58c48293-0b92-4393-a34d-84c3b6b1c39e
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 01aa6aff-1dc4-4631-a847-f499d5647962
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
         config: {}
         dataType: LONG
         description: ""
@@ -33,8 +33,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 1ae54de8-b697-4860-9413-5b5639f65dee
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 89bf60b3-52e6-431e-8bed-1e3c762f3aa0
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
         config:
           multi_active_key: true
         dataType: STRING
@@ -48,8 +48,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 29616884-3579-461b-9854-bc7ba88002b4
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: cce19858-8e13-423b-9731-b008e4266967
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
         config: {}
         dataType: STRING
         description: ""
@@ -65,8 +65,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 605f05d5-4c7d-4151-8af2-178267d8e733
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 9506de3a-3f7f-4291-8240-2fc275d9b92b
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -82,8 +82,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 36cfa6c2-80a6-4389-840f-d4b3d7b12ee1
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: f314e25f-49ad-4d32-bf20-21990ab63083
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
         config: {}
         dataType: STRING
         defaultValue: ""
@@ -99,17 +99,38 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: f45a0210-221c-49cd-979d-eca07d24858a
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        config: {}
+          columnCounter: 7b4254ab-46a5-4ad5-869d-ea9ae8a763f5
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config:
+          is_hk: true
         dataType: STRING
         defaultValue: ""
         description: ""
         hashDetails:
-          hashAlgorithm: MD5
+          hashAlgorithm: SHA1
         hashedColumns:
-          - columnCounter: 29616884-3579-461b-9854-bc7ba88002b4
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          - columnCounter: 01aa6aff-1dc4-4631-a847-f499d5647962
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        name: HK_PHONE_H
+        nullable: true
+        sourceColumnReferences: []
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: f4a69ed4-b386-41ec-bf37-2cc2afa49a8b
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config:
+          is_hk: true
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: cce19858-8e13-423b-9731-b008e4266967
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
         name: HK_PHONE_NUMBER
         nullable: true
         sourceColumnReferences: []
@@ -118,39 +139,18 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: bd519688-4d83-48e7-ae97-3054ee60af4c
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 6d5d6333-c33f-4ede-a91e-a2cc422f9c00
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
         config:
           is_hd: true
         dataType: STRING
         defaultValue: ""
         description: ""
         hashDetails:
-          hashAlgorithm: MD5
+          hashAlgorithm: SHA1
         hashedColumns:
-          - columnCounter: 29616884-3579-461b-9854-bc7ba88002b4
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-          - columnCounter: 1ae54de8-b697-4860-9413-5b5639f65dee
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        name: HD_TYPE_NUMBER_MS
-        nullable: true
-        sourceColumnReferences: []
-      - acceptedValues:
-          strictMatch: true
-          values: []
-        appliedColumnTests: {}
-        columnReference:
-          columnCounter: d6cf539b-3ed2-4e3c-b408-5de7cbce4db5
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        config: {}
-        dataType: STRING
-        defaultValue: ""
-        description: ""
-        hashDetails:
-          hashAlgorithm: MD5
-        hashedColumns:
-          - columnCounter: 29616884-3579-461b-9854-bc7ba88002b4
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          - columnCounter: cce19858-8e13-423b-9731-b008e4266967
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
         name: HD_NUMBER_MS
         nullable: true
         sourceColumnReferences: []
@@ -159,18 +159,21 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: f7d41fca-8381-4b58-b844-666881b7985f
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        config: {}
+          columnCounter: 515a0256-4fe0-4364-8ad0-bdd1ee8da40f
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config:
+          is_hd: true
         dataType: STRING
         defaultValue: ""
         description: ""
         hashDetails:
           hashAlgorithm: SHA1
         hashedColumns:
-          - columnCounter: 58c48293-0b92-4393-a34d-84c3b6b1c39e
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        name: HK_PHONE_H
+          - columnCounter: 89bf60b3-52e6-431e-8bed-1e3c762f3aa0
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+          - columnCounter: cce19858-8e13-423b-9731-b008e4266967
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        name: HD_TYPE_NUMBER_MS
         nullable: true
         sourceColumnReferences: []
     cteString: ""
@@ -184,9 +187,9 @@ operation:
             nodeName: phone_numbers
         join:
           joinCondition: FROM {{ ref('RICARDO', 'phone_numbers') }} `phone_numbers`
-        name: DVSTG_phone_numbers
+        name: DVSTG_phone_numbers1
         noLinkRefs: []
-  name: DVSTG_phone_numbers
+  name: DVSTG_phone_numbers1
   overrideSQL: false
   schema: ""
   sqlType: "4"
