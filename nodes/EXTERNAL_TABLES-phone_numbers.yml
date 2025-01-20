@@ -1,0 +1,71 @@
+fileVersion: 1
+id: 5cc66449-e356-4e49-b097-0ab9ed0ebbfc
+name: phone_numbers
+operation:
+  database: ""
+  dataset: ""
+  deployEnabled: true
+  description: ""
+  locationName: EXTERNAL_TABLES
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: e9fbeb5b-bfab-442f-92b4-307323fe48cb
+          stepCounter: 5cc66449-e356-4e49-b097-0ab9ed0ebbfc
+        config: {}
+        dataType: LONG
+        defaultValue: ""
+        description: ""
+        name: CUSTOMER_ID
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 13067ca7-2a8e-4d83-93a1-77faedb37159
+          stepCounter: 5cc66449-e356-4e49-b097-0ab9ed0ebbfc
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        name: PHONE_TYPE
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: c20033a1-5952-4934-a8d3-95189548e52f
+          stepCounter: 5cc66449-e356-4e49-b097-0ab9ed0ebbfc
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        name: PHONE_NUMBER
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+    join:
+      joinCondition: FROM {{ ref('EXTERNAL_TABLES', 'phone_numbers') }}
+  name: phone_numbers
+  schema: ""
+  sqlType: Source
+  table: phone_numbers
+  type: sourceInput
+  version: 1
+type: Node
