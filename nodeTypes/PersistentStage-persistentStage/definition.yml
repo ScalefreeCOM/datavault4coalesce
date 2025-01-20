@@ -6,7 +6,7 @@ metadata:
   error: null
   nodeMetadataSpec: |
     capitalized: Persistent Stage
-    short: PSTG
+    short: pstg
     plural: Persistent Stages
     tagColor: '#29B2DB'
         
@@ -18,51 +18,111 @@ metadata:
         default: table
         options:
         - table
-        - view
       
-      - type: businessKeyColumns
-        isRequired: false
-
       - type: multisourceToggle
         enableIf: "{% if node.materializationType == 'table' %} true {% else %} false {% endif %}"
 
-      - type: overrideSQLToggle
-        enableIf: "{% if node.materializationType == 'view' %} true {% else %} false {% endif %}"
+      - displayName: Multi Source Strategy
+        attributeName: insertStrategy
+        type: dropdownSelector
+        default: UNION ALL
+        options:
+        - "UNION"
+        - "UNION ALL"
+        isRequired: false
+        enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
+      
+      - type: businessKeyColumns
+        isRequired: false
+      
+      - type: changeTrackingColumns
+        isRequired: false
+
+      - displayName: Truncate Before
+        attributeName: truncateBefore
+        type: toggleButton
+        default: false
+       
 
       - displayName: Enable Tests
         attributeName: testsEnabled
         type: toggleButton
-        default: true
+        default: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
         
+
+      - displayName: Distinct
+        attributeName: selectDistinct
+        type: toggleButton
+        enableIf: "{% if config.groupByAll %} false {% else %} true {% endif %}"
+        default: false
+
+      - displayName: Group By All
+        attributeName: groupByAll
+        type: toggleButton
+        enableIf: "{% if config.selectDistinct %} false {% else %} true {% endif %}"
+        default: false
+        
+      - displayName: Order By
+        attributeName: orderby
+        type: toggleButton
+        default: false
+
+      - type: tabular
+        displayName: 'Sort column'
+        attributeName: orderbycolumn
+        columns:
+
+          -  type: columnDropdownSelector
+             displayName: Column Name
+             attributeName: sortColName
+
+          -  type: dropdownSelector
+             displayName: Sort Order
+             attributeName: sortOrder
+             default: desc
+             options:
+             - desc
+             - asc
+           
+        isRequired: true
+        enableIf: "{% if config.orderby %} true {% else %} false {% endif %}"    
+
       - displayName: Pre-SQL
         attributeName: preSQL
         type: textBox
         syntax: sql
         isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
 
       - displayName: Post-SQL
         attributeName: postSQL
         type: textBox
         syntax: sql
         isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+
+
 
     systemColumns:
 
     - displayName: '{{NODE_NAME}}_KEY'
       transform: ''
-      dataType: NUMBER
+      dataType: BIGINT
       placement: beginning
       attributeName: isSurrogateKey
 
     - displayName: SYSTEM_VERSION
       transform: ''
-      dataType: NUMBER
+      dataType: NUMERIC
       placement: end
       attributeName: isSystemVersion
 
     - displayName: SYSTEM_CURRENT_FLAG
       transform: ''
-      dataType: VARCHAR
+      dataType: VARCHAR(1)
       placement: end
       attributeName: isSystemCurrentFlag
 

@@ -1,0 +1,20 @@
+fileVersion: 1
+id: eb24f3be-2843-4481-addb-ecdfe501d003
+name: part
+operation:
+  database: ""
+  dataset: ""
+  deployEnabled: true
+  description: ""
+  locationName: TPCH_SF1
+  metadata:
+    columns: []
+    join:
+      joinCondition: FROM {{ ref('TPCH_SF1', 'part') }}
+  name: part
+  schema: ""
+  sqlType: Source
+  table: part
+  type: sourceInput
+  version: 1
+type: Node

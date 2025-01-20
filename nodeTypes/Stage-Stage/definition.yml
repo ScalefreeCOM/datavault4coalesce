@@ -5,8 +5,9 @@ metadata:
   defaultStorageLocation: null
   error: null
   nodeMetadataSpec: |
+
     capitalized: Stage
-    short: STG
+    short: stg
     plural: Stages
     tagColor: '#2EB67D'
 

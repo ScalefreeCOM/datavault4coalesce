@@ -2,7 +2,7 @@ fileVersion: 1
 id: "4"
 isDisabled: false
 metadata:
-  defaultStorageLocation: null
+  defaultStorageLocation: RAW_STAGE
   error: null
   nodeMetadataSpec: |-
     capitalized: 'DATAVAULT BY SCALEFREE: STAGE'
@@ -58,7 +58,7 @@ metadata:
 
     systemColumns:
     - displayName: "LDTS"
-      transform: SYSDATE()
+      transform: CURRENT_TIMESTAMP()
       dataType: TIMESTAMP
       placement: end
       attributeName: is_system_ldts    

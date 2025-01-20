@@ -1,0 +1,95 @@
+fileVersion: 1
+id: ec96cff5-3efb-4b25-bb6a-6389b6d91a44
+name: order_h
+operation:
+  config:
+    disable_hwm: true
+    postSQL: ""
+    preSQL: ""
+    testsEnabled: false
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: CORE
+  materializationType: table
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: f1415744-c8f0-4f54-ba21-df3c6b0357b5
+          stepCounter: ec96cff5-3efb-4b25-bb6a-6389b6d91a44
+        config: {}
+        dataType: LONG
+        description: ""
+        name: o_orderkey
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 3c811d44-0642-4092-84de-4fb819fd7bc2
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 2336b65c-b0b0-478e-90fb-5d8dee7a0e96
+          stepCounter: ec96cff5-3efb-4b25-bb6a-6389b6d91a44
+        config: {}
+        dataType: TIMESTAMP
+        description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+        name: LDTS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 20b2728f-7800-49af-8ffe-e71126e48b3f
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 43b2cfd3-972b-48bf-a6d0-526c79f2a932
+          stepCounter: ec96cff5-3efb-4b25-bb6a-6389b6d91a44
+        config: {}
+        dataType: STRING
+        description: The Record Source (RSRC) describes the source of this data.
+        name: RSRC
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 7a000eb2-c2fa-4448-b8da-272a8d7cec31
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: e45cd808-8c77-4414-a0eb-ebde22bacbe4
+          stepCounter: ec96cff5-3efb-4b25-bb6a-6389b6d91a44
+        config:
+          is_Hub_hk: true
+        dataType: STRING
+        description: ""
+        name: hk_order_h
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: cbeb9eee-b624-4c2d-929e-85fbd18e054c
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
+            transform: ""
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases: {}
+        customSQL:
+          customSQL: ""
+        dependencies:
+          - locationName: RAW_STAGE
+            nodeName: DVSTG_orders
+        join:
+          joinCondition: FROM {{ ref('RAW_STAGE', 'DVSTG_orders') }} `DVSTG_orders`
+        name: order_h
+        noLinkRefs: []
+  name: order_h
+  overrideSQL: false
+  schema: ""
+  sqlType: "6"
+  type: sql
+  version: 1
+type: Node

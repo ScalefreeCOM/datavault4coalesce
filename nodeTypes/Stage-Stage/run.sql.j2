@@ -1,5 +1,18 @@
+{#
+    Copyright (c) 2023 Coalesce. All rights reserved.
+This script and its associated documentation are confidential and proprietary to Coalesce.
+Unauthorized reproduction, distribution, or disclosure of this material is strictly prohibited.
+Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
+does not permit copying or modification for any other purpose.
+#}
+{# == Node Type Version        : 1  == #}
+{# == Node Type Name           : Stage  == #}
+{# == Node Type Description    : This node loads data into stage table using config options distinct,groupby all,order by ,multi-source == #}
 
-    {% for test in node.tests if config.testsEnabled %}
+
+ {# == To run data quality tests before data insertion == #}
+
+{% for test in node.tests if config.testsEnabled %}
         {% if test.runOrder == 'Before' %}
             {{ test_stage(test.name, test.continueOnFailure) }}
             {{ test.templateString }}
@@ -7,79 +20,107 @@
     {% endfor %}
 
 {% if node.materializationType == 'table' %}
-	{% if config.preSQL %}
-		{{ stage('Pre-SQL') }}
-		{{ config.preSQL }}
-	{% endif %}
-	
-	
-	
-		{% if config.truncateBefore %}
-	
-			{{ stage('Truncate Stage Table') }}
-			TRUNCATE IF EXISTS {{ ref_no_link(node.location.name, node.name) }}
-	
-		{% endif %}
-	
-	
-		{% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
-			{{ stage( config.insertStrategy + ' Sources' | string ) }}
-			INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-				(
-					{% for col in columns %}
-						"{{ col.name }}"
-						{%- if not loop.last -%},{% endif %}
-					{% endfor %}
-				)
-		{% endif %}
-	
-	
-		{% for source in sources %}
-	
-			{% if config.insertStrategy == 'INSERT' %}
-				{{ stage('Insert ' + source.name | string ) }}
-	
-				INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-				(
-					{% for col in source.columns %}
-						"{{ col.name }}"
-						{%- if not loop.last -%},{% endif %}
-					{% endfor %}
-				)
-			{% endif %}
-	
-			SELECT
-			{% for col in source.columns %}
-                {{ get_source_transform(col) }} AS "{{ col.name }}"
-				{%- if not loop.last -%}, {% endif %}
-			{% endfor %}
-	
-			{{ source.join }}
-	
-			{% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
-				{{config.insertStrategy}}
-			{% endif %}
-	
-		{% endfor %}
-	
-	{% if config.postSQL %}
-		{{ stage('Post-SQL') }}
-		{{ config.postSQL }}
-	{% endif %}
+
+    {# == Queries to be executed before data insertion  == #}
+
+    {% if config.preSQL %}
+        {{ stage('Pre-SQL') }}
+        {{ config.preSQL }}
+    {% endif %}
+
+
+    {# == Multi-Source option  == #}
+
+        {% if node.isMultisource %}
+            {% set insertStrategy = config.insertStrategy  %}
+        {% else %}
+            {% set insertStrategy = 'INSERT' %}
+        {% endif %}
+
+    {# == Truncate data before data insertion  == #}
+
+        {% if config.truncateBefore %}
+
+            {{ stage('Truncate Stage Table') }}
+            TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
+
+        {% endif %}
+
+
+        {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
+            {{ stage(insertStrategy + ' Sources' | string ) }}
+            INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+                (
+                    {% for col in columns %}
+                        `{{ col.name }}`
+                        {%- if not loop.last -%},{% endif %}
+                    {% endfor %}
+                )
+        {% endif %}
+
+
+        {% for source in sources %}
+
+        {# == Insert data from sources into Stage table  == #}
+
+            {% if config.insertStrategy == 'INSERT' %}
+                {{ stage('Insert ' + source.name | string ) }}
+
+                INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+                (
+                    {% for col in source.columns %}
+                        `{{ col.name }}`
+                        {%- if not loop.last -%},{% endif %}
+                    {% endfor %}
+                )
+            {% endif %}
+
+             (SELECT
+            {% if config.selectDistinct %}
+            DISTINCT
+            {% endif %}
+            {% for col in source.columns %}
+                {{ get_source_transform(col) }} AS `{{ col.name }}`
+                {%- if not loop.last -%}, {% endif %}
+            {% endfor %}
+
+                {{ source.join }}
+                 {% if config.groupByAll %}
+                 GROUP BY ALL
+                 {% endif %}
+                 {{ sortorder_by_colv() }} )
+
+
+            {% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+                {{config.insertStrategy}}
+            {% endif %}
+
+        {% endfor %}
+
+
+
+{# == Queries to be executed post data insertion  == #}
+
+    {% if config.postSQL %}
+        {{ stage('Post-SQL') }}
+        {{ config.postSQL }}
+    {% endif %}
 {% endif %}
 
-{% if config.testsEnabled %}
-	{% for test in node.tests %}
-		{% if test.runOrder == 'After' %}
-			{{ test_stage(test.name, test.continueOnFailure) }}
-			{{ test.templateString }}
-        {% endif %}
-	{% endfor %}
+{# == To run data quality tests after data insertion == #}
 
-	{% for column in columns %}
-		{% for test in column.tests %}
-			{{ test_stage(column.name + ": " + test.name) }}
-			{{ test.templateString }}
-		{% endfor %}
-	{% endfor %}
+{% if config.testsEnabled %}
+    {% for test in node.tests %}
+        {% if test.runOrder == 'After' %}
+            {{ test_stage(test.name, test.continueOnFailure) }}
+            {{ test.templateString }}
+        {% endif %}
+    {% endfor %}
+
+    {% for column in columns %}
+        {% for test in column.tests %}
+            {{ test_stage(column.name + ": " + test.name) }}
+            {{ test.templateString }}
+        {% endfor %}
+    {% endfor %}
 {% endif %}

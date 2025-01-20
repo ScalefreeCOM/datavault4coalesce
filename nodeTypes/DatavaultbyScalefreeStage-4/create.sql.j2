@@ -11,11 +11,11 @@
     (
         {% for col in columns %}
             {%- if col.is_rsrc_column -%}
-                "{{datavault4coalesce.config.rsrc_alias}}"
+                `{{ datavault4coalesce.config.rsrc_alias }}`
             {%- elif col.is_ldts_column -%}
-                "{{datavault4coalesce.config.ldts_alias}}"
+                `{{ datavault4coalesce.config.ldts_alias }}`
             {% else %}
-                "{{ col.name }}"
+                `{{ col.name }}`
             {% endif %}
             {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
             {%- if not loop.last -%}, {% endif %}
@@ -23,74 +23,178 @@
 
     )
     {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
-    AS
-    {% for source in sources %}
-        {#-------------------- Process multi-activity config --------------------#}
-        {#----------------------- FIXME explain variables -----------------------#}
-        {%- set multi_active_key = [] -%}
-        {%- set main_hashkey_col = namespace(hk_col='') -%}
-        {%- if config.contains_multiactive_data -%}
-            {%- for col in source.columns -%}
-                {%- if col.multi_active_key -%}{%- set multi_active_key = multi_active_key.append(col.name) -%}{%- endif %}
-                {%- if col.id == config.main_hk_col.id -%}{%- set main_hashkey_col.hk_col = col.name -%}{%- endif -%}
-            {%- endfor -%}
-        {%- endif %}
+    AS WITH 
+       
+    
+    {% if not config.contains_multiactive_data -%}
+
+        hashed_columns AS(
+
         SELECT
-        {% for col in source.columns %}
+        {% for col in sources[0].columns %}
             {#- Print DV hash calculations -#}
             {% if col.hashDetails %}
-                {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}"
+                {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash) }} AS `{{ col.name }}`
             {#- Print other table columns -#}
             {% else %}
-                {{ get_source_transform(col) }} AS "{{ col.name }}"
+                {{ get_source_transform(col) }} AS `{{ col.name }}`
             {% endif %}
             {%- if not loop.last -%}, {% endif %}
         {% endfor %}
 
-        {{ source.join }}
+        {{ sources[0].join }}
+        )
 
-        {% if not loop.last %}
-            {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
-                {{ config.insertStrategy }}
-            {% else %}
-                UNION
-            {% endif %}
-        {% endif %}
+    {% else %}
+    
 
-        {%- if config.generate_ghost_records -%}
+        {%- set multi_active_key = [] -%}
+        {%- set main_hashkey_col = namespace(hk_col='') -%}
+        {%- for col in sources[0].columns -%}
+            {%- if col.multi_active_key -%}{%- set multi_active_key = multi_active_key.append(col.name) -%}{%- endif %}
+            {%- if col.id == config.main_hk_col.id -%}{%- set main_hashkey_col.hk_col = col.name -%}{%- endif -%}
+        {%- endfor -%}
+    
+    
+                  {#  {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS `{{ col.name }}` #}
 
+
+        main_hashkey_generation AS(
+            SELECT
+            {% set main_hashkey_generation_columns = [] %}
+            {% for item in sources[0].columns %}
+            
+                {% if 'is_hd' not in item and 'is_hk' not in item %}
+                
+                    {% set _ = main_hashkey_generation_columns.append(item) %}
+                {% endif %}
+                {%- if item.id == config.main_hk_col.id -%}
+                    {% set main_hashkey_col.hk_col = item.id -%}
+                    {% set _ = main_hashkey_generation_columns.append(item) %}
+                {%- endif -%}
+            {% endfor %}
+            
+
+            {% for col in main_hashkey_generation_columns %}
+                {#- Print DV hash calculations -#}
+                {% if col.hashDetails %}
+                    {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash) }} AS `{{ col.name }}`
+                {#- Print other table columns -#}
+                {% else %}
+                    {{ get_source_transform(col) }} AS `{{ col.name }}`
+                {% endif %}
+                {%- if not loop.last -%}, {% endif %}
+            {% endfor %}
+
+            {{ sources[0].join }}
+        )
+
+        , ma_hashdiff_prep AS (
+            {% set ma_hashdiff_prep_columns = [] %}
+            {% for item in sources[0].columns %}
+                {% if 'is_hd' in item %}
+                    {% set _ = ma_hashdiff_prep_columns.append(item) %}
+                {% endif %}
+                {%- if 'is_system_ldts' in item -%}
+                    {% set _ = ma_hashdiff_prep_columns.append(item) %}
+                {%- endif -%}
+                {%- if item.id == config.main_hk_col.id -%}
+                    {% set main_hashkey_col.hk_col = item.id -%}
+                    {% set _ = ma_hashdiff_prep_columns.append(item) %}
+                {%- endif -%}
+            {% endfor %}
+
+            SELECT
+            {% for col in ma_hashdiff_prep_columns %}
+                {#- Print DV hash calculations -#}
+                {% if 'is_hd' in col %}
+                    {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS `{{ col.name }}`
+                {#- Print other table columns -#}
+                {% else %}
+                    {{ col.name }} AS `{{ col.name }}`
+                {% endif %}
+                {%- if not loop.last -%}, {% endif %}
+            {% endfor %}
+            FROM main_hashkey_generation
+            GROUP BY {{ config.main_hk_col.name }}, {{ datavault4coalesce.config.ldts_alias }}
+        )
+        , hashed_columns AS (
+
+            {% set hashed_columns = [] %}
+            {% for item in sources[0].columns %}
+                {% if 'is_hk' in item and not item.id == config.main_hk_col.id  %}
+                    {% set _ = hashed_columns.append(item) %}
+                {% endif %}
+            {% endfor %}
+
+            SELECT 
+            {% for col in main_hashkey_generation_columns %}
+                main_hashkey_generation.{{ col.name }}
+                {%- if not loop.last -%}, {% endif %}
+            {% endfor %}
+
+            {% for col in hashed_columns %}
+                    , {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS `{{ col.name }}`            
+            {% endfor %}
+
+            {% for col in ma_hashdiff_prep_columns %}
+                {% if 'is_hd' in col %}
+                   , ma_hashdiff_prep.{{ col.name }}
+                {% endif %}
+            {% endfor %}
+
+            FROM main_hashkey_generation
+            LEFT JOIN ma_hashdiff_prep
+                ON main_hashkey_generation.{{ config.main_hk_col.name }} = ma_hashdiff_prep.{{ config.main_hk_col.name }}
+                AND main_hashkey_generation.{{ datavault4coalesce.config.ldts_alias }} = ma_hashdiff_prep.{{ datavault4coalesce.config.ldts_alias }} 
+
+
+
+
+        )
+    {% endif %}
+
+
+
+    {%- if config.generate_ghost_records -%}
+
+        
+
+        , ghost_records AS (SELECT
+
+            {% for col in sources[0].columns %}
+                {%- if "hashDetails" in col.keys() %}
+                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true, hash_algo=col.hashDetails.algorithm) }}
+                {%- else -%}
+                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=false) }}
+                {%- endif -%}
+            {% if not loop.last %},{% endif %}
+            {% endfor %}
+            
             UNION ALL 
 
             SELECT
 
-            {% for source in sources %}
-                {% for col in source.columns %}
-                    {%- if "hashDetails" in col.keys() %}
-                        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true, hash_algo=col.hashDetails.algorithm) }}
-                    {%- else -%}
-                        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=false) }}
-                    {%- endif -%}
-                {% if not loop.last %},{% endif %}
-                {% endfor %}
+            {% for col in sources[0].columns %}
+                {%- if "hashDetails" in col.keys() %}
+                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true, hash_algo=col.hashDetails.algorithm) }}
+                {%- else -%}
+                    {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=false) }}
+                {%- endif -%}
+            {% if not loop.last %},{% endif %}
             {% endfor %}
+        )
+    {%- endif -%}
 
-            UNION ALL 
+    , columns_to_select as (
+        SELECT * FROM hashed_columns  
 
-            SELECT
+        {% if config.generate_ghost_records %}
+             UNION ALL SELECT * FROM ghost_records
+        {%- endif %}
 
-            {% for source in sources %}
-                {% for col in source.columns %}
-                    {%- if "hashDetails" in col.keys() %}
-                        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true, hash_algo=col.hashDetails.algorithm) }}
-                    {%- else -%}
-                        {{ datavault4coalesce__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=false) }}
-                    {%- endif -%}
-                {% if not loop.last %},{% endif %}
-                {% endfor %}
-            {% endfor %}
+    )
+    select * from columns_to_select
 
-        {%- endif -%}
-
-    {% endfor %}
 
 {% endif %}

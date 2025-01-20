@@ -1,0 +1,198 @@
+fileVersion: 1
+id: 42cf0530-93a1-4256-ab2a-d271050f031b
+name: DVSTG_phone_numbers1
+operation:
+  config:
+    contains_multiactive_data: true
+    generate_ghost_records: true
+    main_hk_col:
+      columnCounter: 7b4254ab-46a5-4ad5-869d-ea9ae8a763f5
+      stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: RAW_STAGE
+  materializationType: view
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 01aa6aff-1dc4-4631-a847-f499d5647962
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config: {}
+        dataType: LONG
+        description: ""
+        name: CUSTOMER_ID
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 26d1abb2-0a1b-4511-9b01-82516ef263a4
+                stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 89bf60b3-52e6-431e-8bed-1e3c762f3aa0
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config:
+          multi_active_key: true
+        dataType: STRING
+        description: ""
+        name: PHONE_TYPE
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 880bd5ca-1e50-4dba-93a0-761bcf0a570f
+                stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: cce19858-8e13-423b-9731-b008e4266967
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config: {}
+        dataType: STRING
+        description: ""
+        name: PHONE_NUMBER
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 9767bd4c-cecf-4b51-a20c-46d2dfc78b81
+                stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+            transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 9506de3a-3f7f-4291-8240-2fc275d9b92b
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: ""
+        description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+        is_system_ldts: true
+        name: LDTS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: CURRENT_TIMESTAMP()
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: f314e25f-49ad-4d32-bf20-21990ab63083
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: The Record Source (RSRC) describes the source of this data.
+        is_system_rsrc: true
+        name: RSRC
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: "{{record_source()}}"
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 7b4254ab-46a5-4ad5-869d-ea9ae8a763f5
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config:
+          is_hk: true
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: 01aa6aff-1dc4-4631-a847-f499d5647962
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        name: HK_PHONE_H
+        nullable: true
+        sourceColumnReferences: []
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: f4a69ed4-b386-41ec-bf37-2cc2afa49a8b
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config:
+          is_hk: true
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: cce19858-8e13-423b-9731-b008e4266967
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        name: HK_PHONE_NUMBER
+        nullable: true
+        sourceColumnReferences: []
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 6d5d6333-c33f-4ede-a91e-a2cc422f9c00
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config:
+          is_hd: true
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: cce19858-8e13-423b-9731-b008e4266967
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        name: HD_NUMBER_MS
+        nullable: true
+        sourceColumnReferences: []
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 515a0256-4fe0-4364-8ad0-bdd1ee8da40f
+          stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        config:
+          is_hd: true
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: 89bf60b3-52e6-431e-8bed-1e3c762f3aa0
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+          - columnCounter: cce19858-8e13-423b-9731-b008e4266967
+            stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+        name: HD_TYPE_NUMBER_MS
+        nullable: true
+        sourceColumnReferences: []
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases: {}
+        customSQL:
+          customSQL: ""
+        dependencies:
+          - locationName: RICARDO
+            nodeName: phone_numbers
+        join:
+          joinCondition: FROM {{ ref('RICARDO', 'phone_numbers') }} `phone_numbers`
+        name: DVSTG_phone_numbers1
+        noLinkRefs: []
+  name: DVSTG_phone_numbers1
+  overrideSQL: false
+  schema: ""
+  sqlType: "4"
+  type: sql
+  version: 1
+type: Node

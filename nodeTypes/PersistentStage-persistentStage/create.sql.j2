@@ -1,21 +1,32 @@
+{#
+    Copyright (c) 2023 Coalesce. All rights reserved.
+This script and its associated documentation are confidential and proprietary to Coalesce.
+Unauthorized reproduction, distribution, or disclosure of this material is strictly prohibited.
+Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
+does not permit copying or modification for any other purpose.  
+#}
+{# == Node Type Version        : 1  == #}
+{# == Node Type Name           :  Persistent Stage == #}
+{# == Node Type Description    : This node loads data into work table using config options distinct,groupby all,order by ,multi-source  == #}
+
 {% if node.materializationType == 'table' %}
     {{ stage('Create Persistent Stage Table') }}
 
     CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
     (
         {% for col in columns %}
-            "{{ col.name }}" {{ col.dataType }}
+            `{{ col.name }}` {{ col.dataType }}
             {% if col.isSurrogateKey %}
-		        identity
+                GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)
             {% endif %}
             {%- if not col.nullable %} NOT NULL
-                {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
             {% endif %}
             {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             {%- if not loop.last -%}, {% endif %}
         {% endfor %}
     )
-    {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
+    {%- if node.description | length > 0 %} COMMENT  '{{ node.description | escape }}'{% endif %}
+    TBLPROPERTIES('delta.columnMapping.mode' = 'name')
 
 
 {% elif node.materializationType == 'view' %}
@@ -24,17 +35,17 @@
     CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
     (
         {% for col in columns %}
-            "{{ col.name }}"
+            `{{ col.name }}`
             {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
             {%- if not loop.last -%},{% endif %}
         {% endfor %}
     )
-    {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
+    {%- if node.description | length > 0 %} COMMENT  '{{ node.description | escape }}'{% endif %}
     AS
     {% for source in sources %}
 
-		{% if not loop.last %} UNION ALL {% endif %}
-	{% endfor %}
+        {% if not loop.last %} UNION ALL {% endif %}
+    {% endfor %}
 
         {% for col in source.columns %}
             {% if col.isSurrogateKey or col.isSystemUpdateDate or col.isSystemCreateDate %}
@@ -42,7 +53,7 @@
             {% else %}
                 {{ get_source_transform(col) }}
             {% endif %}
-            AS "{{ col.name }}"
+            AS `{{ col.name }}`
             {%- if not loop.last -%}, {% endif %}
         {% endfor %}
         {{ source.join }}
