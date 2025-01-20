@@ -1,13 +1,13 @@
 fileVersion: 1
-id: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-name: DVSTG_phone_numbers
+id: eb1fe5f1-8e18-407d-996d-4c4981991188
+name: dvstg_phone_numbers
 operation:
   config:
     contains_multiactive_data: true
     generate_ghost_records: true
     main_hk_col:
-      columnCounter: f7d41fca-8381-4b58-b844-666881b7985f
-      stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+      columnCounter: 16916c74-092b-47a6-a2f5-8aab9ef7d9af
+      stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
   database: ""
   deployEnabled: true
   description: ""
@@ -19,8 +19,8 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 58c48293-0b92-4393-a34d-84c3b6b1c39e
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 142a93a2-fd0f-41d8-9e1b-d95e729f541b
+          stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
         config: {}
         dataType: LONG
         description: ""
@@ -28,13 +28,13 @@ operation:
         nullable: true
         sourceColumnReferences:
           - columnReferences:
-              - columnCounter: 26d1abb2-0a1b-4511-9b01-82516ef263a4
-                stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+              - columnCounter: e9fbeb5b-bfab-442f-92b4-307323fe48cb
+                stepCounter: 5cc66449-e356-4e49-b097-0ab9ed0ebbfc
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 1ae54de8-b697-4860-9413-5b5639f65dee
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 28174cd9-bd07-4eff-9ece-43ba8c3e6cf9
+          stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
         config:
           multi_active_key: true
         dataType: STRING
@@ -43,13 +43,13 @@ operation:
         nullable: true
         sourceColumnReferences:
           - columnReferences:
-              - columnCounter: 880bd5ca-1e50-4dba-93a0-761bcf0a570f
-                stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+              - columnCounter: 13067ca7-2a8e-4d83-93a1-77faedb37159
+                stepCounter: 5cc66449-e356-4e49-b097-0ab9ed0ebbfc
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 29616884-3579-461b-9854-bc7ba88002b4
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 25f0fe04-4404-431d-a60d-b38b3b263c08
+          stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
         config: {}
         dataType: STRING
         description: ""
@@ -57,16 +57,16 @@ operation:
         nullable: true
         sourceColumnReferences:
           - columnReferences:
-              - columnCounter: 9767bd4c-cecf-4b51-a20c-46d2dfc78b81
-                stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+              - columnCounter: c20033a1-5952-4934-a8d3-95189548e52f
+                stepCounter: 5cc66449-e356-4e49-b097-0ab9ed0ebbfc
             transform: ""
       - acceptedValues:
           strictMatch: true
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 605f05d5-4c7d-4151-8af2-178267d8e733
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 4b99be28-b31f-4ffb-9f47-f1e47fdf5c02
+          stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -82,8 +82,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 36cfa6c2-80a6-4389-840f-d4b3d7b12ee1
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 122bce01-9861-4d15-af94-6ccab35459ba
+          stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
         config: {}
         dataType: STRING
         defaultValue: ""
@@ -99,70 +99,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: f45a0210-221c-49cd-979d-eca07d24858a
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        config:
-          is_hk: true
-        dataType: STRING
-        defaultValue: ""
-        description: ""
-        hashDetails:
-          hashAlgorithm: MD5
-        hashedColumns:
-          - columnCounter: 29616884-3579-461b-9854-bc7ba88002b4
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        name: HK_PHONE_NUMBER
-        nullable: true
-        sourceColumnReferences: []
-      - acceptedValues:
-          strictMatch: true
-          values: []
-        appliedColumnTests: {}
-        columnReference:
-          columnCounter: bd519688-4d83-48e7-ae97-3054ee60af4c
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        config:
-          is_hd: true
-        dataType: STRING
-        defaultValue: ""
-        description: ""
-        hashDetails:
-          hashAlgorithm: MD5
-        hashedColumns:
-          - columnCounter: 29616884-3579-461b-9854-bc7ba88002b4
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-          - columnCounter: 1ae54de8-b697-4860-9413-5b5639f65dee
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        name: HD_TYPE_NUMBER_MS
-        nullable: true
-        sourceColumnReferences: []
-      - acceptedValues:
-          strictMatch: true
-          values: []
-        appliedColumnTests: {}
-        columnReference:
-          columnCounter: d6cf539b-3ed2-4e3c-b408-5de7cbce4db5
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        config:
-          is_hd: true
-        dataType: STRING
-        defaultValue: ""
-        description: ""
-        hashDetails:
-          hashAlgorithm: MD5
-        hashedColumns:
-          - columnCounter: 29616884-3579-461b-9854-bc7ba88002b4
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        name: HD_NUMBER_MS
-        nullable: true
-        sourceColumnReferences: []
-      - acceptedValues:
-          strictMatch: true
-          values: []
-        appliedColumnTests: {}
-        columnReference:
-          columnCounter: f7d41fca-8381-4b58-b844-666881b7985f
-          stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
+          columnCounter: 16916c74-092b-47a6-a2f5-8aab9ef7d9af
+          stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
         config:
           is_hk: true
         dataType: STRING
@@ -171,9 +109,29 @@ operation:
         hashDetails:
           hashAlgorithm: SHA1
         hashedColumns:
-          - columnCounter: 58c48293-0b92-4393-a34d-84c3b6b1c39e
-            stepCounter: 582a917f-31e3-4906-b6c2-271d7f83c5fe
-        name: HK_PHONE_H
+          - columnCounter: 142a93a2-fd0f-41d8-9e1b-d95e729f541b
+            stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
+        name: hk_customer_h
+        nullable: true
+        sourceColumnReferences: []
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 70341436-14bc-410c-a2f0-84ffe97475b2
+          stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
+        config:
+          is_hd: true
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        hashDetails:
+          hashAlgorithm: SHA1
+        hashedColumns:
+          - columnCounter: 25f0fe04-4404-431d-a60d-b38b3b263c08
+            stepCounter: eb1fe5f1-8e18-407d-996d-4c4981991188
+        name: hd_customer_ma_s
         nullable: true
         sourceColumnReferences: []
     cteString: ""
@@ -183,13 +141,13 @@ operation:
         customSQL:
           customSQL: ""
         dependencies:
-          - locationName: RICARDO
+          - locationName: EXTERNAL_TABLES
             nodeName: phone_numbers
         join:
-          joinCondition: FROM {{ ref('RICARDO', 'phone_numbers') }} `phone_numbers`
-        name: DVSTG_phone_numbers
+          joinCondition: FROM {{ ref('EXTERNAL_TABLES', 'phone_numbers') }} `phone_numbers`
+        name: dvstg_phone_numbers
         noLinkRefs: []
-  name: DVSTG_phone_numbers
+  name: dvstg_phone_numbers
   overrideSQL: false
   schema: ""
   sqlType: "4"
