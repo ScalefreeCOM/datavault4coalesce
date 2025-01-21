@@ -72,7 +72,7 @@ WITH "date_base" AS (
 
 SELECT * FROM "records_to_insert"
 
-{%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+{%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
 
 {% if config.testsEnabled %}
   {% for test in node.tests %}
