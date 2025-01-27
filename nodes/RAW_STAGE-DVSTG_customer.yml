@@ -141,7 +141,9 @@ operation:
         name: LDTS
         nullable: true
         sourceColumnReferences:
-          - columnReferences: []
+          - columnReferences:
+              - columnCounter: 20b2728f-7800-49af-8ffe-e71126e48b3f
+                stepCounter: 881fa313-3cc6-4316-a0a1-c338ae54089f
             transform: CURRENT_TIMESTAMP()
       - acceptedValues:
           strictMatch: true

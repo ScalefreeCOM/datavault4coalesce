@@ -5,9 +5,12 @@
 
 {{ stage('Insert New Rows') }}
 
+{%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
+{%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
+
 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
-WITH latest_entries_in_sat AS (
+WITH source_data AS (
   /* get current rows from satellite */
 
   {# /* USE THIS again when ColumnDropdownSelector is used
@@ -17,13 +20,78 @@ WITH latest_entries_in_sat AS (
   {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
   {%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
 
+  SELECT
+    {% for col in columns %}
+      `{{ col.name }}`
+      {%- if not loop.last -%}, {% endif %}
+    {% endfor %}
+ {{ sources[0].join }}
+  WHERE {{ datavault4coalesce.config.ldts_alias }} > (
+      SELECT 
+        COALESCE(MAX({{ datavault4coalesce.config.ldts_alias }}),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+      FROM {{ ref_no_link(node.location.name, node.name) }}
+      WHERE {{ datavault4coalesce.config.ldts_alias }} != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+      )
+)
+, latest_entries_in_sat AS(
   SELECT 
-    "{{ hashkey_column }}",
-    "{{ hashdiff_column }}"
+    `{{ hashkey_column }}`,
+    `{{ hashdiff_column }}`
+
+  FROM {{ ref_no_link(node.location.name, node.name) }} 
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY {{ hashkey_column }} ORDER BY {{ datavault4coalesce.config.ldts_alias }} DESC) = 1
+)
+
+, deduped_row_hashdiff AS(
+  SELECT 
+    {{ hashdiff_column }}
+    , {{ hashkey_column }}
+    , {{ datavault4coalesce.config.ldts_alias }}
+  FROM source_data
+  QUALIFY CASE
+    WHEN {{ hashdiff_column }} = LAG({{ hashdiff_column }}) OVER (PARTITION BY {{ hashkey_column }} ORDER BY {{ datavault4coalesce.config.ldts_alias }}) THEN FALSE ELSE TRUE END
+
+)
+
+, deduped_rows AS (
+  SELECT
+    {% for col in columns %}
+        source_data.`{{ col.name }}`
+      {%- if not loop.last -%}, {% endif %}
+    {% endfor %}
+  FROM source_data
+  INNER JOIN deduped_row_hashdiff
+    ON source_data.{{ hashkey_column }} = deduped_row_hashdiff.{{ hashkey_column }}
+    AND source_data.{{ datavault4coalesce.config.ldts_alias }} = deduped_row_hashdiff.{{ datavault4coalesce.config.ldts_alias }}
+    AND source_data.{{ hashdiff_column }} = deduped_row_hashdiff.{{ hashdiff_column }}
+)
+
+, records_to_insert AS (
+  SELECT
+  {% for col in columns %}
+      deduped_rows.`{{ col.name }}`
+    {%- if not loop.last -%}, {% endif %}
+  {% endfor %}
+  FROM deduped_rows
+  WHERE NOT EXISTS (
+    SELECT 1
+    FROM latest_entries_in_sat
+    WHERE latest_entries_in_sat.{{ hashkey_column }} = deduped_rows.{{ hashkey_column }}
+      AND latest_entries_in_sat.{{ hashdiff_column }} = deduped_rows.{{ hashdiff_column }}
+  )
+)
+SELECT * FROM records_to_insert
+
+
+---- aaaa
+
+  SELECT 
+    `{{ hashkey_column }}`,
+    `{{ hashdiff_column }}`
 
   FROM {{ ref_no_link(node.location.name, node.name) }} 
 
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY {{ hashkey_column }} ORDER BY {{ datavault4coalesce.config.ldts_alias }} DESC) = 1
 
 ),
 
@@ -35,23 +103,23 @@ deduplicated_numbered_source AS (
     {% for col in source.columns %}
       {{ get_source_transform(col) }} AS {{ col.name }},
     {% endfor %}
-        ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
+        ROW_NUMBER() OVER(PARTITION BY {{ hashkey_column }} ORDER BY {{ datavault4coalesce.config.ldts_alias }}) as rn
         
         {{ source.join }}
 
     {% if not config.disable_hwm -%}
-    WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+    WHERE {{ datavault4coalesce.config.ldts_alias }} > (
       SELECT 
-        COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+        COALESCE(MAX({{ datavault4coalesce.config.ldts_alias }}),  {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
       FROM {{ ref_no_link(node.location.name, node.name) }}
-      WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+      WHERE {{ datavault4coalesce.config.ldts_alias }} != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
       )
-      OR "{{ hashkey_column }}" = {{ datavault4coalesce__unknown_key() }}
-      OR "{{ hashkey_column }}" = {{ datavault4coalesce__error_key() }}
+      OR {{ hashkey_column }} = {{ datavault4coalesce__unknown_key() }}
+      OR {{ hashkey_column }} = {{ datavault4coalesce__error_key() }}
     {% endif %}  
         QUALIFY
         CASE
-            WHEN "{{ hashdiff_column }}" = LAG("{{ hashdiff_column }}") OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
+            WHEN {{ hashdiff_column }} = LAG({{ hashdiff_column }}) OVER(PARTITION BY {{ hashkey_column }} ORDER BY {{ datavault4coalesce.config.ldts_alias }} ) THEN FALSE
             ELSE TRUE
         END
 
@@ -70,8 +138,8 @@ deduplicated_numbered_source AS (
   WHERE NOT EXISTS (
     SELECT 1 FROM latest_entries_in_sat
     WHERE 
-      deduplicated_numbered_source.{{ hashdiff_column }} = latest_entries_in_sat."{{ hashdiff_column }}"
-    AND deduplicated_numbered_source.{{ hashkey_column }} = latest_entries_in_sat."{{ hashkey_column }}"
+      deduplicated_numbered_source.{{ hashdiff_column }} = latest_entries_in_sat.`{{ hashdiff_column }}`
+    AND deduplicated_numbered_source.{{ hashkey_column }} = latest_entries_in_sat.`{{ hashkey_column }}`
         AND deduplicated_numbered_source.rn = 1
   )
 

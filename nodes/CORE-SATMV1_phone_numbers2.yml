@@ -1,0 +1,166 @@
+fileVersion: 1
+id: 7fd2a615-4bcc-4c70-b654-05577d1f2ca2
+name: SATMV1_phone_numbers2
+operation:
+  config:
+    postSQL: ""
+    preSQL: ""
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: CORE
+  materializationType: view
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 4ce47890-5334-4464-a032-dddf511301bd
+          stepCounter: 7fd2a615-4bcc-4c70-b654-05577d1f2ca2
+        config: {}
+        dataType: STRING
+        description: ""
+        name: PHONE_TYPE
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 01c66702-4fb9-4d70-a9f9-982909387e13
+                stepCounter: e7c20823-0a38-4168-b4ae-d62146131acc
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 90e72d6c-23a3-4bff-b107-2590b455266c
+          stepCounter: 7fd2a615-4bcc-4c70-b654-05577d1f2ca2
+        config: {}
+        dataType: STRING
+        description: ""
+        name: PHONE_NUMBER
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 71335157-8768-44d5-a085-2aefa339c233
+                stepCounter: e7c20823-0a38-4168-b4ae-d62146131acc
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 88bcb54a-f94f-42ea-a540-c21b055a0007
+          stepCounter: 7fd2a615-4bcc-4c70-b654-05577d1f2ca2
+        config: {}
+        dataType: TIMESTAMP
+        description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+        name: LDTS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 31f88201-8d57-4abe-a4aa-9626932a70ab
+                stepCounter: e7c20823-0a38-4168-b4ae-d62146131acc
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: e61b80b1-88d5-4f3b-8147-d83ffe2b2088
+          stepCounter: 7fd2a615-4bcc-4c70-b654-05577d1f2ca2
+        config: {}
+        dataType: STRING
+        description: The Record Source (RSRC) describes the source of this data.
+        name: RSRC
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: a46e800d-40b0-4bfb-9169-a3afaaa34705
+                stepCounter: e7c20823-0a38-4168-b4ae-d62146131acc
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 0eddca15-c8b7-4cb2-a8f4-7caecd11af42
+          stepCounter: 7fd2a615-4bcc-4c70-b654-05577d1f2ca2
+        config:
+          is_hk: true
+        dataType: STRING
+        description: ""
+        name: HK_PHONE_H
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: d64bdc2d-6ac0-4fd2-9b3f-b3ff1e3958fe
+                stepCounter: e7c20823-0a38-4168-b4ae-d62146131acc
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 81a712ca-e9a0-40d0-9b99-7574f55e1fbb
+          stepCounter: 7fd2a615-4bcc-4c70-b654-05577d1f2ca2
+        config: {}
+        dataType: STRING
+        description: ""
+        name: HD_TYPE_NUMBER_MS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 226ced61-658e-461f-a5c1-caafc2e3bea2
+                stepCounter: e7c20823-0a38-4168-b4ae-d62146131acc
+            transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: cbd16b6e-dcb7-4cbb-8d6a-8a2d52b37aa3
+          stepCounter: 7fd2a615-4bcc-4c70-b654-05577d1f2ca2
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: ""
+        description: ""
+        is_system_ledts: true
+        name: LEDTS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: |-
+              COALESCE(LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+              OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}", "{{ get_source_ma_keys(delimiter=',') }}"  
+              ORDER BY "{{ datavault4coalesce.config.ldts_alias }}"), {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: e9dcfc39-e52b-43a0-8d80-6c12ea0cd58e
+          stepCounter: 7fd2a615-4bcc-4c70-b654-05577d1f2ca2
+        config: {}
+        dataType: BOOLEAN
+        defaultValue: ""
+        description: ""
+        is_system_current_col: true
+        name: IS_CURRENT
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: |-
+              CASE 
+                WHEN 
+                  LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+                  OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}", "{{ get_source_ma_keys(delimiter=',') }}"
+                  ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
+                THEN TRUE 
+                ELSE FALSE 
+              END
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases: {}
+        customSQL:
+          customSQL: ""
+        dependencies:
+          - locationName: CORE
+            nodeName: SATMV0_phone_numbers2
+        join:
+          joinCondition: FROM {{ ref('CORE', 'SATMV0_phone_numbers2') }} `SATMV0_phone_numbers2`
+        name: SATMV1_phone_numbers2
+        noLinkRefs: []
+  name: SATMV1_phone_numbers2
+  overrideSQL: false
+  schema: ""
+  sqlType: "21"
+  type: sql
+  version: 1
+type: Node

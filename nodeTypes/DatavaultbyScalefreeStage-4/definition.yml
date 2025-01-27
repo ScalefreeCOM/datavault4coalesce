@@ -25,6 +25,12 @@ metadata:
         type: toggleButton
         default: true
 
+      - displayName: is_ldts
+        type: columnSelector
+        attributeName: is_ldts
+        default: true
+
+
       - displayName: Contains Multi-active Data
         attributeName: contains_multiactive_data
         type: toggleButton

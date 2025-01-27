@@ -1,0 +1,123 @@
+fileVersion: 1
+id: 8b6e0ac7-163b-4d71-8eb6-6dd7d86b6a7b
+name: SATMV0_phone_numbers1
+operation:
+  config:
+    postSQL: ""
+    preSQL: ""
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: CORE
+  materializationType: table
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 581286b6-3de2-4323-a9bc-b316a52dcd59
+          stepCounter: 8b6e0ac7-163b-4d71-8eb6-6dd7d86b6a7b
+        config:
+          is_ma_key: true
+        dataType: STRING
+        description: ""
+        name: PHONE_TYPE
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 89bf60b3-52e6-431e-8bed-1e3c762f3aa0
+                stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 6cf2e284-3425-4854-94be-28e8dc41cf1b
+          stepCounter: 8b6e0ac7-163b-4d71-8eb6-6dd7d86b6a7b
+        config: {}
+        dataType: STRING
+        description: ""
+        name: PHONE_NUMBER
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: cce19858-8e13-423b-9731-b008e4266967
+                stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 6fac7f28-eb45-4989-bec1-b6bef1e3cd1b
+          stepCounter: 8b6e0ac7-163b-4d71-8eb6-6dd7d86b6a7b
+        config: {}
+        dataType: TIMESTAMP
+        description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+        name: LDTS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 9506de3a-3f7f-4291-8240-2fc275d9b92b
+                stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 112c0aee-5593-4e5a-ad30-5c191895e862
+          stepCounter: 8b6e0ac7-163b-4d71-8eb6-6dd7d86b6a7b
+        config: {}
+        dataType: STRING
+        description: The Record Source (RSRC) describes the source of this data.
+        name: RSRC
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: f314e25f-49ad-4d32-bf20-21990ab63083
+                stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 7d0e11d5-f34a-4b9c-a397-bfed9790fe08
+          stepCounter: 8b6e0ac7-163b-4d71-8eb6-6dd7d86b6a7b
+        config:
+          is_hk: true
+        dataType: STRING
+        description: ""
+        name: HK_PHONE_H
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 7b4254ab-46a5-4ad5-869d-ea9ae8a763f5
+                stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: a285b196-d3b0-490f-a598-ac13c42e3791
+          stepCounter: 8b6e0ac7-163b-4d71-8eb6-6dd7d86b6a7b
+        config:
+          is_hd: true
+        dataType: STRING
+        description: ""
+        name: HD_TYPE_NUMBER_MS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 515a0256-4fe0-4364-8ad0-bdd1ee8da40f
+                stepCounter: 42cf0530-93a1-4256-ab2a-d271050f031b
+            transform: ""
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases: {}
+        customSQL:
+          customSQL: ""
+        dependencies:
+          - locationName: RAW_STAGE
+            nodeName: DVSTG_phone_numbers1
+        join:
+          joinCondition: FROM {{ ref('RAW_STAGE', 'DVSTG_phone_numbers1') }} `DVSTG_phone_numbers1`
+        name: SATMV0_phone_numbers1
+        noLinkRefs: []
+  name: SATMV0_phone_numbers1
+  overrideSQL: false
+  schema: ""
+  sqlType: "18"
+  type: sql
+  version: 1
+type: Node

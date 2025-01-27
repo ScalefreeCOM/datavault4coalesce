@@ -1,0 +1,112 @@
+fileVersion: 1
+id: c34d5d17-42e2-4fa4-883e-da981e44a5b5
+name: DVSTG_phone_numbers2
+operation:
+  config:
+    contains_multiactive_data: false
+    generate_ghost_records: false
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: RAW_STAGE
+  materializationType: view
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: cf88a22f-cd60-4cb7-83d9-91561b18386f
+          stepCounter: c34d5d17-42e2-4fa4-883e-da981e44a5b5
+        config: {}
+        dataType: LONG
+        description: ""
+        name: CUSTOMER_ID
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 26d1abb2-0a1b-4511-9b01-82516ef263a4
+                stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 6b2fbb48-a514-405c-a821-5137405acf34
+          stepCounter: c34d5d17-42e2-4fa4-883e-da981e44a5b5
+        config: {}
+        dataType: STRING
+        description: ""
+        name: PHONE_TYPE
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 880bd5ca-1e50-4dba-93a0-761bcf0a570f
+                stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 74403a23-2719-4f29-9235-fa1b750a5635
+          stepCounter: c34d5d17-42e2-4fa4-883e-da981e44a5b5
+        config: {}
+        dataType: STRING
+        description: ""
+        name: PHONE_NUMBER
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 9767bd4c-cecf-4b51-a20c-46d2dfc78b81
+                stepCounter: b442312f-408c-4684-b6c3-ec72b6d9f9a5
+            transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: e28ef683-f8f4-4dd2-83e0-a63aaadce851
+          stepCounter: c34d5d17-42e2-4fa4-883e-da981e44a5b5
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: ""
+        description: The Load Date Timestamp (LDTS) describes when this data first arrived in the Data Warehouse.
+        is_system_ldts: true
+        name: LDTS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: CURRENT_TIMESTAMP()
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 5085e566-aee5-42d2-874d-426fe0187595
+          stepCounter: c34d5d17-42e2-4fa4-883e-da981e44a5b5
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: The Record Source (RSRC) describes the source of this data.
+        is_system_rsrc: true
+        name: RSRC
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: "{{record_source()}}"
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases: {}
+        customSQL:
+          customSQL: ""
+        dependencies:
+          - locationName: RICARDO
+            nodeName: phone_numbers
+        join:
+          joinCondition: FROM {{ ref('RICARDO', 'phone_numbers') }} `phone_numbers`
+        name: DVSTG_phone_numbers2
+        noLinkRefs: []
+  name: DVSTG_phone_numbers2
+  overrideSQL: false
+  schema: ""
+  sqlType: "4"
+  type: sql
+  version: 1
+type: Node
