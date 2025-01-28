@@ -19,12 +19,6 @@ metadata:
         isRequired: true
         default: "2020-01-01"
 
-      - displayName: Snapshot End Date (yyyy-mm-dd)
-        type: textBox
-        attributeName: input_snapshot_end_date
-        isRequired: true
-        default: "2025-12-31"
-
       - displayName: Daily Snapshot Time (hh:mm:ss)
         type: textBox
         attributeName: input_daily_snapshot_time
