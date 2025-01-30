@@ -7,7 +7,24 @@
 
 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
-WITH latest_entries_in_sat AS (
+WITH 
+
+source_data AS (
+
+    {% for source in sources %}
+
+        SELECT
+    {% for col in source.columns %}
+      {{ get_source_transform(col) }} AS "{{ col.name }}",
+    {% endfor %}
+
+        {{ source.join }}
+
+    {% endfor %}
+
+),
+
+latest_entries_in_sat AS (
   /* get current rows from satellite */
 
   {# /* USE THIS again when ColumnDropdownSelector is used
@@ -33,7 +50,7 @@ deduplicated_numbered_source AS (
 
         SELECT
     {% for col in source.columns %}
-      {{ get_source_transform(col) }} AS {{ col.name }},
+      {{ get_source_transform(col) }} AS "{{ col.name }}",
     {% endfor %}
         ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
         
@@ -62,17 +79,21 @@ deduplicated_numbered_source AS (
   {% for source in sources %}
     SELECT DISTINCT
     {% for col in source.columns %}
-      {{ col.name }}
+      src."{{ col.name }}"
       {%- if not loop.last -%}, {% endif %}
     {% endfor %}
 
-    FROM deduplicated_numbered_source
+    FROM source_data src
+    INNER JOIN deduplicated_numbered_source dedupe
+      ON src."{{ hashkey_column }}" = dedupe."{{ hashkey_column }}"
+      AND src."{{ hashdiff_column }}" = dedupe."{{ hashdiff_column }}"
+      AND src."{{ datavault4coalesce.config.ldts_alias }}" = dedupe."{{ datavault4coalesce.config.ldts_alias }}"
   WHERE NOT EXISTS (
     SELECT 1 FROM latest_entries_in_sat
     WHERE 
-      deduplicated_numbered_source.{{ hashdiff_column }} = latest_entries_in_sat."{{ hashdiff_column }}"
-    AND deduplicated_numbered_source.{{ hashkey_column }} = latest_entries_in_sat."{{ hashkey_column }}"
-        AND deduplicated_numbered_source.rn = 1
+      dedupe."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
+    AND dedupe."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
+        AND dedupe.rn = 1
   )
 
   {% endfor %}

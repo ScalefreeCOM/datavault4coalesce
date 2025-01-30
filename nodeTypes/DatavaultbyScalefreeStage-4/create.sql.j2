@@ -24,6 +24,31 @@
     )
     {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
     AS
+
+    WITH 
+
+    {# All columns  that are not hash columns #}
+
+    regular_columns AS (
+
+    {% for source in sources %}
+        SELECT
+        {% for col in source.columns %}
+            {% if not col.hashDetails %}
+                {{ get_source_transform(col) }} AS "{{ col.name }}"
+                {%- if not loop.last -%}, {% endif %}
+            {% endif %}
+        {% endfor %}
+
+        {{ source.join }}
+
+    {% endfor %}
+
+    ),
+
+    all_columns AS (
+        
+
     {% for source in sources %}
         {#-------------------- Process multi-activity config --------------------#}
         {#----------------------- FIXME explain variables -----------------------#}
@@ -42,12 +67,12 @@
                 {{ datavault4coalesce__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}"
             {#- Print other table columns -#}
             {% else %}
-                {{ get_source_transform(col) }} AS "{{ col.name }}"
+                "{{ col.name }}"
             {% endif %}
             {%- if not loop.last -%}, {% endif %}
         {% endfor %}
 
-        {{ source.join }}
+        FROM regular_columns
 
         {% if not loop.last %}
             {% if config.insertStrategy in ['UNION', 'UNION ALL'] %}
@@ -92,5 +117,9 @@
         {%- endif -%}
 
     {% endfor %}
+
+    )
+
+    SELECT * FROM all_columns
 
 {% endif %}

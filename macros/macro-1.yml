@@ -21,7 +21,7 @@ macroString: |-
        "hash": "MD5", 
        "hash_datatype": "STRING", 
        "hash_input_case_sensitive": "TRUE",
-       "hash_passthrough_input_transformations": "TRUE",
+       "hash_passthrough_input_transformations": "FALSE",
        "beginning_of_all_times": "0001-01-01T00:00:01",
        "end_of_all_times": "8888-12-31T23:59:59",
        "timestamp_format": "YYYY-MM-DDTHH24:MI:SS", 
@@ -406,7 +406,7 @@ macroString: |-
   {#--                       hashing calculation of multi-active                           --#}
   {#--                       satellite's hash diff attribute.                              --#}
   {%- if is_hashdiff and multi_active_key is defined and multi_active_key|length>0 -%}
-      {%- set multi_active_key = multi_active_key|join(", ") -%}
+      {%- set multi_active_key = multi_active_key|join('", "') -%}
       {%- set listagg_closing = ' WITHIN GROUP (ORDER BY "{}") OVER (PARTITION BY "{}", "{}"))'.format(multi_active_key, main_hashkey_col, ldts_alias) -%}
   {%- endif -%}
 
@@ -498,7 +498,7 @@ macroString: |-
   {{ standardise_prefix }}
   {%- for column in columns -%}
       {%- set ns.all_null = ns.all_null + [null_placeholder_string] -%}
-      {%- if datavault4coalesce.config.hash_passthrough_input_transformations -%}
+      {%- if datavault4coalesce.config.hash_passthrough_input_transformations == TRUE -%}
           {%- set column_str = datavault4coalesce__as_constant(get_source_transform(column)) -%}
       {%- else -%}
           {%- if '.' in column.name %}
