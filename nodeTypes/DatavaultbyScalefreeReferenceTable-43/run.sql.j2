@@ -55,7 +55,7 @@ dates AS (
   {% for satellite in ref_satellites_dict -%}
     SELECT distinct 
         {{ date_column }}
-    FROM "{{ satellite }}"
+    FROM {{ ref_no_link(node.location.name, satellite) }}
     WHERE {{ date_column }} != {{ datavault4coalesce__string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
     {% if not loop.last -%} UNION {% endif %}
     {%- endfor %}
@@ -127,8 +127,7 @@ dates AS (
             {%- set _ = joined_tables.append(source_node_name) -%}
           {%- set target_node = node.name -%}
 
-              FULL OUTER JOIN dates "ld" ON 1 = 1  
-              AND  "ld"."{{ date_column }}" BETWEEN "{{ source_node_name }}"."{{ date_column }}" AND "{{ source_node_name }}"."{{ datavault4coalesce.config.ledts_alias }}"
+              
         LEFT JOIN {{ ref(source_node_schema, source_node_name) }} "{{ source_node_name }}"
         ON 1 = 1
         
@@ -138,6 +137,8 @@ dates AS (
               AND "{{ ns.hub_node_name }}"."{{ ref_key_col.name}}" = "{{ source_node_name }}"."{{ ref_key_col.name}}"
             {%- endif -%}
           {% endfor -%}
+        FULL OUTER JOIN dates "ld" ON 1 = 1  
+              AND  "ld"."{{ date_column }}" BETWEEN "{{ source_node_name }}"."{{ date_column }}" AND "{{ source_node_name }}"."{{ datavault4coalesce.config.ledts_alias }}"
           {%- endif -%}
             {% endif %}
     {%- endif %}
