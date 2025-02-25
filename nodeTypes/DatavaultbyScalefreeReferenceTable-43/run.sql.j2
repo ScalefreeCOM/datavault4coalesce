@@ -22,7 +22,22 @@
 
 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
+
 WITH 
+
+{%- set snapshot_tbl = [] -%}
+
+{%- for col in sources[0].columns -%}
+    
+    {%- if 'is_sdts' in col.keys() %}
+            {%- set snapshot_source_node_name = col.sourceColumns[0].node.name -%}
+            {%- set snapshot_source_node_schema = col.sourceColumns[0].node.location.name -%}
+            {%- if snapshot_source_node_name not in snapshot_tbl -%}
+              {%- set _ = snapshot_tbl.append(snapshot_source_node_name) -%}
+        {%- endif -%}
+    {%- endif -%}
+{%- endfor %}
+
 
 {%- set ref_satellites_dict = [] -%}
 
@@ -30,14 +45,16 @@ WITH
     
     {%- if 'column' in col.sourceColumns[0].keys() %}
         {%- if 'is_ref_key' not in col.sourceColumns[0].column.keys() -%}
-          {%- set source_node_name = col.sourceColumns[0].node.name -%}
-          {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
-          {%- if source_node_name not in ref_satellites_dict -%}
-            {%- set _ = ref_satellites_dict.append(source_node_name) -%}
+          {%- if col.sourceColumns[0].node.name not in snapshot_tbl -%}
+            {%- set source_node_name = col.sourceColumns[0].node.name -%}
+            {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
+            {%- if source_node_name not in ref_satellites_dict -%}
+              {%- set _ = ref_satellites_dict.append(source_node_name) -%}
+            {%- endif -%}
           {%- endif -%}
         {%- endif -%}
     {%- endif -%}
-{%- endfor %} 
+{%- endfor %}
 
 dates AS (
 
@@ -61,7 +78,26 @@ dates AS (
     {%- endfor %}
     )
 
- 
+{% elif historized in ['Snapshot-based'] %}
+
+
+          {%- set date_column = datavault4coalesce.config.sdts_alias -%} 
+          
+          {% for snp_tbl in snapshot_tbl -%}
+          SELECT 
+                {{ date_column }},
+                {{ datavault4coalesce.config.snapshot_trigger_column }}
+            FROM (
+                
+                SELECT 
+                    {{ datavault4coalesce.config.sdts_alias }},
+                    {{ datavault4coalesce.config.snapshot_trigger_column }}
+                FROM {{ ref_no_link(node.location.name, snp_tbl) }}
+                WHERE {{ datavault4coalesce.config.snapshot_trigger_column }}
+          {%- endfor %}
+            )
+
+
 
 {%- endif %}
 )
@@ -72,11 +108,18 @@ dates AS (
   {% for col in sources[0].columns %}
 
     {% if 'column' in col.sourceColumns[0].keys() -%}
-
-      {%- set source_node_name = col.sourceColumns[0].node.name -%}
-      {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
-      {%- set source_column_name = col.sourceColumns[0].column.name -%}
-      {%- set target_column_name = col.name -%}
+      {%- if col.sourceColumns[0].node.name in snapshot_tbl -%}
+        {%- set source_node_name = 'ld' -%}
+        {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
+        {%- set source_column_name = col.sourceColumns[0].column.name -%}
+        {%- set target_column_name = col.name -%}
+      {% else %}
+        {%- set source_node_name = col.sourceColumns[0].node.name -%}
+        {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
+        {%- set source_column_name = col.sourceColumns[0].column.name -%}
+        {%- set target_column_name = col.name -%}
+      {% endif %}
+      
 
       {%- if col.sourceColumns[0].column.is_ref_key -%}
                 {%- set ns.hub_node_name = source_node_name -%}
@@ -93,9 +136,11 @@ dates AS (
 
       {%- else -%}
         "{{ source_node_name }}"."{{ source_column_name }}" AS "{{ target_column_name }}"
+       
       {%- endif %}
 
     {%- if not loop.last -%} , {% endif %}
+   {# {% endif %} #}
     {%- elif col.is_ref_key -%}
       {{ get_source_transform(col) }} AS "{{ col.name }}",
     {%- endif %}
@@ -105,7 +150,7 @@ dates AS (
   FROM {{ ref(ns.hub_node_schema, ns.hub_node_name) }} "{{ ns.hub_node_name }}"
 
   {% for col in sources[0].columns -%}
-    {%- if col.name == datavault4coalesce.config.sdts_alias -%}
+    {%- if col.name == datavault4coalesce.config.sdts_alias and col.sourceColumns[0].node.name not in snapshot_tbl-%}
 
             {%- set source_node_name = col.sourceColumns[0].node.name -%}
       {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
@@ -120,12 +165,12 @@ dates AS (
     
     {%- if 'column' in col.sourceColumns[0].keys() %}
         {%- if 'is_ref_key' not in col.sourceColumns[0].column.keys() and not loop.first -%}
-{#      {%- if not col.sourceColumns[0].column.is_ref_key and not loop.first -%} #}
-          {%- set source_node_name = col.sourceColumns[0].node.name -%}
-          {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
-          {%- if source_node_name not in joined_tables -%}
-            {%- set _ = joined_tables.append(source_node_name) -%}
-          {%- set target_node = node.name -%}
+          {%- if col.sourceColumns[0].node.name not in snapshot_tbl -%}
+            {%- set source_node_name = col.sourceColumns[0].node.name -%}
+            {%- set source_node_schema = col.sourceColumns[0].node.location.name -%}
+            {%- if source_node_name not in joined_tables -%}
+              {%- set _ = joined_tables.append(source_node_name) -%}
+            {%- set target_node = node.name -%}
 
               
         LEFT JOIN {{ ref(source_node_schema, source_node_name) }} "{{ source_node_name }}"
@@ -136,11 +181,12 @@ dates AS (
             {%- if 'is_ref_key' in ref_key_col.sourceColumns[0].column.keys() and ref_key_col.sourceColumns[0].column.is_ref_key %}
               AND "{{ ns.hub_node_name }}"."{{ ref_key_col.name}}" = "{{ source_node_name }}"."{{ ref_key_col.name}}"
             {%- endif -%}
-          {% endfor -%}
+          {% endfor %}
         FULL OUTER JOIN dates "ld" ON 1 = 1  
-              AND  "ld"."{{ date_column }}" BETWEEN "{{ source_node_name }}"."{{ date_column }}" AND "{{ source_node_name }}"."{{ datavault4coalesce.config.ledts_alias }}"
+              AND  "ld"."{{ date_column }}" BETWEEN "{{ source_node_name }}"."{{ datavault4coalesce.config.ldts_alias }}" AND "{{ source_node_name }}"."{{ datavault4coalesce.config.ledts_alias }}"
           {%- endif -%}
             {% endif %}
+        {%- endif -%} 
     {%- endif %}
   {% endfor -%}
 )

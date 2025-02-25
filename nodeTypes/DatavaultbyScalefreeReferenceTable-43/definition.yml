@@ -4,7 +4,7 @@ isDisabled: false
 metadata:
   defaultStorageLocation: null
   error: null
-  nodeMetadataSpec: |-
+  nodeMetadataSpec: |
     capitalized: 'DATAVAULT BY SCALEFREE: Reference Table'
     short: 'REF_TBL'
     tagColor: '#FF0090'
@@ -16,6 +16,11 @@ metadata:
       - displayName: Reference Table Key Column(s)
         type: columnSelector
         attributeName: is_ref_key
+        isRequired: true
+      
+      - displayName: SDTS Column
+        type: columnSelector
+        attributeName: is_sdts
         isRequired: true
 
       - displayName: Enable Tests
