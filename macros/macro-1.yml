@@ -32,7 +32,8 @@ macroString: |-
        "error_value__STRING": "'(error)'", 
        "error_value_alt__STRING": "'e'", 
        "unknown_value__STRING": "'(unknown)'",
-       "unknown_value_alt__STRING": "'u'"
+       "unknown_value_alt__STRING": "'u'",
+       "include_business_objects_before_appearance": "false"
        }
   ) -%}
 
