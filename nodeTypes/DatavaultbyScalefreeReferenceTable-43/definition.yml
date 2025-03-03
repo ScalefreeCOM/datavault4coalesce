@@ -17,16 +17,6 @@ metadata:
         type: columnSelector
         attributeName: is_ref_key
         isRequired: true
-      
-      - displayName: SDTS Column
-        type: columnSelector
-        attributeName: is_sdts
-        isRequired: true
-
-      - displayName: Enable Tests
-        attributeName: testsEnabled
-        type: toggleButton
-        default: true
 
       - displayName: Historization
         attributeName: historized
@@ -36,5 +26,17 @@ metadata:
         - 'Full'
         - 'Latest'
         - 'Snapshot-based'
+      
+      - displayName: SDTS Column
+        enableIf: "{% if config.historized == 'Snapshot-based' %} true {% else %} false {% endif %}"
+        type: columnSelector
+        attributeName: is_sdts
+        isRequired: true
+        default: ""
+
+      - displayName: Enable Tests
+        attributeName: testsEnabled
+        type: toggleButton
+        default: true
 name: "Datavault by Scalefree: Reference Table"
 type: NodeType
