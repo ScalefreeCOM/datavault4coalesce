@@ -11,6 +11,15 @@ metadata:
     plural: 'DATAVAULT BY SCALEFREE: Reference Tables'
 
     config:
+    - groupName: Options
+      items:
+      - type: materializationSelector
+        isRequired: true
+        default: table
+        options:
+        - table
+        - view
+
     - groupName: Data Vault
       items:
       - displayName: Reference Table Key Column(s)
@@ -31,8 +40,8 @@ metadata:
         enableIf: "{% if config.historized == 'Snapshot-based' %} true {% else %} false {% endif %}"
         type: columnSelector
         attributeName: is_sdts
-        isRequired: true
-        default: ""
+        isRequired: false
+        default: 'sdts'
 
       - displayName: Enable Tests
         attributeName: testsEnabled
