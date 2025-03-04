@@ -11,4 +11,4 @@
       {%- if not loop.last -%}, {% endif %}
     {% endfor %}
   )
-  {%- if node.description | length > 0 %} COMMENT = '{{ node.descriptio | escape }}'{% endif %}
+  {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape }}'{% endif %}
