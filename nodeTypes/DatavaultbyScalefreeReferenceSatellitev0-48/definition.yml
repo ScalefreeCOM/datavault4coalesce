@@ -1,0 +1,50 @@
+fileVersion: 1
+id: "48"
+isDisabled: false
+metadata:
+  defaultStorageLocation: null
+  error: null
+  nodeMetadataSpec: |-
+    capitalized: 'DATAVAULT BY SCALEFREE: REFERENCE SATELLITE V0'
+    short: 'REF_SATV0'
+    plural: 'DATAVAULT BY SCALEFREE: REFERENCE SATELLITES V0'
+    tagColor: 'Yellow'
+
+
+    config:
+    - groupName: Data Vault
+      items:
+      - displayName: Reference Keys
+        type: columnSelector
+        attributeName: is_ref_key
+        isRequired: true
+
+      - displayName: Hashdiff Column
+        type: columnSelector
+        attributeName: is_hd
+        isRequired: true
+
+      - displayName: Disable High-Water-Mark?
+        type: toggleButton
+        isRequired: true
+        attributeName: disable_hwm   
+        default: false    
+
+      - displayName: Enable Tests
+        attributeName: testsEnabled
+        type: toggleButton
+        default: true
+
+    - groupName: Pre/Post SQL
+      items:
+      - displayName: Pre-SQL
+        attributeName: preSQL
+        type: textBox
+        isRequired: false
+
+      - displayName: Post-SQL
+        attributeName: postSQL
+        type: textBox
+        isRequired: false
+name: "Datavault by Scalefree: Reference Satellite v0"
+type: NodeType
