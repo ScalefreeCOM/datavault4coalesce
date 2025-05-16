@@ -17,11 +17,11 @@ macroString: |-
             (
                 {% for col in columns %}
                     {%- if col.is_rsrc_column -%}
-                        `{{ datavault4coalesce.config.rsrc_alias }}`
+                        "{{ datavault4coalesce.config.rsrc_alias }}"
                     {%- elif col.is_ldts_column -%}
-                        `{{ datavault4coalesce.config.ldts_alias }}`
+                        "{{ datavault4coalesce.config.ldts_alias }}"
                     {% else %}
-                        `{{ col.name }}`
+                        "{{ col.name }}"
                     {% endif %}
                     {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
                     {%- if not loop.last -%}, {% endif %}
@@ -40,10 +40,10 @@ macroString: |-
                 {% for col in sources[0].columns %}
                     {#- Print DV hash calculations -#}
                     {% if col.hashDetails %}
-                        {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash) }} AS `{{ col.name }}`
+                        {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash) }} AS "{{ col.name }}"
                     {#- Print other table columns -#}
                     {% else %}
-                        {{ get_source_transform(col) }} AS `{{ col.name }}`
+                        {{ get_source_transform(col) }} AS "{{ col.name }}"
                     {% endif %}
                     {%- if not loop.last -%}, {% endif %}
                 {% endfor %}
@@ -62,7 +62,7 @@ macroString: |-
                 {%- endfor -%}
             
             
-                        {#  {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS `{{ col.name }}` #}
+                        {#  {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}" #}
 
 
                 main_hashkey_generation AS(
@@ -84,10 +84,10 @@ macroString: |-
                     {% for col in main_hashkey_generation_columns %}
                         {#- Print DV hash calculations -#}
                         {% if col.hashDetails %}
-                            {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash) }} AS `{{ col.name }}`
+                            {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash) }} AS "{{ col.name }}"
                         {#- Print other table columns -#}
                         {% else %}
-                            {{ get_source_transform(col) }} AS `{{ col.name }}`
+                            {{ get_source_transform(col) }} AS "{{ col.name }}"
                         {% endif %}
                         {%- if not loop.last -%}, {% endif %}
                     {% endfor %}
@@ -114,10 +114,10 @@ macroString: |-
                     {% for col in ma_hashdiff_prep_columns %}
                         {#- Print DV hash calculations -#}
                         {% if 'is_hd' in col %}
-                            {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS `{{ col.name }}`
+                            {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}"
                         {#- Print other table columns -#}
                         {% else %}
-                            {{ col.name }} AS `{{ col.name }}`
+                            {{ col.name }} AS "{{ col.name }}"
                         {% endif %}
                         {%- if not loop.last -%}, {% endif %}
                     {% endfor %}
@@ -140,7 +140,7 @@ macroString: |-
                     {% endfor %}
 
                     {% for col in hashed_columns %}
-                            , {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS `{{ col.name }}`            
+                            , {{ datavault4coalesce__snowflake_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS "{{ col.name }}"            
                     {% endfor %}
 
                     {% for col in ma_hashdiff_prep_columns %}
