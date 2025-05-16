@@ -1,0 +1,6 @@
+fileVersion: 1
+id: "4"
+macroString: |- 
+  {#-- Utility macro: outputs a SQL function to create a stage table. --#}
+name: datavault4coalesce__snowflake_stage_run
+type: Macro

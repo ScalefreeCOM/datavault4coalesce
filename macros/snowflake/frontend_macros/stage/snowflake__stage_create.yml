@@ -2,7 +2,7 @@ fileVersion: 1
 id: "1"
 macroString: |- 
     {#-- Utility macro: outputs a SQL function to create stage. --#}
-    {%- macro snowflake__stage_create(node, config, sources, columns) -%}
+    {%- macro datavault4coalesce__snowflake_stage_create(node, config, sources, columns) -%}
     
     
     {% if node.override.create.enabled %}
@@ -209,5 +209,5 @@ macroString: |-
 
     {% endif %}
     {%- endmacro -%}
-name: snowflake__stage_create
+name: datavault4coalesce__snowflake_stage_create
 type: Macro

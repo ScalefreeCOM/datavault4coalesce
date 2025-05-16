@@ -37,13 +37,6 @@ macroString: |-
        "include_business_objects_before_appearance": "false"
        }
   ) -%}
-
-  {%- if datavault4coalesce.config.database_type == "SNOWFLAKE" -%}
-     {%- include "snowflake/background_macros/snowflake__macro.yml" -%}
-     {%- include "snowflake/background_macros/snowflake__hash.yml" -%}
-  {%- elif datavault4coalesce.config.database_type == "DATABRICKS" -%}
-     {%- include "databricks/background_macros/databricks__hash.yml" -%}
-     {%- include "databricks/background_macros/databricks__macro.yml" -%}
-  {%- endif -%}
+  
 name: top_level_macro
 type: Macro

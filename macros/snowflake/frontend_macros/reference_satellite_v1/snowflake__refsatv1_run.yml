@@ -1,0 +1,6 @@
+fileVersion: 1
+id: "35"
+macroString: |- 
+  {#-- Utility macro: outputs a SQL function to create a reference satellite table. --#}
+name: datavault4coalesce__snowflake_reference_satellite_v1_run
+type: Macro
