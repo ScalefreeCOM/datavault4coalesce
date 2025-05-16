@@ -1,0 +1,21 @@
+fileVersion: 1
+id: "1"
+macroString: |-
+
+  {#-----------------------------------------------------------------------------------------------#}
+  {#-- DV Utility macro: generates a string as the record source.                                --#}
+  {#--                                                                                           --#}
+  {#-- The record source is a standard, technical attribute in Data Vault 2.0 object structures. --#}
+  {#-- It is used to identify the origin of a data record and should contain a detailed path     --#}
+  {#--    to trace a record back to its source table and source system.                          --#}
+  {#-----------------------------------------------------------------------------------------------#}
+  {%- macro snowflake_record_source() -%}
+  {%- if sources[0].dependencies -%}
+       {% set src = storageLocations | selectattr('name', "equalto", sources[0].dependencies[0].node.location.name) | list | first %} 
+       '"{{src.database}}"."{{src.schema}}"."{{sources[0].dependencies[0].node.name}}"'
+  {%- else -%}
+       'Missing Dependencies!'
+  {%- endif -%}
+  {%- endmacro -%}
+name: snowflake_record_source
+type: Macro

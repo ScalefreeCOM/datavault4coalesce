@@ -1,0 +1,51 @@
+fileVersion: 1
+id: "1"
+macroString: |-  
+  {#---------------------------------------------------------------------------------------------#}
+  {#-- DV Utility macro: Output unknown zero key for ghost record.                             --#}
+  {#--                                                                                         --#}
+  {#-- Generates unknown zero key based on the hashing algorithm being used for ghost records. --#}
+  {#-- Usage: main hashing macro datavault4coalesce__hash                                      --#}
+  {#--        and macro for ghost record datavault4coalesce__ghost_record_per_datatype         --#}
+  {#--                                                                                         --#}
+  {#-- Parameters:                                                                             --#}
+  {#--     hash_function: hashing algorithm.                                                   --#}
+  {#--     hash_datatype: datatype of hash column.                                             --#}
+  {#---------------------------------------------------------------------------------------------#}
+  {%- macro datavault4coalesce__snowflake_unknown_key(hash_function=none, hash_datatype=none) -%}
+       {%- if hash_function is none -%}
+            {%- set hash_function = datavault4coalesce.config.hash -%}
+       {%- endif -%}
+       {%- if hash_datatype is none -%}
+            {%- set hash_datatype = datavault4coalesce.config.hash_datatype -%}
+       {%- endif -%}     
+
+       {%- set dict_result = {} -%}
+       {%- set unknown_key = '' -%}
+
+       {%- if hash_function == 'MD5' -%}
+            {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                 {%- set unknown_key = '!00000000000000000000000000000000' -%}
+            {%- elif 'BINARY' in hash_datatype -%}  
+                 {%- set unknown_key = "TO_BINARY('00000000000000000000000000000000')" -%}     
+            {%- endif -%}                       
+       {%- elif hash_function == 'SHA1' or hash_function == 'SHA1_HEX' or hash_function == 'SHA' -%} 
+            {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                 {%- set unknown_key = '!0000000000000000000000000000000000000000' -%}
+            {%- elif 'BINARY' in hash_datatype -%}
+                 {%- set unknown_key = "TO_BINARY('0000000000000000000000000000000000000000')" -%}     
+            {%- endif -%}
+       {%- elif hash_function == 'SHA2' or hash_function == 'SHA2_HEX' or hash_function == 'SHA256'  -%}
+            {%- if 'VARCHAR' in hash_datatype or 'CHAR' in hash_datatype or 'STRING' in hash_datatype or 'TEXT' in hash_datatype %}
+                 {%- set unknown_key = '!0000000000000000000000000000000000000000000000000000000000000000' -%}
+            {%- elif 'BINARY' in hash_datatype -%}
+                 {%- set unknown_key = "TO_BINARY('0000000000000000000000000000000000000000000000000000000000000000')" -%}  
+            {%- endif -%}   
+       {%- endif -%}
+
+       {% set unknown_key = datavault4coalesce__as_constant(unknown_key) %}
+       {{ unknown_key }}
+
+  {%- endmacro -%}
+name: datavault4coalesce__snowflake_unknown_key
+type: Macro

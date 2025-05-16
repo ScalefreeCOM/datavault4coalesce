@@ -1,0 +1,19 @@
+fileVersion: 1
+id: "1"
+macroString: |- 
+
+  {#-------------------------------------------------------------------------#}
+  {#-- Outputs list of multi-active keys from the direct parent object     --#}
+  {#-- Usage: Node definition of multi-active satellite v1                 --#}
+  {#--   delimiter: delimiter character to be used in string concatenation --#}
+  {#-------------------------------------------------------------------------#}
+  {%- macro snowflake_get_source_ma_keys(delimiter=',') -%}
+       {%- set srcCols = sources[0].dependencies[0].columns -%}
+       {%- set result = [] -%}
+       {% for srcMAKey in srcCols if srcMAKey.is_ma_key %}
+            {%- set result = result.append(srcMAKey.name) -%}
+       {%- endfor -%}
+       {{- result|join(delimiter) -}}
+  {%- endmacro -%}
+name: snowflake_get_source_ma_keys
+type: Macro

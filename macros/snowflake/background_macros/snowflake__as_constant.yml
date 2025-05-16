@@ -1,0 +1,20 @@
+fileVersion: 1
+id: "1"
+macroString: |-
+
+  {#-- Utility macro: wrap input between escape characters --#}
+  {%- macro datavault4coalesce__snowflake_as_constant(column_str) -%}
+      {%- if column_str is not none and column_str is string and column_str -%}
+          {%- if column_str|first == "!" -%}
+              {{- "'" ~ column_str[1:] ~ "'" -}}
+          {%- else -%}
+              {%- if datavault4coalesce__is_expression(column_str) -%}
+                  {{- column_str -}}
+              {%- else -%}
+                  {{- datavault4coalesce__escape_column_name(column_str) -}}
+              {%- endif -%}
+          {%- endif -%}
+      {%- endif -%}
+  {%- endmacro -%}
+name: datavault4coalesce__snowflake_as_constant
+type: Macro

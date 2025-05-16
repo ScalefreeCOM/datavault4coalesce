@@ -1,0 +1,49 @@
+fileVersion: 1
+id: "1"
+macroString: |-
+  {#------------------------------------------------------------------------------------------------------#}
+  {#-- Global variables of datavault4coalesce                                                           --#}
+  {#--                                                                                                  --#}
+  {#-- The following variables can be customized to implement your own DV standard definition.          --#}
+  {#-- They will be used in the macros found below.                                                     --#}
+  {#-- Refer to official wiki: https://github.com/ScalefreeCOM/datavault4coalesce/wiki/Global-variables --#}
+  {#------------------------------------------------------------------------------------------------------#}
+  {%- set datavault4coalesce = namespace(
+       config = {
+       "database_type": "SNOWFLAKE" | "DATABRICKS",
+       "ldts_alias": "LDTS",
+       "rsrc_alias": "RSRC", 
+       "ledts_alias": "LEDTS",
+       "stg_alias": "STG", 
+       "snapshot_trigger_column": "IS_ACTIVE",
+       "use_object_name_prefix": TRUE,
+       "sdts_alias": "SDTS",
+       "is_current_col_alias": "IS_CURRENT", 
+       "hash": "MD5", 
+       "hash_datatype": "STRING", 
+       "hash_input_case_sensitive": "TRUE",
+       "hash_passthrough_input_transformations": "FALSE",
+       "beginning_of_all_times": "0001-01-01T00:00:01",
+       "end_of_all_times": "8888-12-31T23:59:59",
+       "timestamp_format": "YYYY-MM-DDTHH24:MI:SS", 
+       "default_unknown_rsrc": "SYSTEM", 
+       "default_error_rsrc": "ERROR", 
+       "rsrc_default_dtype": "STRING", 
+       "stg_default_dtype": "STRING", 
+       "error_value__STRING": "'(error)'", 
+       "error_value_alt__STRING": "'e'", 
+       "unknown_value__STRING": "'(unknown)'",
+       "unknown_value_alt__STRING": "'u'",
+       "include_business_objects_before_appearance": "false"
+       }
+  ) -%}
+
+  {%- if datavault4coalesce.config.database_type == "SNOWFLAKE" -%}
+     {%- include "snowflake/background_macros/snowflake__macro.yml" -%}
+     {%- include "snowflake/background_macros/snowflake__hash.yml" -%}
+  {%- elif datavault4coalesce.config.database_type == "DATABRICKS" -%}
+     {%- include "databricks/background_macros/databricks__hash.yml" -%}
+     {%- include "databricks/background_macros/databricks__macro.yml" -%}
+  {%- endif -%}
+name: top_level_macro
+type: Macro

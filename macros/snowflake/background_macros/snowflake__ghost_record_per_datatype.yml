@@ -1,0 +1,74 @@
+fileVersion: 1
+id: "1"
+macroString: |-
+  {#--------------------------------------------------------------------------------------------------#}
+  {#-- DV Utility macro: Generate default values for ghost record.                                  --#}
+  {#--                                                                                              --#}
+  {#-- As part of the INSERT statements for DV2.0 ghost records, the output of this macro processes --#}
+  {#-- table columns and generate default values based on the column data types.                    --#}
+  {#-- Usage: create template for node type DataVault by Scalefree: Stage.                          --#}
+  {#--                                                                                              --#}
+  {#-- Parameters:                                                                                  --#}
+  {#--     column_name: name of table column to be processed.                                       --#}
+  {#--     datatype: datatype of table column.                                                      --#}
+  {#--     ghost_record_type : type of the ghost record being generated.                            --#}
+  {#--                         By default, Datavault4coalesce uses 2 types: 'unknown' and 'error'.  --#}
+  {#--     hash: indicates if the table column being process is either a hash key or a change hash. --#}
+  {#--           Values: true | false                                                                 --#}
+  {#--     hash_algo: hash algorithm being used for the hashing function.                           --#}
+  {#--------------------------------------------------------------------------------------------------#}
+  
+  {%- macro datavault4coalesce__snowflake_ghost_record_per_datatype(column_name, datatype, ghost_record_type, hash, hash_algo=none) -%}
+
+  {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times -%}
+  {%- set end_of_all_times = datavault4coalesce.config.end_of_all_times -%}
+  {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
+  {%- set unknown_value__STRING = datavault4coalesce.config.unknown_value__STRING -%}
+  {%- set unknown_value_alt__STRING = datavault4coalesce.config.unknown_value_alt__STRING -%}
+  {%- set error_value__STRING = datavault4coalesce.config.error_value__STRING -%}
+  {%- set error_value_alt__STRING = datavault4coalesce.config.error_value_alt__STRING -%}
+
+  {%- if hash %}
+
+       {%- set datatype = datatype|upper -%}
+       {%- set hash_alg = datavault4coalesce__hash_algorithm(hash_function=hash_algo, hash_datatype=datatype) -%}
+       {%- set unknown_key = datavault4coalesce__unknown_key(hash_function=hash_algo, hash_datatype=datatype) -%}
+       {%- set error_key = datavault4coalesce__error_key(hash_function=hash_algo, hash_datatype=datatype) -%}
+
+       {%- if ghost_record_type == 'unknown' -%}
+            {{ unknown_key }} as {{ column_name }}
+       {%- elif ghost_record_type == 'error' -%}
+            {{ error_key }} as {{ column_name }}
+       {% endif %}
+
+  {% else %}
+
+       {%- if ghost_record_type == 'unknown' -%}
+       {%- if datatype.upper().startswith('TIMESTAMP') or datatype.upper().startswith('DATE') -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
+       {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
+            {%- if datatype.upper().startswith('VARCHAR') and datatype[8:-1]|int >= unknown_value__STRING|length -%} {{unknown_value__STRING}} AS {{ column_name }}
+            {%- elif datatype.upper().startswith('STRING') -%} {{unknown_value__STRING}} AS {{ column_name }}
+            {% else %} {{unknown_value_alt__STRING}} AS {{ column_name }}
+            {% endif %}
+       {% elif datatype in ['NUMBER','INT','FLOAT','DECIMAL'] or datatype.upper().startswith('NUMBER') %}0 AS {{ column_name }}
+       {% elif datatype == 'BOOLEAN' %}CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
+       {% else %}NULL AS {{ column_name }}
+       {% endif %}
+       
+       {%- elif ghost_record_type == 'error' -%}
+       {%- if datatype.upper().startswith('TIMESTAMP') or datatype.upper().startswith('DATE') -%}{{ datavault4coalesce__string_to_timestamp(timestamp_format, end_of_all_times) }} AS {{ column_name }}
+       {% elif datatype.upper().startswith('STRING') or datatype.upper().startswith('VARCHAR') %}
+            {%- if datatype.upper().startswith('VARCHAR') and datatype[8:-1]|int >= error_value__STRING|length -%} {{error_value__STRING}} AS {{ column_name }}
+            {%- elif datatype.upper().startswith('STRING') -%} {{error_value__STRING}} AS {{ column_name }}
+            {% else %} {{error_value_alt__STRING}} AS {{ column_name }}
+            {% endif %}
+       {% elif datatype in ['NUMBER','INT','FLOAT','DECIMAL'] or datatype.upper().startswith('NUMBER') %}-1 AS {{ column_name }}
+       {% elif datatype == 'BOOLEAN' %}CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
+       {% else %}NULL AS {{ column_name }}
+       {% endif %}
+       {%- endif -%}
+
+  {%- endif -%}
+  {%- endmacro -%}
+name: datavault4coalesce__snowflake_ghost_record_per_datatype
+type: Macro
