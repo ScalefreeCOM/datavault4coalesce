@@ -2,5 +2,11 @@ fileVersion: 1
 id: "1"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to run a Multi active Satellite V1. --#}
+  {%- macro datavault4coalesce__snowflake_multi_active_satellite_v1_run(node, columns) -%}
+  
+    {% if node.override.run.enabled %}
+      {{ node.override.run.script }}
+    {% endif %}
+  {%- endmacro -%}
 name: datavault4coalesce__snowflake_multi_active_satellite_v1_run
 type: Macro

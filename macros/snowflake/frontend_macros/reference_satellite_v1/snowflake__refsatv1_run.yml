@@ -1,6 +1,12 @@
 fileVersion: 1
 id: "35"
 macroString: |- 
-  {#-- Utility macro: outputs a SQL function to create a reference satellite table. --#}
+  {#-- Utility macro: outputs a SQL function to run a reference satellite table. --#}
+  {%- macro datavault4coalesce__snowflake_reference_satellite_v1_run(node, columns) -%}
+
+    {% if node.override.run.enabled %}
+      {{ node.override.run.script }}
+    {% endif %} 
+  {%- endmacro -%}
 name: datavault4coalesce__snowflake_reference_satellite_v1_run
 type: Macro

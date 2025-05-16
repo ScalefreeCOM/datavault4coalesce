@@ -1,6 +1,12 @@
 fileVersion: 1
 id: "4"
 macroString: |- 
-  {#-- Utility macro: outputs a SQL function to create a stage table. --#}
+  {#-- Utility macro: outputs a SQL function to run a stage table. --#}
+  {%- macro datavault4coalesce__snowflake_stage_run(node, columns) -%}
+
+    {% if node.override.run.enabled %}
+      {{ node.override.run.script }}
+    {% endif %} 
+  {%- endmacro -%}
 name: datavault4coalesce__snowflake_stage_run
 type: Macro
