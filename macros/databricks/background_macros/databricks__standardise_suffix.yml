@@ -1,0 +1,83 @@
+fileVersion: 1
+id: "1"
+macroString: |-  
+
+  {%- macro datavault4coalesce__databricks_standardise_suffix(case_sensitive, hash_alg, is_hashdiff, datatype, zero_key, alias, multi_active_key, main_hashkey_col) -%}
+  {%- set dict_result = {} -%}
+  {%- set ldts_alias = datavault4coalesce.config.ldts_alias -%}
+  {%- set zero_key = datavault4coalesce__as_constant(column_str=zero_key) -%}
+  {%- set listagg_closing = "" -%}
+  {#-- If definition of multi-active key(s) is found, prep the following string variables: --#}
+  {#--     multi_active_key: list of multi-active keys, concatenated with comma delimiter. --#}
+  {#--     listagg_closing : 2nd part of LISTAGG window function, used in                  --#}
+  {#--                       hashing calculation of multi-active                           --#}
+  {#--                       satellite's hash diff attribute.                              --#}
+  {%- if is_hashdiff and multi_active_key is defined and multi_active_key|length>0 -%}
+
+       {%- if 'STRING' in datatype %}
+            {%- if case_sensitive -%}
+                 {%- if alias is not none -%}
+                      {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),','))), {}) AS {}".format(zero_key, alias)-%}
+                 {%- else -%}
+                      {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),','))), {})".format(zero_key)-%}
+                 {%- endif -%}
+            {%- else -%}
+                 {%- if alias is not none -%}
+                      {%- set standardise_suffix = "\n), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),','))), {}) AS {}".format(zero_key, alias)-%}
+                 {%- else -%}
+                      {%- set standardise_suffix = "\n), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),','))), {})".format(zero_key)-%}
+                 {%- endif -%}
+            {%- endif -%}
+
+       {%- else -%}
+            {%- if case_sensitive -%}
+                 {%- if alias is not none -%}
+                      {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),',')) AS {}), CAST({} AS {})) AS {}".format(datatype, zero_key, datatype, alias)-%}
+                 {%- else -%}
+                      {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),',')) AS {}), CAST({} AS {}))".format(datatype, zero_key, datatype)-%}
+                 {%- endif -%}
+            {%- else -%}
+                 {%- if alias is not none -%}
+                      {%- set standardise_suffix = "\n), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),',')) AS {}), CAST({} AS {})) AS {}".format(datatype, zero_key, datatype, alias)-%}
+                 {%- else -%}
+                      {%- set standardise_suffix = "\n), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))),',')) AS {}), CAST({} AS {}))".format(datatype, zero_key, datatype)-%}
+                 {%- endif -%}
+            {%- endif -%}
+       {%- endif -%}
+
+
+  {%- else -%}
+
+       {%- if 'STRING' in datatype %}
+            {%- if case_sensitive -%}
+                 {%- if alias is not none -%}
+                      {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))), {}) AS {}".format(zero_key, alias)-%}
+                 {%- else -%}
+                      {%- set standardise_suffix = "\n)), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))), {})".format(zero_key)-%}
+                 {%- endif -%}
+            {%- else -%}
+                 {%- set standardise_suffix = "\n), r'\\n', '') \n, r'\\t', '') \n, r'\\v', '') \n, r'\\r', '') AS STRING), '[ALL_NULL]'))), {}) AS {}".format(zero_key, alias)-%}
+
+            {%- endif -%}
+
+       {%- else -%}
+            {%- if case_sensitive -%}
+                 {%- if alias is not none -%}
+                      {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}
+                 {%- else -%}
+                      {%- set standardise_suffix = "\n)), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
+                 {%- endif -%}
+            {%- else -%}
+                 {%- if alias is not none -%}
+                      {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {}) AS {}".format(listagg_closing, zero_key, alias)-%}
+                 {%- else -%}
+                      {%- set standardise_suffix = "\n), '\\n', '') \n, '\\t', '') \n, '\\v', '') \n, '\\r', '') AS STRING), '[ALL_NULL]')){}, {})".format(listagg_closing, zero_key)-%}
+                 {%- endif -%}
+            {%- endif -%}
+       {%- endif -%}
+
+  {%- endif -%}
+  {{ standardise_suffix }}
+  {%- endmacro -%}
+name: datavault4coalesce__databricks_standardise_suffix
+type: Macro

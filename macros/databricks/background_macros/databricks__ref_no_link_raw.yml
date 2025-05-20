@@ -1,0 +1,9 @@
+fileVersion: 1
+id: "1"
+macroString: |-
+
+  {%- macro databricks_ref_no_link_raw(location_name, node_name) -%}
+      {% raw %}{{ ref_no_link('{% endraw %}{{ location_name }}{% raw %}', '{% endraw %}{{ node_name }}{% raw %}') }}{% endraw %}
+  {%- endmacro -%}
+name: databricks_ref_no_link_raw
+type: Macro
