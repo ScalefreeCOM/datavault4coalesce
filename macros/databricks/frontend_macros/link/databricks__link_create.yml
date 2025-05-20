@@ -1,0 +1,26 @@
+fileVersion: 1
+id: "7"
+macroString: |-
+    {#-- Utility macro: outputs a SQL function to create a link table. --#}
+    {%- macro datavault4coalesce__databricks_link_create(node, columns) -%}
+
+        {% if node.override.create.enabled %}
+        {{ node.override.create.script }}
+        {% endif %}     
+        {{ stage('Create Link Table') }}
+
+        CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+        (
+            {% for col in columns %}
+                `{{ col.name }}` {{ col.dataType }}
+                {%- if not col.nullable %} NOT NULL
+                    {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+                {% endif %}
+                {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+                {%- if not loop.last -%}, {% endif %}
+            {% endfor %}
+        )
+        {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+    {%- endmacro -%}
+name: datavault4coalesce__databricks_link_create
+type: Macro
