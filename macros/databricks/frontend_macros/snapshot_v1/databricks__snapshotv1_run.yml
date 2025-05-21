@@ -1,0 +1,13 @@
+fileVersion: 1
+id: "14" 
+macroString: 
+  |- 
+  {#-- Utility macro: outputs a SQL function to run a snapshot v1 table. --#}
+  {%- macro datavault4coalesce__databricks_snapshot_v1_run(node, columns) -%}
+
+    {% if node.override.run.enabled %}
+      {{ node.override.run.script }}
+    {% endif %} 
+  {%- endmacro -%}
+name: "datavault4coalesce__databricks_snapshot_v1_run"
+type: "Macro"
