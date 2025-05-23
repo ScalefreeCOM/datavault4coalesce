@@ -1,5 +1,5 @@
 {% if datavault4coalesce.config.database_type == 'SNOWFLAKE' %}
-    {{ datavault4coalesce__snowflake_multi_active_satellite_v1_create() }}
+    {{ datavault4coalesce__snowflake_multi_active_satellite_v1_create(node, columns) }}
 {% elif datavault4coalesce.config.database_type == 'DATABRICKS' %}
-    {{ datavault4coalesce__databricks_multi_active_satellite_v1_create() }}
+    {{ datavault4coalesce__databricks_multi_active_satellite_v1_create(node, columns) }}
 {% endif %}
