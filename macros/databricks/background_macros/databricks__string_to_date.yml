@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "1"
+id: Databricks string to date
 macroString: |-
 
   {%- macro datavault4coalesce__databricks_string_to_date(format, timestamp) -%}
