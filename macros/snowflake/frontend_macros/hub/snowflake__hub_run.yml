@@ -2,7 +2,7 @@ fileVersion: 1
 id: "6-run"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to run a hub table. --#}
-  {%- macro datavault4coalesce__snowflake__hub_run(node, config, sources, columns) -%}
+  {%- macro datavault4coalesce__snowflake_hub_run(node, config, sources, columns) -%}
 
     {% if config.preSQL %}
       {{ stage('Pre-SQL') }}
@@ -104,5 +104,5 @@ macroString: |-
       {% endfor %}
     {% endif %}
   {%- endmacro -%}
-name: datavault4coalesce__snowflake__hub_run
+name: datavault4coalesce__snowflake_hub_run
 type: Macro
