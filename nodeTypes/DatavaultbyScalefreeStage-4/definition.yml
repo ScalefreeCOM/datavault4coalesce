@@ -58,7 +58,12 @@ metadata:
 
     systemColumns:
     - displayName: "LDTS"
-      transform: SYSDATE()
+      transform: |
+        {% if target.type == 'databricks' %}
+          to_utc_timestamp(current_timestamp(), 'UTC')
+        {% elif target.type == 'snowflake' %}
+          convert_timezone('UTC', current_timestamp())::timestamp_ntz
+        {% endif %}
       dataType: TIMESTAMP
       placement: end
       attributeName: is_system_ldts    
