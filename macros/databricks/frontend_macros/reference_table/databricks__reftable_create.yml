@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "43"
+id: "43-create"
 macroString: |-
   {#-- Utility macro: outputs a SQL function to create a Reference table. --#}
   {%- macro datavault4coalesce__databricks_reference_table_create(node, columns) -%}

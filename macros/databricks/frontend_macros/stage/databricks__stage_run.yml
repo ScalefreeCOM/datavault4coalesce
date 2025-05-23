@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "4"
+id: "4-run"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to run a stage table. --#}
   {%- macro datavault4coalesce__databricks_stage_run(node, columns) -%}

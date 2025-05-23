@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "35"
+id: "35-create"
 macroString: |-
   {#-- Utility macro: outputs a SQL function to create a Reference Satellite V1. --#}
   {%- macro datavault4coalesce__databricks_reference_satellite_v1_create(node, columns) -%}
