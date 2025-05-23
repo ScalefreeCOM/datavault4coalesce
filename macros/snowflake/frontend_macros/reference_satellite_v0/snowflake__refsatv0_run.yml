@@ -4,9 +4,6 @@ macroString: |-
   {#-- Utility macro: outputs a SQL function to run a Reference Satellite V0. --#}
   {%- macro datavault4coalesce__snowflake_reference_satellite_v0_run(node, columns) -%}
 
-    {% if node.override.run.enabled %}
-      {{ node.override.run.script }}
-    {% endif %}  
     {% if config.preSQL %}
       {{ stage('Pre-SQL') }}
       {{ config.preSQL }}

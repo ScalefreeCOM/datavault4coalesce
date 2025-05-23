@@ -4,10 +4,6 @@ macroString: |-
   {#-- Utility macro: outputs a SQL function to run a hub table. --#}
   {%- macro snowflake__hub_run(node, config, sources, columns) -%}
 
-    {% if node.override.run.enabled %}
-      {{ node.override.run.script }}
-    {% endif %}
-
     {% if config.preSQL %}
       {{ stage('Pre-SQL') }}
       {{ config.preSQL }}

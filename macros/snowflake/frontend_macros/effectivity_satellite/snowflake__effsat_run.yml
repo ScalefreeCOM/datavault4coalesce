@@ -4,9 +4,6 @@ macroString: |-
   {#-- Utility macro: outputs a SQL function to run an effectivity satellite table. --#}
   {%- macro datavault4coalesce__snowflake_effectivity_satellite_run(node, columns) -%}
 
-    {% if node.override.run.enabled %}
-        {{ node.override.run.script }}
-    {% endif %} 
         {{ stage('Insert New Rows') }}
 
         {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times -%}

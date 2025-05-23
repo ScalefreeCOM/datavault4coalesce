@@ -4,9 +4,6 @@ macroString: |-
     {#-- Utility macro: outputs a SQL function to create a snapshot v0 table. --#}
     {%- macro datavault4coalesce__snowflake_snapshot_v0_run(node, columns) -%}
 
-        {% if node.override.run.enabled %}
-            {{ node.override.run.script }}
-        {% endif %}
 
         {{ stage('Run Snapshot v0') }}
         {% for test in node.tests if config.testsEnabled %}
