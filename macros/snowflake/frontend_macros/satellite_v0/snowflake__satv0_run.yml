@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "8"
+id: "8-run"
 macroString: |-
   {#-- Utility macro: outputs a SQL function to run a Satellite v0 table. --#}
   {%- macro datavault4coalesce__snowflake_satellite_v0_run(node, columns) -%}

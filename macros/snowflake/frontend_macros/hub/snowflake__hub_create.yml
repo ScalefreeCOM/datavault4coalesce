@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "6"
+id: "6-create"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to create a hub table. --#}
   {%- macro snowflake__hub_create(node, config, sources, columns) -%}

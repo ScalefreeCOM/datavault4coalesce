@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "7"
+id: "7-create"
 macroString: |-
     {#-- Utility macro: outputs a SQL function to create a link table. --#}
     {%- macro datavault4coalesce__snowflake_link_create(node, columns) -%}

@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "33"
+id: "33-create"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to create a Reference Hub. --#}
   {%- macro datavault4coalesce__snowflake_reference_hub_create(node, columns) -%}

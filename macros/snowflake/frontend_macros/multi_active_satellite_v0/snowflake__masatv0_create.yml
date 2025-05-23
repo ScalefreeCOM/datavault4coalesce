@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "18"
+id: "18-create"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to create a Multi Active Satellite V0. --#}
   {%- macro datavault4coalesce__snowflake_multi_active_satellite_v0_create(node, columns) -%}
