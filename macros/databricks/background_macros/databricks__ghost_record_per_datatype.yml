@@ -19,9 +19,9 @@ macroString: |-
       {%- set error_key = datavault4coalesce__databricks_error_key(hash_function=hash_algo, hash_datatype=datatype) -%}
 
       {%- if ghost_record_type == 'unknown' -%}
-            CAST('{{ unknown_key }}' AS BINARY) AS {{ column_name }}
+            {{ unknown_key }} AS {{ column_name }}
       {%- elif ghost_record_type == 'error' -%}
-            CAST('{{ error_key }}' AS BINARY) AS {{ column_name }}
+            {{ error_key }} AS {{ column_name }}
       {%- else -%}
             {%- if execute -%}
             {{ exceptions.raise_compiler_error("Invalid Ghost Record Type. Accepted are 'unknown' and 'error'.") }}
@@ -44,7 +44,7 @@ macroString: |-
             {%- elif datatype == 'BOOLEAN' %}
             CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
             {%- elif datatype == 'BINARY' %}
-            CAST({{ unknown_key }} AS BINARY) AS {{ column_name }}
+            {{ unknown_key }} AS {{ column_name }}
             {%- else %}
             CAST(NULL AS {{ datatype }}) AS {{ column_name }}
             {%- endif %}
@@ -63,7 +63,7 @@ macroString: |-
             {%- elif datatype == 'BOOLEAN' %}
             CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
             {%- elif datatype == 'BINARY' %}
-            CAST({{ error_key }} AS BINARY) AS {{ column_name }}
+            {{ error_key }} AS {{ column_name }}
             {%- else %}
             CAST(NULL AS {{ datatype }}) AS {{ column_name }}
             {%- endif %}
