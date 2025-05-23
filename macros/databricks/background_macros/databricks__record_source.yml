@@ -17,5 +17,5 @@ macroString: |-
        'Missing Dependencies!'
   {%- endif -%}
   {%- endmacro -%}
-name: record_source
+name: databricks__record_source
 type: Macro

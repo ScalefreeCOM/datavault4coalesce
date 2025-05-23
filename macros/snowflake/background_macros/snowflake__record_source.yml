@@ -17,5 +17,5 @@ macroString: |-
        'Missing Dependencies!'
   {%- endif -%}
   {%- endmacro -%}
-name: record_source
+name: snowflake__record_source
 type: Macro
