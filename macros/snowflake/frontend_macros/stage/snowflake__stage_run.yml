@@ -1,10 +1,7 @@
 fileVersion: 1
 id: "4"
 macroString: |- 
-  {#-- Utility macro: outputs a SQL function to run a stage table. --#}
-  {%- if not datavault4coalesce -%}
-        {%- from 'top_level_macro.yml' import datavault4coalesce with context -%}
-  {%- endif -%}
+  {#-- Utility macro: outputs a SQL function to run a stage table. --#}S
   {%- macro datavault4coalesce__snowflake_stage_run(node, columns) -%}
 
     {% if node.override.run.enabled %}
