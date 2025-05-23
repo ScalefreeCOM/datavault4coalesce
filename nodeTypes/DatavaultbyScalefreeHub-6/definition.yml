@@ -15,10 +15,10 @@ metadata:
       items:
       - type: materializationSelector
         isRequired: true
-        enableIf: 'true'
+        enableIf: 'false'
+        default: table
         options: 
         - table
-        default: table
      
       - displayName: Pre-SQL
         attributeName: preSQL
@@ -39,12 +39,10 @@ metadata:
 
     - groupName: Data Vault
       items:
-
-      - displayName: Hub Hash Key column
+      - displayName: Hub Hashkey column
         type: columnSelector
         attributeName: is_Hub_hk
         isRequired: true
-        enableIf: 'true'
         
       - displayName: Hub LoadDateTimestamp Column
         enableIf: 'false'
@@ -57,7 +55,6 @@ metadata:
         isRequired: false
         enableIf: 'false'
         attributeName: disable_hwm   
-        default: true
-        
+        default: true     
 name: "Datavault by Scalefree: Hub"
 type: NodeType
