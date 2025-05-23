@@ -22,11 +22,11 @@ macroString: |-
 
   {#-- Select hashing algorithm from global variables. --#}
   {%- set datatype = datatype|upper -%}
-  {%- set hash_alg = datavault4coalesce__hash_algorithm(hash_function=algo, hash_datatype=datatype) -%}
-  {%- set unknown_key = datavault4coalesce__unknown_key(hash_function=algo, hash_datatype=datatype) -%}
-  {%- set error_key = datavault4coalesce__error_key(hash_function=algo, hash_datatype=datatype) -%}
+  {%- set hash_alg = datavault4coalesce__snowflake_hash_algorithm(hash_function=algo, hash_datatype=datatype) -%}
+  {%- set unknown_key = datavault4coalesce__snowflake_unknown_key(hash_function=algo, hash_datatype=datatype) -%}
+  {%- set error_key = datavault4coalesce__snowflake_error_key(hash_function=algo, hash_datatype=datatype) -%}
 
-  {%- set attribute_standardise = datavault4coalesce__attribute_standardise() %}
+  {%- set attribute_standardise = datavault4coalesce__snowflake_attribute_standardise() %}
 
   {#-- Set up a list of columns going into hashing calculation --#}
   {%- set ns = namespace(columns=[], all_null=[]) -%}
@@ -36,7 +36,7 @@ macroString: |-
        {%- set ns.columns = ns.columns + [column.name] -%}
   {%- endfor -%}
 
-  {%- set standardise_prefix = datavault4coalesce__standardise_prefix(case_sensitive=hash_input_case_sensitive, 
+  {%- set standardise_prefix = datavault4coalesce__snowflake_standardise_prefix(case_sensitive=hash_input_case_sensitive, 
                                                                       hash_alg=hash_alg,
                                is_hashdiff=is_hashdiff,
                                                                       datatype=hash_dtype,
@@ -44,7 +44,7 @@ macroString: |-
                                                                       zero_key=unknown_key,
                                                                       multi_active_key=multi_active_key,
                                                                       main_hashkey_col=main_hashkey_col) -%}
-  {%- set standardise_suffix = datavault4coalesce__standardise_suffix(case_sensitive=hash_input_case_sensitive, 
+  {%- set standardise_suffix = datavault4coalesce__snowflake_standardise_suffix(case_sensitive=hash_input_case_sensitive, 
                                                                       hash_alg=hash_alg,
                                             is_hashdiff=is_hashdiff,
                                                                       datatype=hash_dtype, 
@@ -58,12 +58,12 @@ macroString: |-
   {%- for column in columns -%}
       {%- set ns.all_null = ns.all_null + [null_placeholder_string] -%}
       {%- if datavault4coalesce.config.hash_passthrough_input_transformations == TRUE -%}
-          {%- set column_str = datavault4coalesce__as_constant(get_source_transform(column)) -%}
+          {%- set column_str = datavault4coalesce__snowflake_as_constant(get_source_transform(column)) -%}
       {%- else -%}
           {%- if '.' in column.name %}
               {% set column_str = column.name -%}
           {%- else -%}
-              {%- set column_str = datavault4coalesce__as_constant(column.name) -%}
+              {%- set column_str = datavault4coalesce__snowflake_as_constant(column.name) -%}
           {%- endif -%}
       {%- endif -%}
 

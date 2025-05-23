@@ -4,7 +4,7 @@ macroString: |-
 
   {%- macro datavault4coalesce__databricks_standardise_prefix(case_sensitive, hash_alg, is_hashdiff, datatype, zero_key, alias, multi_active_key, main_hashkey_col) -%}
   {%- set dict_result = {} -%}
-  {%- set zero_key = datavault4coalesce__as_constant(column_str=zero_key) -%}
+  {%- set zero_key = datavault4coalesce__databricks_as_constant(column_str=zero_key) -%}
   {%- set listagg_opening = "" -%}
 
   {#-- If definition of multi-active key(s) is found, prep string variables:                      --#}

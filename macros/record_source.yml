@@ -10,9 +10,9 @@ macroString: |-
   {#-----------------------------------------------------------------------------------------------#}
   {%- macro record_source() -%}
     {% if datavault4coalesce.config.database_type == 'SNOWFLAKE' %}
-      {{ snowflake__record_source() }}
+      {{ datavault4coalesce__snowflake_record_source() }}
     {% elif datavault4coalesce.config.database_type == 'DATABRICKS' %}
-      {{ databricks__record_source() }}
+      {{ datavault4coalesce__databricks_record_source() }}
     {% endif %}
   {% endmacro %}
 name: record_source

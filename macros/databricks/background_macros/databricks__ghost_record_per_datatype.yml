@@ -16,9 +16,9 @@ macroString: |-
 
       {%- if hash %}
       {%- set datatype = datatype|upper -%}
-      {%- set hash_alg = datavault4coalesce__hash_algorithm(hash_function=hash_algo, hash_datatype=datatype) -%}
-      {%- set unknown_key = datavault4coalesce__unknown_key(hash_function=hash_algo, hash_datatype=datatype) -%}
-      {%- set error_key = datavault4coalesce__error_key(hash_function=hash_algo, hash_datatype=datatype) -%}
+      {%- set hash_alg = datavault4coalesce__databricks_hash_algorithm(hash_function=hash_algo, hash_datatype=datatype) -%}
+      {%- set unknown_key = datavault4coalesce__databricks_unknown_key(hash_function=hash_algo, hash_datatype=datatype) -%}
+      {%- set error_key = datavault4coalesce__databricks_error_key(hash_function=hash_algo, hash_datatype=datatype) -%}
 
       {%- if ghost_record_type == 'unknown' -%}
             CAST('{{ unknown_key }}' AS BINARY) AS {{ column_name }}
@@ -34,9 +34,9 @@ macroString: |-
       {%- set datatype = datatype | string | upper | trim -%}
       {%- if ghost_record_type == 'unknown' -%}
             {%- if datatype == 'TIMESTAMP' %}
-            {{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
+            {{ datavault4coalesce__databricks_string_to_timestamp(timestamp_format, beginning_of_all_times) }} AS {{ column_name }}
             {%- elif datatype == 'DATE' %}
-            {{ datavault4coalesce__string_to_date(date_format, beginning_of_all_times) }} AS {{ column_name }}
+            {{ datavault4coalesce__databricks_string_to_date(date_format, beginning_of_all_times) }} AS {{ column_name }}
             {%- elif datatype == 'STRING' %}
             '{{ unknown_value__STRING }}' AS {{ column_name }}
             {%- elif datatype in ['INT', 'SMALLINT', 'TINYINT', 'BIGINT', 'DOUBLE', 'FLOAT'] %}
@@ -53,9 +53,9 @@ macroString: |-
 
       {%- elif ghost_record_type == 'error' -%}
             {%- if datatype == 'TIMESTAMP' %}
-            {{ datavault4coalesce__string_to_timestamp(timestamp_format, end_of_all_times) }} AS {{ column_name }}
+            {{ datavault4coalesce__databricks_string_to_timestamp(timestamp_format, end_of_all_times) }} AS {{ column_name }}
             {%- elif datatype == 'DATE' %}
-            {{ datavault4coalesce__string_to_date(date_format, end_of_all_times) }} AS {{ column_name }}
+            {{ datavault4coalesce__databricks_string_to_date(date_format, end_of_all_times) }} AS {{ column_name }}
             {%- elif datatype == 'STRING' %}
             '{{ error_value__STRING }}' AS {{ column_name }}
             {%- elif datatype in ['INT', 'SMALLINT', 'TINYINT', 'BIGINT', 'DOUBLE', 'FLOAT'] %}

@@ -43,7 +43,7 @@ macroString: |-
             {%- endif -%}   
        {%- endif -%}
 
-       {% set unknown_key = datavault4coalesce__as_constant(unknown_key) %}
+       {% set unknown_key = datavault4coalesce__snowflake_as_constant(unknown_key) %}
        {{ unknown_key }}
 
   {%- endmacro -%}

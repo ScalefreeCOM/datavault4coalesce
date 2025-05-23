@@ -6,7 +6,7 @@ macroString: |-
     {#-- Outputs name of a single hash key from the direct parent object. --#}
     {#-- Usage: Node definition of Satellite v1                           --#}
     {#----------------------------------------------------------------------#}
-    {%- macro snowflake_get_source_hash_key_column() -%}
+    {%- macro datavault4coalesce__snowflake_get_source_hash_key_column() -%}
         {%- set srcCols = sources[0].dependencies[0].columns -%}
         {%- set result = namespace(name='') -%}
         {% for srcHKCol in srcCols if srcHKCol.is_hk %}
@@ -14,5 +14,5 @@ macroString: |-
         {%- endfor -%}
         {{- result.name -}}
     {%- endmacro -%}
-name: snowflake_get_source_hash_key_column
+name: datavault4coalesce__snowflake_get_source_hash_key_column
 type: Macro

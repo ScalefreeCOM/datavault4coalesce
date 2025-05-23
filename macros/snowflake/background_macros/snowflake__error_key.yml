@@ -44,7 +44,7 @@ macroString: |-
             {%- endif -%}   
        {%- endif -%}
 
-       {% set error_key = datavault4coalesce__as_constant(error_key) %}
+       {% set error_key = datavault4coalesce__snowflake_as_constant(error_key) %}
        {{ error_key }}
   {%- endmacro -%}
 name: datavault4coalesce__snowflake_error_key

@@ -9,7 +9,7 @@ macroString: |-
   {#-- It is used to identify the origin of a data record and should contain a detailed path     --#}
   {#--    to trace a record back to its source table and source system.                          --#}
   {#-----------------------------------------------------------------------------------------------#}
-  {%- macro databricks__record_source() -%}
+  {%- macro datavault4coalesce__databricks_record_source() -%}
   {%- if sources[0].dependencies -%}
        {% set src = storageLocations | selectattr('name', "equalto", sources[0].dependencies[0].node.location.name) | list | first %} 
        '`{{src.database}}`.`{{src.schema}}`.`{{sources[0].dependencies[0].node.name}}`'
@@ -17,5 +17,5 @@ macroString: |-
        'Missing Dependencies!'
   {%- endif -%}
   {%- endmacro -%}
-name: databricks__record_source
+name: datavault4coalesce__databricks_record_source
 type: Macro
