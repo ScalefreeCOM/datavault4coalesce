@@ -11,8 +11,6 @@ macroString: |-
       {%- set end_of_all_times_date = datavault4coalesce.config.end_of_all_times_date -%}
       {%- set unknown_value__STRING = datavault4coalesce.config.unknown_value__STRING -%}
       {%- set error_value__STRING = datavault4coalesce.config.error_value__STRING -%}
-      {%- set unknown_value__numeric = datavault4coalesce.config.unknown_value__numeric -%}
-      {%- set error_value__numeric = datavault4coalesce.config.error_value__numeric -%}
 
       {%- if hash %}
       {%- set datatype = datatype|upper -%}
@@ -38,15 +36,15 @@ macroString: |-
             {%- elif datatype == 'DATE' %}
             {{ datavault4coalesce__databricks_string_to_date(date_format, beginning_of_all_times) }} AS {{ column_name }}
             {%- elif datatype == 'STRING' %}
-            '{{ unknown_value__STRING }}' AS {{ column_name }}
+            {{ unknown_value__STRING }} AS {{ column_name }}
             {%- elif datatype in ['INT', 'SMALLINT', 'TINYINT', 'BIGINT', 'DOUBLE', 'FLOAT'] %}
-            CAST('{{ unknown_value__numeric }}' AS {{ datatype }}) AS {{ column_name }}
+            CAST(0 AS {{ datatype }}) AS {{ column_name }}
             {%- elif datatype.startswith('DECIMAL') %}
-            CAST('{{ unknown_value__numeric }}' AS DECIMAL) AS {{ column_name }}
+            CAST(0 AS DECIMAL) AS {{ column_name }}
             {%- elif datatype == 'BOOLEAN' %}
             CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
             {%- elif datatype == 'BINARY' %}
-            CAST('{{ unknown_key }}' AS BINARY) AS {{ column_name }}
+            CAST({{ unknown_key }} AS BINARY) AS {{ column_name }}
             {%- else %}
             CAST(NULL AS {{ datatype }}) AS {{ column_name }}
             {%- endif %}
@@ -57,15 +55,15 @@ macroString: |-
             {%- elif datatype == 'DATE' %}
             {{ datavault4coalesce__databricks_string_to_date(date_format, end_of_all_times) }} AS {{ column_name }}
             {%- elif datatype == 'STRING' %}
-            '{{ error_value__STRING }}' AS {{ column_name }}
+            {{ error_value__STRING }} AS {{ column_name }}
             {%- elif datatype in ['INT', 'SMALLINT', 'TINYINT', 'BIGINT', 'DOUBLE', 'FLOAT'] %}
-            CAST('{{ error_value__numeric }}' AS {{ datatype }}) AS {{ column_name }}
+            CAST(-1 AS {{ datatype }}) AS {{ column_name }}
             {%- elif datatype.startswith('DECIMAL') %}
-            CAST('{{ error_value__numeric }}' AS DECIMAL) AS {{ column_name }}
+            CAST(-1 AS DECIMAL) AS {{ column_name }}
             {%- elif datatype == 'BOOLEAN' %}
             CAST('FALSE' AS BOOLEAN) AS {{ column_name }}
             {%- elif datatype == 'BINARY' %}
-            CAST('{{ error_key }}' AS BINARY) AS {{ column_name }}
+            CAST({{ error_key }} AS BINARY) AS {{ column_name }}
             {%- else %}
             CAST(NULL AS {{ datatype }}) AS {{ column_name }}
             {%- endif %}
