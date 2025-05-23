@@ -15,3 +15,5 @@ macroString: |-
       {{ databricks__record_source() }}
     {% endif %}
   {% endmacro %}
+name: record_source
+type: Macro
