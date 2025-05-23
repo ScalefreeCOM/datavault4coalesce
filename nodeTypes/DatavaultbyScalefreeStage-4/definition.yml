@@ -59,9 +59,9 @@ metadata:
     systemColumns:
     - displayName: "LDTS"
       transform: |
-        {% if target.type == 'databricks' %}
+        {% if parameters.database_type.upper() == 'DATABRICKS' %}
           to_utc_timestamp(current_timestamp(), 'UTC')
-        {% elif target.type == 'snowflake' %}
+        {% elif parameters.database_type.upper() == 'SNOWFLAKE' %}
           convert_timezone('UTC', current_timestamp())::timestamp_ntz
         {% endif %}
       dataType: TIMESTAMP
