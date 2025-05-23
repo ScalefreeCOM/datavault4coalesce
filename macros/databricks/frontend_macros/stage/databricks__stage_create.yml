@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "4-create"
+id: "4-create-databricks"
 macroString: |- 
     {#-- Utility macro: outputs a SQL function to create stage. --#}
     {%- macro datavault4coalesce__databricks_stage_create(node, config, sources, columns) -%}

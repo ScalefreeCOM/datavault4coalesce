@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "6-create"
+id: "6-create-databricks"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to create a hub table. --#}
   {%- macro datavault4coalesce__databricks_hub_create(node, config, sources, columns) -%}

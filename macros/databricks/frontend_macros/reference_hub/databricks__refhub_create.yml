@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "33-create"
+id: "33-create-databricks"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to create a Reference Hub. --#}
   {%- macro datavault4coalesce__databricks_reference_hub_create(node, columns) -%}

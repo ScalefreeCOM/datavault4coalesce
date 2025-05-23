@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "35-run"
+id: "35-run-snowflake"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to run a reference satellite table. --#}
   {%- macro datavault4coalesce__snowflake_reference_satellite_v1_run(node, columns) -%}

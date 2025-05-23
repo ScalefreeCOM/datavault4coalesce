@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "44-create"
+id: "44-create-databricks"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to create an effectivity satellite table. --#}
   {%- macro datavault4coalesce__databricks_effectivity_satellite_create(node, columns) -%}

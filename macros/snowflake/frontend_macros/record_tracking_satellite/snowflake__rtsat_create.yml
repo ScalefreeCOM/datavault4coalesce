@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "27-create"
+id: "27-create-snowflake"
 macroString: |-
   {#-- Utility macro: outputs a SQL function to create a Record Tracking Satellite. --#}
   {%- macro datavault4coalesce__snowflake_record_tracking_satellite_create(node, columns) -%}

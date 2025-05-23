@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "24-create"
+id: "24-create-databricks"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to create a Non-Historized Satellite. --#}
   {%- macro datavault4coalesce__databricks_non_historized_satellite_create(node, columns) -%}
