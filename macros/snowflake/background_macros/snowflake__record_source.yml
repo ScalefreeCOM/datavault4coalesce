@@ -9,7 +9,7 @@ macroString: |-
   {#-- It is used to identify the origin of a data record and should contain a detailed path     --#}
   {#--    to trace a record back to its source table and source system.                          --#}
   {#-----------------------------------------------------------------------------------------------#}
-  {%- macro record_source() -%}
+  {%- macro snowflake__record_source() -%}
   {%- if sources[0].dependencies -%}
        {% set src = storageLocations | selectattr('name', "equalto", sources[0].dependencies[0].node.location.name) | list | first %} 
        '"{{src.database}}"."{{src.schema}}"."{{sources[0].dependencies[0].node.name}}"'
