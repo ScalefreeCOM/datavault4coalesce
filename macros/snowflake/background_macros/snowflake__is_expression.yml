@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "1"
+id: Snowflake is expression
 macroString: |-
   {#-- Utility macro: check if string object is an expression --#}
   {%- macro datavault4coalesce__snowflake_is_expression(obj) -%}

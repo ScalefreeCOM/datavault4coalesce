@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "1"
+id: Snowflake Escape Column Name
 macroString: |-
 
   {#-- Utility macro: wrap string input between escape characters --#}

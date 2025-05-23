@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "1"
+id: Snowflake Attribute Standardise
 macroString: |-  
   
   {%- macro datavault4coalesce__snowflake_attribute_standardise() -%}

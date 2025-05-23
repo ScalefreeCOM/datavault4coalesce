@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "1"
+id: Snowflake as Constant
 macroString: |-
 
   {#-- Utility macro: wrap input between escape characters --#}

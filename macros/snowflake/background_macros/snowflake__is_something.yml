@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "1"
+id: Snowflake is Something
 macroString: |-
 
   {#-- Utility macro: check if object exists, is defined and not empty --#}
