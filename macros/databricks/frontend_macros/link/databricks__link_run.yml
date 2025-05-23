@@ -2,7 +2,7 @@ fileVersion: 1
 id: "7"
 macroString: |-   
   {#-- Utility macro: outputs a SQL function to run a link table. --#}
-  {%- macro databricks__link_run(node, config, sources, columns) -%}
+  {%- macro datavault4coalesce__databricks_link_run(node, config, sources, columns) -%}
 
     {% if config.preSQL %}
       {{ stage('Pre-SQL') }}
@@ -94,5 +94,5 @@ macroString: |-
       {% endfor %}
     {% endif %}
   {%- endmacro -%}
-name: databricks__link_run
+name: datavault4coalesce__databricks_link_run
 type: Macro
