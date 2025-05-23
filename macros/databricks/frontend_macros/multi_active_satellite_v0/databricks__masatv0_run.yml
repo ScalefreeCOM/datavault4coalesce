@@ -4,10 +4,6 @@ macroString: |-
   {#-- Utility macro: outputs a SQL function to run a multi-active satellite v0 table. --#}
   {%- macro datavault4coalesce__databricks_multi_active_satellite_v0_run(node, config, sources) -%}
 
-    {% if node.override.run.enabled %}
-      {{ node.override.run.script }}
-    {% endif %}
-
     {% if config.preSQL %}
       {{ stage('Pre-SQL') }}
       {{ config.preSQL }}

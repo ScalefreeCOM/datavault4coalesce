@@ -1,0 +1,5 @@
+{% if datavault4coalesce.config.database_type == 'SNOWFLAKE' %}
+    {{ datavault4coalesce__snowflake_effectivity_satellite_create() }}
+{% elif datavault4coalesce.config.database_type == 'DATABRICKS' %}
+    {{ datavault4coalesce__databricks_effectivity_satellite_create() }}
+{% endif %}

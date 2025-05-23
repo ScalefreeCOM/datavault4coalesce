@@ -10,7 +10,7 @@ macroString: |-
   {#------------------------------------------------------------------------------------------------------#}
   {%- set datavault4coalesce = namespace(
        config = {
-       "database_type": parameters.database_type,
+       "database_type": parameters.database_type | upper,
        "ldts_alias": "LDTS",
        "rsrc_alias": "RSRC", 
        "ledts_alias": "LEDTS",
