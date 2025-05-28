@@ -34,13 +34,6 @@ macroString: |-
             
             
             {% if not config.contains_multiactive_data -%}
-                {# Initialize outside multi-active block to ensure persistence #}
-                {%- set main_hashkey_col = namespace(hk_col='') -%}
-                {%- for col in sources[0].columns -%}
-                    {%- if col.id == config.main_hk_col.id -%}
-                        {%- set main_hashkey_col.hk_col = col.name -%}
-                    {%- endif -%}
-                {%- endfor -%}
 
 
                 hashed_columns AS(
