@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "1"
+id: datavault4coalesce__config_macro
 macroString: |-
   {#------------------------------------------------------------------------------------------------------#}
   {#-- Global config macros for datavault4coalesce                                                     --#}
@@ -38,5 +38,5 @@ macroString: |-
     {%- endif %}
   {%- endmacro -%}
 
-name: macro
+name: datavault4coalesce__config_macro
 type: Macro
