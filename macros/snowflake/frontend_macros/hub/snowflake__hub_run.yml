@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "6-run-snowflake"
+id: "datavault4coalesce__snowflake_hub_run"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to run a hub table. --#}
   {%- macro datavault4coalesce__snowflake_hub_run(node, config, sources, columns) -%}

@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Snowflake Ghost Record Per Datatype
+id: datavault4coalesce__snowflake_ghost_record_per_datatype
 macroString: |-
   {#--------------------------------------------------------------------------------------------------#}
   {#-- DV Utility macro: Generate default values for ghost record.                                  --#}

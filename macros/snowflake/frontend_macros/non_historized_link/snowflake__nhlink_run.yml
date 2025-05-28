@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "23-run-snowflake"
+id: "datavault4coalesce__snowflake_non_historized_link_run"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to run a Non-Historized Link. --#}
   {%- macro datavault4coalesce__snowflake_non_historized_link_run(node, columns) -%}

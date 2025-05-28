@@ -1,5 +1,5 @@
 fileVersion: 1
-id: databricks standardise prefix
+id: datavault4coalesce__databricks_standardise_prefix
 macroString: |-  
 
   {%- macro datavault4coalesce__databricks_standardise_prefix(case_sensitive, hash_alg, is_hashdiff, datatype, zero_key, alias, multi_active_key, main_hashkey_col) -%}

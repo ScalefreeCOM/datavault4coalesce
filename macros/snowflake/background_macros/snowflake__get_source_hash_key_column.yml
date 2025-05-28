@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Snowflake get Source Hash Key Column
+id: datavault4coalesce__snowflake_get_source_hash_key_column
 macroString: |-  
 
   {#----------------------------------------------------------------------#}

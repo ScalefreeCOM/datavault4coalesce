@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Snowflake as Constant
+id: datavault4coalesce__snowflake_as_constant
 macroString: |-
 
   {#-- Utility macro: wrap input between escape characters --#}

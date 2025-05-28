@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "14-run-databricks" 
+id: "datavault4coalesce__databricks_snapshot_v1_run" 
 macroString: 
   |- 
   {#-- Utility macro: outputs a SQL function to run a snapshot v1 table. --#}

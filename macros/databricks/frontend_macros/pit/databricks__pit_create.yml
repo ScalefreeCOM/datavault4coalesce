@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "12-create-databricks"
+id: "datavault4coalesce__databricks_pit_create"
 macroString: |-
   {#-- Utility macro: outputs a SQL function to create a Point In Time(PIT) table. --#}
   {%- macro datavault4coalesce__databricks_pit_create(node, columns) -%}

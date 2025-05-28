@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Databricks hash algorithm
+id: datavault4coalesce__databricks_hash_algorithm
 macroString: |- 
 
   {#---------------------------------------------------------------------------------------------#}

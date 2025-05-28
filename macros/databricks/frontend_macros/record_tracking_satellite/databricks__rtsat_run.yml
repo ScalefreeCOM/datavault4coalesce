@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "27-run-databricks"
+id: "datavault4coalesce__databricks_record_tracking_satellite_run"
 macroString: |-
     {#-- Utility macro: outputs a SQL function to run a Record Tracking Satellite. --#}
     {%- macro datavault4coalesce__databricks_record_tracking_satellite_run(node, columns) -%}

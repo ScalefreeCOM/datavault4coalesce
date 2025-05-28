@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Snowflake record source
+id: datavault4coalesce__snowflake_record_source
 macroString: |-
 
   {#-----------------------------------------------------------------------------------------------#}

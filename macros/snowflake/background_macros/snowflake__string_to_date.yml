@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Snowflake string to date
+id: datavault4coalesce__snowflake_string_to_date
 macroString: |-
 
   {%- macro datavault4coalesce__snowflake_string_to_date(format, timestamp) -%}

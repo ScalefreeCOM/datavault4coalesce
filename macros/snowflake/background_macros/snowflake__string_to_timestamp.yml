@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Snowflake string to timestamp
+id: datavault4coalesce__snowflake_string_to_timestamp
 macroString: |-
 
   {#-- Utility macro: outputs a SQL function to convert input string into a timestamp of dynamic format. --#}

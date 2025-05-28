@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "6-create-snowflake"
+id: "datavault4coalesce__snowflake_hub_create"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to create a hub table. --#}
   {%- macro datavault4coalesce__snowflake_hub_create(node, config, sources, columns) -%}

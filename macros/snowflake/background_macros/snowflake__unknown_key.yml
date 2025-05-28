@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Snowflake unknown key
+id: datavault4coalesce__snowflake_unknown_key
 macroString: |-  
   {#---------------------------------------------------------------------------------------------#}
   {#-- DV Utility macro: Output unknown zero key for ghost record.                             --#}

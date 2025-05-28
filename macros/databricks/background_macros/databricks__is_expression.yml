@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Databricks is expression
+id: datavault4coalesce__databricks_is_expression
 macroString: |-
   {#-- Utility macro: check if string object is an expression --#}
   {%- macro datavault4coalesce__databricks_is_expression(obj) -%}

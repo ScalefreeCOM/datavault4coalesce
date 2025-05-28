@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "44-run-databricks"
+id: "datavault4coalesce__databricks_effectivity_satellite_run"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to run an effectivity satellite table. --#}
   {%- macro datavault4coalesce__databricks_effectivity_satellite_run(node, columns) -%}

@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "23-create-databricks"
+id: "datavault4coalesce__databricks_non_historized_link_create"
 macroString: |- 
   {#-- Utility macro: outputs a SQL function to create a Non-Historized Link. --#}
   {%- macro datavault4coalesce__databricks_non_historized_link_create(node, columns) -%}

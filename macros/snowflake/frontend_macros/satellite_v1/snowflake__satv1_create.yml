@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "9-create-snowflake"
+id: "datavault4coalesce__snowflake_satellite_v1_create"
 macroString: |-
     {#-- Utility macro: outputs a SQL function to create a Satellite View. --#}
     {%- macro datavault4coalesce__snowflake_satellite_v1_create(node, columns, sources) -%}

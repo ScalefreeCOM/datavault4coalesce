@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Snowflake Escape Column Name
+id: datavault4coalesce__snowflake_escape_column_name
 macroString: |-
 
   {#-- Utility macro: wrap string input between escape characters --#}

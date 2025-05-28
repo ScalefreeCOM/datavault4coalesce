@@ -1,5 +1,5 @@
 fileVersion: 1
-id: Record Source
+id: record_source
 macroString: |-
   {#-----------------------------------------------------------------------------------------------#}
   {#-- DV Utility macro: generates a string as the record source.                                --#}
