@@ -55,14 +55,25 @@ metadata:
       attributeName: is_system_ledts
     - displayName: "IS_CURRENT"
       transform: |-
-        CASE 
-          WHEN 
-            LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
-            OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}", "{{ get_source_ma_keys(delimiter=',') }}"
-            ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
-          THEN TRUE 
-          ELSE FALSE 
-        END
+        {% if database_type.upper() == "DATABRICKS" %}
+          CASE 
+            WHEN 
+              LEAD(TRY_SUBTRACT(`{{ datavault4coalesce.config.ldts_alias }}`, INTERVAL 1 MICROSECOND)) 
+              OVER (PARTITION BY `{{ get_value_by_column_attribute("is_ref_key") }}`
+              ORDER BY `{{ datavault4coalesce.config.ldts_alias }}`) IS NULL 
+            THEN TRUE 
+            ELSE FALSE 
+          END
+        {% elif database_type.upper() == "SNOWFLAKE" %}
+          CASE 
+            WHEN 
+                LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+                OVER (PARTITION BY "{{ get_value_by_column_attribute("is_ref_key") }}" 
+                ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
+            THEN TRUE 
+            ELSE FALSE 
+          END
+        {% endif %}
       dataType: BOOLEAN
       placement: end
       attributeName: is_system_current_col
