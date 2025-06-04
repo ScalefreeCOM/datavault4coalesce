@@ -60,7 +60,7 @@ metadata:
           CASE 
             WHEN 
               LEAD(TRY_SUBTRACT(`{{ datavault4coalesce.config.ldts_alias }}`, INTERVAL 1 MICROSECOND)) 
-              OVER (PARTITION BY `{{ get_value_by_column_attribute("is_ref_key") }}`
+              OVER (PARTITION BY `{{ get_value_by_column_attribute("is_hk") }}`
               ORDER BY `{{ datavault4coalesce.config.ldts_alias }}`) IS NULL 
             THEN TRUE 
             ELSE FALSE 
@@ -68,9 +68,9 @@ metadata:
         {% elif database_type.upper() == "SNOWFLAKE" %}
           CASE 
             WHEN 
-                LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
-                OVER (PARTITION BY "{{ get_value_by_column_attribute("is_ref_key") }}" 
-                ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
+              LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
+              OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}"
+              ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
             THEN TRUE 
             ELSE FALSE 
           END

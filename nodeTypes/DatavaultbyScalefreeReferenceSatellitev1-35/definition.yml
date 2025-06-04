@@ -44,11 +44,11 @@ metadata:
       transform: |-
         {% if database_type.upper() == "DATABRICKS" %}
           COALESCE(LEAD(`{{ datavault4coalesce.config.ldts_alias }}` - INTERVAL '1 MICROSECOND') 
-          OVER (PARTITION BY `{{ get_value_by_column_attribute("is_hk") }}` 
+          OVER (PARTITION BY `{{ get_value_by_column_attribute("is_ref_key") }}` 
           ORDER BY `{{ datavault4coalesce.config.ldts_alias }}`), {{ datavault4coalesce__databricks_string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
         {% elif database_type.upper() == "SNOWFLAKE" %}
           COALESCE(LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
-          OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}" 
+          OVER (PARTITION BY "{{ get_value_by_column_attribute("is_ref_key") }}" 
           ORDER BY "{{ datavault4coalesce.config.ldts_alias }}"), {{ datavault4coalesce__snowflake_string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }})
         {% endif %}
       dataType: TIMESTAMP
