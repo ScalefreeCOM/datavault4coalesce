@@ -64,7 +64,7 @@ macroString: |-
                     {% for col in source.columns %}
                         {#- Print DV hash calculations -#}
                         {% if col.hashDetails %}
-                            {{ datavault4coalesce_databricks__hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS `{{ col.name }}`
+                            {{ datavault4coalesce__databricks_hash(columns=col.hashDetails.columns, is_hashdiff=col.is_hd,datatype=col.dataType, algo=datavault4coalesce.config.hash, multi_active_key=multi_active_key, main_hashkey_col=main_hashkey_col.hk_col) }} AS `{{ col.name }}`
                         {#- Print other table columns -#}
                         {% else %}
                             `{{ col.name }}`
@@ -91,9 +91,9 @@ macroString: |-
                         {% for source in sources %}
                             {% for col in source.columns %}
                                 {%- if "hashDetails" in col.keys() %}
-                                    {{ datavault4coalesce_databricks__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true, hash_algo=col.hashDetails.algorithm) }}
+                                    {{ datavault4coalesce__databricks_ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=true, hash_algo=col.hashDetails.algorithm) }}
                                 {%- else -%}
-                                    {{ datavault4coalesce_databricks__ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=false) }}
+                                    {{ datavault4coalesce__databricks_ghost_record_per_datatype(col.name, col.dataType, 'unknown', hash=false) }}
                                 {%- endif -%}
                             {% if not loop.last %},{% endif %}
                             {% endfor %}
@@ -106,9 +106,9 @@ macroString: |-
                         {% for source in sources %}
                             {% for col in source.columns %}
                                 {%- if "hashDetails" in col.keys() %}
-                                    {{ datavault4coalesce_databricks__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true, hash_algo=col.hashDetails.algorithm) }}
+                                    {{ datavault4coalesce__databricks_ghost_record_per_datatype(col.name, col.dataType, 'error', hash=true, hash_algo=col.hashDetails.algorithm) }}
                                 {%- else -%}
-                                    {{ datavault4coalesce_databricks__ghost_record_per_datatype(col.name, col.dataType, 'error', hash=false) }}
+                                    {{ datavault4coalesce__databricks_ghost_record_per_datatype(col.name, col.dataType, 'error', hash=false) }}
                                 {%- endif -%}
                             {% if not loop.last %},{% endif %}
                             {% endfor %}
