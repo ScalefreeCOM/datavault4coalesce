@@ -59,10 +59,10 @@ metadata:
     systemColumns:
     - displayName: "LDTS"
       transform: |
-        {% if parameters.database_type.upper() == 'DATABRICKS' %}
-          to_utc_timestamp(current_timestamp(), 'UTC')
-        {% elif parameters.database_type.upper() == 'SNOWFLAKE' %}
-          convert_timezone('UTC', current_timestamp())::timestamp_ntz
+        {% if database_type.upper() == "DATABRICKS" %}
+          CURRENT_TIMESTAMP()
+        {% elif database_type.upper() == "SNOWFLAKE" %}
+          SYSDATE()
         {% endif %}
       dataType: TIMESTAMP
       placement: end

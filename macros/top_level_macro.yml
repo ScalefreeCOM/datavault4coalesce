@@ -8,36 +8,36 @@ macroString: |-
   {#-- They will be used in the macros found below.                                                     --#}
   {#-- Refer to official wiki: https://github.com/ScalefreeCOM/datavault4coalesce/wiki/Global-variables --#}
   {#------------------------------------------------------------------------------------------------------#}
-    
-    {%- set datavault4coalesce = namespace(
-        config = {
-        "database_type": "DATABRICKS" | "SNOWFLAKE",
-        "ldts_alias": "LDTS",
-        "rsrc_alias": "RSRC", 
-        "ledts_alias": "LEDTS",
-        "stg_alias": "STG", 
-        "snapshot_trigger_column": "IS_ACTIVE",
-        "use_object_name_prefix": TRUE,
-        "sdts_alias": "SDTS",
-        "is_current_col_alias": "IS_CURRENT", 
-        "hash": "MD5", 
-        "hash_datatype": "STRING", 
-        "hash_input_case_sensitive": "TRUE",
-        "hash_passthrough_input_transformations": datavault4coalesce__hash_passthrough_input_transformations(database_type),
-        "beginning_of_all_times": datavault4coalesce__beginning_of_all_times(database_type),
-        "end_of_all_times": datavault4coalesce__end_of_all_times(database_type),
-        "timestamp_format": datavault4coalesce__timestamp_format(database_type), 
-        "default_unknown_rsrc": "SYSTEM", 
-        "default_error_rsrc": "ERROR", 
-        "rsrc_default_dtype": "STRING", 
-        "stg_default_dtype": "STRING", 
-        "error_value__STRING": "'(error)'", 
-        "error_value_alt__STRING": "'e'", 
-        "unknown_value__STRING": "'(unknown)'",
-        "unknown_value_alt__STRING": "'u'",
-        "include_business_objects_before_appearance": "false"
-        }
-    ) -%}
+  {%- set database_type = "DATABRICKS" | "SNOWFLAKE" -%}
+  {%- set datavault4coalesce = namespace(
+      config = {
+      "database_type": database_type,
+      "ldts_alias": "LDTS",
+      "rsrc_alias": "RSRC", 
+      "ledts_alias": "LEDTS",
+      "stg_alias": "STG", 
+      "snapshot_trigger_column": "IS_ACTIVE",
+      "use_object_name_prefix": TRUE,
+      "sdts_alias": "SDTS",
+      "is_current_col_alias": "IS_CURRENT", 
+      "hash": "MD5", 
+      "hash_datatype": "STRING", 
+      "hash_input_case_sensitive": "TRUE",
+      "hash_passthrough_input_transformations": datavault4coalesce__hash_passthrough_input_transformations(database_type),
+      "beginning_of_all_times": datavault4coalesce__beginning_of_all_times(database_type),
+      "end_of_all_times": datavault4coalesce__end_of_all_times(database_type),
+      "timestamp_format": datavault4coalesce__timestamp_format(database_type), 
+      "default_unknown_rsrc": "SYSTEM", 
+      "default_error_rsrc": "ERROR", 
+      "rsrc_default_dtype": "STRING", 
+      "stg_default_dtype": "STRING", 
+      "error_value__STRING": "'(error)'", 
+      "error_value_alt__STRING": "'e'", 
+      "unknown_value__STRING": "'(unknown)'",
+      "unknown_value_alt__STRING": "'u'",
+      "include_business_objects_before_appearance": "false"
+      }
+  ) -%}
   
 name: macro
 type: Macro
