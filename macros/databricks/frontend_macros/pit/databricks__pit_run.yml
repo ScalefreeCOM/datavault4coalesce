@@ -67,7 +67,7 @@ macroString: |-
                           }) -%}
               {%- endfor -%}
 
-              {{ datavault4coalesce__hash(
+              {{ datavault4coalesce__databricks_hash(
                     columns=hashed_columns, 
                     is_hashdiff=false, 
                     datatype=col.dataType, 

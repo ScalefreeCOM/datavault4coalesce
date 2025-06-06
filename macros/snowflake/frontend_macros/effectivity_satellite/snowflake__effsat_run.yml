@@ -265,7 +265,7 @@ macroString: |-
                             AND current_status.{{ is_active_alias }} = di.{{ is_active_alias }}
                             AND di.{{ src_ldts }} = (SELECT MIN({{ src_ldts }}) FROM deduplicated_incoming)
                         )
-                    AND di.{{ src_ldts }} > COALESCE((SELECT MAX({{ src_ldts }}) FROM {{ this }}), {{ datavault4coalesce__string_to_timestamp(timestamp_format, beginning_of_all_times) }} )
+                    AND di.{{ src_ldts }} > COALESCE((SELECT MAX({{ src_ldts }}) FROM {{ this }}), {{ datavault4coalesce__snowflake_string_to_timestamp(timestamp_format, beginning_of_all_times) }} )
                 {% endif %}
 
             {#

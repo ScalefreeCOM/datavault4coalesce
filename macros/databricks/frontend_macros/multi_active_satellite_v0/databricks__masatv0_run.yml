@@ -52,8 +52,8 @@ macroString: |-
           FROM {{ ref_no_link(node.location.name, node.name) }}
           WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__databricks_string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
           )
-          OR "{{ hashkey_column }}" = {{ datavault4coalesce__unknown_key() }}
-          OR "{{ hashkey_column }}" = {{ datavault4coalesce__error_key() }}
+          OR "{{ hashkey_column }}" = {{ datavault4coalesce__databricks_unknown_key() }}
+          OR "{{ hashkey_column }}" = {{ datavault4coalesce__databricks_error_key() }}
         {% endif %}  
             QUALIFY
             CASE
