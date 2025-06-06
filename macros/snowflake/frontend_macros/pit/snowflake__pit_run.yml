@@ -103,7 +103,7 @@ macroString: |-
     WHERE "{{ get_value_by_column_attribute('is_dimension_key') }}" NOT IN 
     (
       SELECT "{{ get_value_by_column_attribute('is_dimension_key') }}" FROM 
-      {{ snowflake_ref_no_link_raw(node.location.name, node.name) }}
+      {{ ref_no_link(node.location.name, node.name) }}
     )
 
 
@@ -111,7 +111,7 @@ macroString: |-
 
     {{ stage('Clean up PIT') }}
 
-      DELETE FROM {{ snowflake_ref_no_link_raw(node.location.name, node.name) }}
+      DELETE FROM {{ ref_no_link(node.location.name, node.name) }}
       WHERE "{{ datavault4coalesce.config.sdts_alias }}" NOT IN (
         SELECT "{{ datavault4coalesce.config.sdts_alias }}" FROM 
         {% for col in sources[0].columns %}
