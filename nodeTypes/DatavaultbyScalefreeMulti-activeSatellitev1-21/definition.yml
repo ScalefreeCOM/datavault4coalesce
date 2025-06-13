@@ -59,7 +59,7 @@ metadata:
           CASE 
             WHEN 
               LEAD(TRY_SUBTRACT(`{{ datavault4coalesce.config.ldts_alias }}`, INTERVAL 1 MICROSECOND)) 
-              OVER (PARTITION BY `{{ get_value_by_column_attribute("is_hk") }}`, `{{ get_source_ma_keys(delimiter=',') }}`
+              OVER (PARTITION BY `{{ get_value_by_column_attribute("is_hk") }}`, `{{ datavault4coalesce__databricks_get_source_ma_keys(delimiter=',') }}`
               ORDER BY `{{ datavault4coalesce.config.ldts_alias }}`) IS NULL 
             THEN TRUE 
             ELSE FALSE 
@@ -68,7 +68,7 @@ metadata:
           CASE 
             WHEN 
                 LEAD("{{ datavault4coalesce.config.ldts_alias }}" - INTERVAL '1 MICROSECOND') 
-                OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}", "{{ get_source_ma_keys(delimiter=',') }}" 
+                OVER (PARTITION BY "{{ get_value_by_column_attribute("is_hk") }}", "{{ datavault4coalesce__snowflake_get_source_ma_keys(delimiter=',') }}" 
                 ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") IS NULL 
             THEN TRUE 
             ELSE FALSE 
