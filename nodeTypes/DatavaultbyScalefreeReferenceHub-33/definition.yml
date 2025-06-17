@@ -39,7 +39,6 @@ metadata:
 
     - groupName: Data Vault
       items:
-
       - displayName: Reference Keys
         type: columnSelector
         attributeName: is_ref_key
