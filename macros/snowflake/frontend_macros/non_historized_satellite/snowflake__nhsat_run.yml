@@ -33,7 +33,7 @@ macroString: |-
                 WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
                     SELECT 
                         COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__snowflake_string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }}) 
-                    FROM {{ snowflake_ref_no_link_raw(node.location.name, node.name) }}
+                    FROM {{ ref_no_link(node.location.name, node.name) }}
             WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__snowflake_string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
                     )
                 {%- endif %}
@@ -51,7 +51,7 @@ macroString: |-
             WHERE NOT EXISTS (
                 SELECT
                     1
-                FROM {{ snowflake_ref_no_link_raw(node.location.name, node.name) }} "TGT"
+                FROM {{ ref_no_link(node.location.name, node.name) }} "TGT"
                 WHERE "SRC"."{{ link_hashkey }}" = "TGT"."{{ link_hashkey }}"
             )
         )
