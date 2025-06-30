@@ -3,9 +3,9 @@ id: datavault4coalesce__databricks_ghost_record_per_datatype
 macroString: |-
   {%- macro datavault4coalesce__databricks_ghost_record_per_datatype(column_name, datatype, ghost_record_type, hash, hash_algo=none) -%}
 
-      {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times -%}
-      {%- set end_of_all_times = datavault4coalesce.config.end_of_all_times -%}
-      {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
+      {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times | replace('"', '') -%}
+      {%- set end_of_all_times = datavault4coalesce.config.end_of_all_times | replace('"', '') -%}
+      {%- set timestamp_format = datavault4coalesce.config.timestamp_format | replace('"', '') -%}
       {%- set date_format = datavault4coalesce.config.date_format -%}
       {%- set beginning_of_all_times_date = datavault4coalesce.config.beginning_of_all_times_date -%}
       {%- set end_of_all_times_date = datavault4coalesce.config.end_of_all_times_date -%}
