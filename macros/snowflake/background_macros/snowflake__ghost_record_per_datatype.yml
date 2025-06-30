@@ -20,8 +20,8 @@ macroString: |-
   
   {%- macro datavault4coalesce__snowflake_ghost_record_per_datatype(column_name, datatype, ghost_record_type, hash, hash_algo=none) -%}
 
-  {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times -%}
-  {%- set end_of_all_times = datavault4coalesce.config.end_of_all_times -%}
+  {%- set beginning_of_all_times = datavault4coalesce.config.beginning_of_all_times | replace('"', '') -%}
+  {%- set end_of_all_times = datavault4coalesce.config.end_of_all_times | replace('"', '') -%}
   {%- set timestamp_format = datavault4coalesce.config.timestamp_format -%}
   {%- set unknown_value__STRING = datavault4coalesce.config.unknown_value__STRING -%}
   {%- set unknown_value_alt__STRING = datavault4coalesce.config.unknown_value_alt__STRING -%}
