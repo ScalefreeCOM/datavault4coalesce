@@ -8,7 +8,7 @@ macroString: |-
   {#------------------------------------------------------------------------------------------------------#}
   {%- macro datavault4coalesce__beginning_of_all_times(database_type) -%}
     {%- if database_type | upper == "SNOWFLAKE" -%}
-      "0001-01-01T00:00:01"
+      '0001-01-01T00:00:01'
     {%- elif database_type | upper == "DATABRICKS" -%}
       "0001-01-01 00:00:01"
     {%- endif %}
