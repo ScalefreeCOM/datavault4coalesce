@@ -1,0 +1,14 @@
+{#-- Utility macro: wrap input between escape characters --#}
+{%- macro datavault4coalesce__databricks_as_constant(column_str) -%}
+    {%- if column_str is not none and column_str is string and column_str -%}
+        {%- if column_str|first == "!" -%}
+            {{- "'" ~ column_str[1:] ~ "'" -}}
+        {%- else -%}
+            {%- if datavault4coalesce__databricks_is_expression(column_str) -%}
+                {{- column_str -}}
+            {%- else -%}
+                {{- datavault4coalesce__databricks_escape_column_name(column_str) -}}
+            {%- endif -%}
+        {%- endif -%}
+    {%- endif -%}
+{%- endmacro -%}
