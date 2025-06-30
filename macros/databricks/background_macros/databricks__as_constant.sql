@@ -1,9 +1,4 @@
-fileVersion: 1
-id: datavault4coalesce__databricks_as_constant
-macroString: |-
-
-  {#-- Utility macro: wrap input between escape characters --#}
-  {%- macro datavault4coalesce__databricks_as_constant(column_str) -%}
+{%- macro datavault4coalesce__databricks_as_constant(column_str) -%}
       {%- if column_str is not none and column_str is string and column_str -%}
           {%- if column_str|first == "!" -%}
               {{- "'" ~ column_str[1:] ~ "'" -}}
@@ -15,6 +10,4 @@ macroString: |-
               {%- endif -%}
           {%- endif -%}
       {%- endif -%}
-  {%- endmacro -%}
-name: datavault4coalesce__databricks_as_constant
-type: Macro
+{%- endmacro -%}
