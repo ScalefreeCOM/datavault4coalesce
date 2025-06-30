@@ -1,4 +1,7 @@
-{#-- Utility macro: outputs a SQL function to create stage. --#}
+fileVersion: 1
+id: "datavault4coalesce__databricks_stage_create"
+macroString: |- 
+    {#-- Utility macro: outputs a SQL function to create stage. --#}
     {%- macro datavault4coalesce__databricks_stage_create(node, config, sources, columns) -%}
     
         
@@ -202,4 +205,6 @@
 
 
         {% endif %}
-{%- endmacro -%}
+    {%- endmacro -%}
+name: datavault4coalesce__databricks_stage_create
+type: Macro
