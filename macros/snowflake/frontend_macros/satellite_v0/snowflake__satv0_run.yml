@@ -46,7 +46,7 @@ macroString: |-
 
             SELECT
         {% for col in source.columns %}
-          {{ get_source_transform(col) }} AS {{ col.name }},
+          {{ get_source_transform(col) }} AS "{{ col.name }}",
         {% endfor %}
 
             ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
@@ -77,7 +77,7 @@ macroString: |-
       {% for source in sources %}
         SELECT DISTINCT
         {% for col in source.columns %}
-          {{ col.name }}
+          "{{ col.name }}"
           {%- if not loop.last -%}, {% endif %}
         {% endfor %}
 
