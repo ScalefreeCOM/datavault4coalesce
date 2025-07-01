@@ -45,7 +45,7 @@ macroString: |-
 
             SELECT
         {% for col in source.columns %}
-          {{ get_source_transform(col) }} AS {{ col.name }},
+          {{ get_source_transform(col) }} AS "{{ col.name }}",
         {% endfor %}
 
             ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
@@ -72,11 +72,11 @@ macroString: |-
         {% endfor %}
 
     )
-
+    {%- set dedup_alias = "deduplicated_numbered_source" -%}
       {% for source in sources %}
         SELECT DISTINCT
         {% for col in source.columns %}
-          {{ col.name }}
+          "{{ col.name }}"
           {%- if not loop.last -%}, {% endif %}
         {% endfor %}
 
@@ -84,10 +84,10 @@ macroString: |-
       WHERE NOT EXISTS (
         SELECT 1 FROM latest_entries_in_sat
         WHERE 
-          deduplicated_numbered_source."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
-        AND deduplicated_numbered_source."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
+          {{dedup_alias}}."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
+        AND {{dedup_alias}}."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
 
-            AND deduplicated_numbered_source.rn = 1
+            AND {{dedup_alias}}.rn = 1
       )
 
       {% endfor %}
