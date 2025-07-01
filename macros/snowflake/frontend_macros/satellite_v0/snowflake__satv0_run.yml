@@ -24,7 +24,6 @@ macroString: |-
       {#/* USE THIS again when ColumnDropdownSelector is used!
       {%- set hashkey_column = config.is_hk.name -%}
       {%- set hashdiff_column = config.is_hd.name -%}
-      {%- set dedup_alias = "deduplicated_numbered_source" -%}
       */#}
 
       {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
@@ -73,7 +72,7 @@ macroString: |-
         {% endfor %}
 
     )
-
+    {%- set dedup_alias = "deduplicated_numbered_source" -%}
       {% for source in sources %}
         SELECT DISTINCT
         {% for col in source.columns %}
