@@ -5,7 +5,6 @@ macroString: |-
     {%- macro datavault4coalesce__snowflake_snapshot_v0_run(node, columns) -%}
 
 
-        {{ stage('Run Snapshot v0') }}
         {% for test in node.tests if config.testsEnabled %}
         {% if test.runOrder == 'Before' %}
             {{ test_stage(test.name, test.continueOnFailure) }}
@@ -97,6 +96,11 @@ macroString: |-
             {% endfor %}
         {% endfor %}
         {% endif %}
+
+        {%- if config.postSQL %}
+        {{ stage('Post-SQL') }}
+        {{ config.postSQL }}
+        {%- endif %}
     {%- endmacro -%}
 name: datavault4coalesce__snowflake_snapshot_v0_run
 type: Macro
