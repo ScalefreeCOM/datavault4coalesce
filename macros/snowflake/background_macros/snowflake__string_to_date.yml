@@ -1,9 +1,0 @@
-fileVersion: 1
-id: datavault4coalesce__snowflake_string_to_date
-macroString: |-
-
-  {%- macro datavault4coalesce__snowflake_string_to_date(format, timestamp) -%}
-  TO_DATE('{{ timestamp }}', '{{ format }}')
-  {%- endmacro -%}
-name: datavault4coalesce__snowflake_string_to_date
-type: Macro

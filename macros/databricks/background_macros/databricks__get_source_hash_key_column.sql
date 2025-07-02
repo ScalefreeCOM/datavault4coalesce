@@ -1,0 +1,13 @@
+
+{#----------------------------------------------------------------------#}
+{#-- Outputs name of a single hash key from the direct parent object. --#}
+{#-- Usage: Node definition of Satellite v1                           --#}
+{#----------------------------------------------------------------------#}
+{%- macro datavault4coalesce__databricks_get_source_hash_key_column() -%}
+    {%- set srcCols = sources[0].dependencies[0].columns -%}
+    {%- set result = namespace(name='') -%}
+    {% for srcHKCol in srcCols if srcHKCol.is_hk %}
+          {%- set result.name = srcHKCol.name -%}
+    {%- endfor -%}
+    {{- result.name -}}
+{%- endmacro -%}

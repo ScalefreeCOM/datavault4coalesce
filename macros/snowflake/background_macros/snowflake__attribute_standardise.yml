@@ -1,9 +1,0 @@
-fileVersion: 1
-id: datavault4coalesce__snowflake_attribute_standardise
-macroString: |-  
-  
-  {%- macro datavault4coalesce__snowflake_attribute_standardise() -%}
-  CONCAT('\"', REPLACE(REPLACE(REPLACE(TRIM(CAST([EXPRESSION] AS STRING)), '\\', '\\\\'), '[QUOTE]', '\"'), '[NULL_PLACEHOLDER_STRING]', '--'), '\"')
-  {%- endmacro -%}
-name: datavault4coalesce__snowflake_attribute_standardise
-type: Macro

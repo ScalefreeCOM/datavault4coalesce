@@ -1,0 +1,20 @@
+
+{#-- Utility macro: outputs a SQL function to create an effectivity satellite table. --#}
+{%- macro datavault4coalesce__snowflake_effectivity_satellite_create(node, columns) -%}
+
+  {{ stage('Create Effectivity Satellite Table') }}
+
+  CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+  (
+    {% for col in columns %}
+      "{{ col.name }}" {{ col.dataType }}
+      {%- if not col.nullable %} NOT NULL
+        {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+      {% endif %}
+      {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape  }}'{% endif %}
+      {%- if not loop.last -%}, {% endif %}
+    {% endfor %}
+  )
+  {%- if node.description | length > 0 %} COMMENT = '{{ node.description | escape  }}'{% endif %}
+{%- endmacro -%}
+
