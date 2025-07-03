@@ -1,114 +1,110 @@
-fileVersion: 1
-id: "datavault4coalesce__snowflake_multi_active_satellite_v0_run" 
-macroString: |-
-  {#-- Utility macro: outputs a SQL function to run a multi-active satellite v0 table. --#}
-  {%- macro datavault4coalesce__snowflake_multi_active_satellite_v0_run(node, config, sources) -%}
+
+{#-- Utility macro: outputs a SQL function to run a multi-active satellite v0 table. --#}
+{%- macro datavault4coalesce__snowflake_multi_active_satellite_v0_run(node, config, sources) -%}
 
 
-    {% if config.preSQL %}
-      {{ stage('Pre-SQL') }}
-      {{ config.preSQL }}
-    {% endif %}
+  {% if config.preSQL %}
+    {{ stage('Pre-SQL') }}
+    {{ config.preSQL }}
+  {% endif %}
 
-    {{ stage('Insert New Rows') }}
+  {{ stage('Insert New Rows') }}
 
-    INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+  INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
-    WITH 
+  WITH 
 
-    source_data AS (
-
-        {% for source in sources %}
-
-            SELECT
-        {% for col in source.columns %}
-          {{ get_source_transform(col) }} AS "{{ col.name }}",
-        {% endfor %}
-
-            {{ source.join }}
-
-        {% endfor %}
-
-    ),
-
-    latest_entries_in_sat AS (
-      /* get current rows from satellite */
-
-      {# /* USE THIS again when ColumnDropdownSelector is used
-      {%- set hashkey_column = config.is_hk.name -%}
-      {%- set hashdiff_column = config.is_hd.name -%} */ #}
-      
-      {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
-      {%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
-
-      SELECT 
-        "{{ hashkey_column }}",
-        "{{ hashdiff_column }}"
-
-      FROM {{ ref_no_link(node.location.name, node.name) }} 
-
-      QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
-
-    ),
-
-    deduplicated_numbered_source AS (
-        
-        {% for source in sources %}
-
-            SELECT
-        {% for col in source.columns %}
-          {{ get_source_transform(col) }} AS "{{ col.name }}",
-        {% endfor %}
-            ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
-            
-            {{ source.join }}
-
-        {% if not config.disable_hwm -%}
-        WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
-          SELECT 
-            COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__snowflake_string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
-          FROM {{ ref_no_link(node.location.name, node.name) }}
-          WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__snowflake_string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
-          )
-          OR "{{ hashkey_column }}" = {{ datavault4coalesce__snowflake_unknown_key() }}
-          OR "{{ hashkey_column }}" = {{ datavault4coalesce__snowflake_error_key() }}
-        {% endif %}  
-            QUALIFY
-            CASE
-                WHEN "{{ hashdiff_column }}" = LAG("{{ hashdiff_column }}") OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
-                ELSE TRUE
-            END
-
-        {% endfor %}
-
-    )
+  source_data AS (
 
       {% for source in sources %}
-        SELECT DISTINCT
-        {% for col in source.columns %}
-          src."{{ col.name }}"
-          {%- if not loop.last -%}, {% endif %}
-        {% endfor %}
 
-        FROM source_data src
-        INNER JOIN deduplicated_numbered_source dedupe
-          ON src."{{ hashkey_column }}" = dedupe."{{ hashkey_column }}"
-          AND src."{{ hashdiff_column }}" = dedupe."{{ hashdiff_column }}"
-          AND src."{{ datavault4coalesce.config.ldts_alias }}" = dedupe."{{ datavault4coalesce.config.ldts_alias }}"
-      WHERE NOT EXISTS (
-        SELECT 1 FROM latest_entries_in_sat
-        WHERE 
-          dedupe."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
-        AND dedupe."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
-            AND dedupe.rn = 1
-      )
+          SELECT
+      {% for col in source.columns %}
+        {{ get_source_transform(col) }} AS "{{ col.name }}",
+      {% endfor %}
+
+          {{ source.join }}
 
       {% endfor %}
 
-    {% if config.postSQL %}
-      {{ stage('Post-SQL') }}
-      {{ config.postSQL }}
-    {% endif %}
-  {%- endmacro -%}
-name: datavault4coalesce__snowflake_multi_active_satellite_v0_run
-type: Macro
+  ),
+
+  latest_entries_in_sat AS (
+    /* get current rows from satellite */
+
+    {# /* USE THIS again when ColumnDropdownSelector is used
+    {%- set hashkey_column = config.is_hk.name -%}
+    {%- set hashdiff_column = config.is_hd.name -%} */ #}
+    
+    {%- set hashkey_column = get_value_by_column_attribute("is_hk") -%}
+    {%- set hashdiff_column = get_value_by_column_attribute("is_hd") -%}
+
+    SELECT 
+      "{{ hashkey_column }}",
+      "{{ hashdiff_column }}"
+
+    FROM {{ ref_no_link(node.location.name, node.name) }} 
+
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" DESC) = 1
+
+  ),
+
+  deduplicated_numbered_source AS (
+      
+      {% for source in sources %}
+
+          SELECT
+      {% for col in source.columns %}
+        {{ get_source_transform(col) }} AS "{{ col.name }}",
+      {% endfor %}
+          ROW_NUMBER() OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}") as rn
+          
+          {{ source.join }}
+
+      {% if not config.disable_hwm -%}
+      WHERE "{{ datavault4coalesce.config.ldts_alias }}" > (
+        SELECT 
+          COALESCE(MAX("{{ datavault4coalesce.config.ldts_alias }}"),  {{ datavault4coalesce__snowflake_string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.beginning_of_all_times) }})
+        FROM {{ ref_no_link(node.location.name, node.name) }}
+        WHERE "{{ datavault4coalesce.config.ldts_alias }}" != {{ datavault4coalesce__snowflake_string_to_timestamp(datavault4coalesce.config.timestamp_format, datavault4coalesce.config.end_of_all_times) }}
+        )
+        OR "{{ hashkey_column }}" = {{ datavault4coalesce__snowflake_unknown_key() }}
+        OR "{{ hashkey_column }}" = {{ datavault4coalesce__snowflake_error_key() }}
+      {% endif %}  
+          QUALIFY
+          CASE
+              WHEN "{{ hashdiff_column }}" = LAG("{{ hashdiff_column }}") OVER(PARTITION BY "{{ hashkey_column }}" ORDER BY "{{ datavault4coalesce.config.ldts_alias }}" ) THEN FALSE
+              ELSE TRUE
+          END
+
+      {% endfor %}
+
+  )
+
+    {% for source in sources %}
+      SELECT DISTINCT
+      {% for col in source.columns %}
+        src."{{ col.name }}"
+        {%- if not loop.last -%}, {% endif %}
+      {% endfor %}
+
+      FROM source_data src
+      INNER JOIN deduplicated_numbered_source dedupe
+        ON src."{{ hashkey_column }}" = dedupe."{{ hashkey_column }}"
+        AND src."{{ hashdiff_column }}" = dedupe."{{ hashdiff_column }}"
+        AND src."{{ datavault4coalesce.config.ldts_alias }}" = dedupe."{{ datavault4coalesce.config.ldts_alias }}"
+    WHERE NOT EXISTS (
+      SELECT 1 FROM latest_entries_in_sat
+      WHERE 
+        dedupe."{{ hashdiff_column }}" = latest_entries_in_sat."{{ hashdiff_column }}"
+      AND dedupe."{{ hashkey_column }}" = latest_entries_in_sat."{{ hashkey_column }}"
+          AND dedupe.rn = 1
+    )
+
+    {% endfor %}
+
+  {% if config.postSQL %}
+    {{ stage('Post-SQL') }}
+    {{ config.postSQL }}
+  {% endif %}
+{%- endmacro -%}

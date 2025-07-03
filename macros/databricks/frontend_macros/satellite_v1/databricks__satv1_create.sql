@@ -1,0 +1,26 @@
+
+{#-- Utility macro: outputs a SQL function to create a Satellite View. --#}
+{%- macro datavault4coalesce__databricks_satellite_v1_create(node, columns, sources) -%}
+
+    {{ stage('Create Satellite View') }}
+
+    CREATE OR REPLACE VIEW {{ ref_no_link(node.location.name, node.name) }}
+    (
+        {% for col in columns %}
+        `{{ col.name }}`
+        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+            {%- if not loop.last -%}, {% endif %}
+        {% endfor %}
+    )
+    {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+
+    AS
+    {% for source in sources %}
+        SELECT
+        {% for col in source.columns %}
+            {{ get_source_transform(col) }} AS `{{ col.name }}`
+            {%- if not loop.last -%}, {% endif %}
+        {% endfor %}
+        {{ source.join }}
+    {% endfor %}
+{%- endmacro -%}
