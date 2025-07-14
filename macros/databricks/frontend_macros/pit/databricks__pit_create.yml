@@ -1,0 +1,25 @@
+fileVersion: 1
+id: "86"
+macroString: |-
+  {#-- Utility macro: outputs a SQL function to create a Point In Time(PIT) table. --#}
+  {%- macro datavault4coalesce__databricks_pit_create(node, columns) -%}
+
+    {{ stage('Create PIT Table') }}
+
+    {%- set ns = namespace(sdts_datatype = '') %}
+
+    CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+    (
+      {% for col in columns %}
+        `{{ col.name }}` {{ col.dataType }}
+        {%- if not col.nullable %} NOT NULL
+          {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
+        {% endif %}
+        {%- if col.description | length > 0 %} COMMENT '{{ col.description }}'{% endif %}
+        {%- if not loop.last -%}, {% endif %}
+      {% endfor %}
+    )
+    {%- if node.description | length > 0 %} COMMENT = '{{ node.description }}'{% endif %}
+  {%- endmacro -%}
+name: databricks__pit_create
+type: Macro

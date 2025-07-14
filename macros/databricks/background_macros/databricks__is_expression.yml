@@ -1,0 +1,17 @@
+fileVersion: 1
+id: "62"
+macroString: |-
+    {#-- Utility macro: check if string object is an expression --#}
+    {%- macro datavault4coalesce__databricks_is_expression(obj) -%}
+        {%- if obj is string -%}
+            {%- if (obj|first == "'" and obj|last == "'") or ("(" in obj and ")" in obj) or "::" in obj or "||" in obj -%}
+                {{ true }}
+            {%- else -%}
+                {{ false }}
+            {%- endif -%}
+        {%- else -%}
+            {{ false }}
+        {%- endif -%}
+    {%- endmacro -%}
+name: databricks__is_expression
+type: Macro
