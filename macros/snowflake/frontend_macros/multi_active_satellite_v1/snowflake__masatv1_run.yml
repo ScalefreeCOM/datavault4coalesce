@@ -1,0 +1,9 @@
+fileVersion: 1
+id: "114"
+macroString: |-
+    {#-- Utility macro: outputs a SQL function to create a multi active satellite V1 table. --#}
+    {%- macro datavault4coalesce__snowflake_multi_active_satellite_v1_run(node, columns) -%}
+
+    {%- endmacro -%}
+name: snowflake__masatv1_run
+type: Macro
