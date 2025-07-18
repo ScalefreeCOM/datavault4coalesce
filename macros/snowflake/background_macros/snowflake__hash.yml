@@ -77,4 +77,4 @@ macroString: |-
     {%- endfor -%}
     {%- endmacro -%}
 name: snowflake__hash
-macro: Macro
+type: Macro

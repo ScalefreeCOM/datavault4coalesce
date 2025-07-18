@@ -47,4 +47,4 @@ macroString: |-
           {{ error_key }}
      {%- endmacro -%}
 name: databricks__error_key
-macro: Macro
+type: Macro

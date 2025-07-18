@@ -5,4 +5,4 @@ macroString: |-
     TO_DATE('{{ timestamp }}', '{{ format }}')
   {%- endmacro -%}
 name: snowflake__string_to_date
-macro: Macro
+type: Macro

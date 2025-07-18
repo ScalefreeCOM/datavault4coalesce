@@ -5,4 +5,4 @@ macroString: |-
         {% raw %}{{ ref_no_link('{% endraw %}{{ location_name }}{% raw %}', '{% endraw %}{{ node_name }}{% raw %}') }}{% endraw %}
     {%- endmacro -%}
 name: snowflake__ref_no_link_raw
-macro: Macro
+type: Macro

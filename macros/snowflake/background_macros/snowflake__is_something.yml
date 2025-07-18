@@ -10,4 +10,4 @@ macroString: |-
         {%- endif -%}
     {%- endmacro -%}
 name: snowflake__is_something
-macro: Macro
+type: Macro

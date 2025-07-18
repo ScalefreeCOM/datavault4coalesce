@@ -8,4 +8,4 @@ macroString: |-
     TO_TIMESTAMP('{{ new_timestamp }}', '{{ new_format }}')
   {%- endmacro -%}
 name: snowflake__string_to_timestamp
-macro: Macro
+type: Macro

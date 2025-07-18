@@ -51,4 +51,4 @@ macroString: |-
     {{ standardise_suffix }}
     {%- endmacro -%}
 name: snowflake__standardise_suffix
-macro: Macro
+type: Macro

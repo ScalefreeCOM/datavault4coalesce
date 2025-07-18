@@ -17,4 +17,4 @@ macroString: |-
      {%- endif -%}
      {%- endmacro -%}
 name: snowflake__record_source
-macro: Macro
+type: Macro

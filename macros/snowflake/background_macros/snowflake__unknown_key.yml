@@ -48,4 +48,4 @@ macroString: |-
 
      {%- endmacro -%}
 name: snowflake__unknown_key
-macro: Macro
+type: Macro
