@@ -8,6 +8,13 @@
 
 {{ stage('Insert New Rows') }}
 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
+(
+  {% for col in sources[0].columns %}
+    "{{ col.name }}"{{ "," if not loop.last }}
+  {% endfor %}
+)
+
 WITH distinct_concated_target AS (
         SELECT
         CONCAT_WS('||',

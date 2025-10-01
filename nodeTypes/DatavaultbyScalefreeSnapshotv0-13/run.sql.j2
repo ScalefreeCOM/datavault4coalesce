@@ -14,6 +14,12 @@
 
 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
+(
+  {% for col in sources[0].columns %}
+    "{{ col.name }}"{{ "," if not loop.last }}
+  {% endfor %}
+)
+
 WITH "date_base" AS (
     SELECT
         "sdts" as "{{ datavault4coalesce.config.sdts_alias }}",
