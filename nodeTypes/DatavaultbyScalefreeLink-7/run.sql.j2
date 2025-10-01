@@ -22,6 +22,12 @@
 
     INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 
+(
+  {% for col in sources[0].columns %}
+    "{{ col.name }}"{{ "," if not loop.last }}
+  {% endfor %}
+)
+
 WITH incoming AS 
     (
         SELECT DISTINCT

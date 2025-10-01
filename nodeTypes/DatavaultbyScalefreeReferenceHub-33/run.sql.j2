@@ -14,7 +14,11 @@
 
   {{ stage('INSERT INTO Reference Hub - ' ~ source.name) }}
   
-  {%- set refkey_column = get_value_by_column_attribute("is_ref_key") -%}
+  {% set ns = namespace(refkey_columns=[]) %}
+
+  {% for col in columns if col.is_ref_key %}
+    {% set ns.refkey_columns = ns.refkey_columns + [col.name] %}
+  {% endfor %}
   
   {#-- enable when ColumnDropDownSelector is used again
   {%- if 'is_ref_key' not in config.keys() -%}
@@ -27,6 +31,12 @@
   #}
 
   INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
+  (
+    {% for col in sources[0].columns %}
+      "{{ col.name }}"{{ "," if not loop.last }}
+    {% endfor %}
+  )
   
 WITH
 
@@ -57,7 +67,9 @@ distinct_target_ref_keys AS (
 
   SELECT
     
-    {{ refkey_column }}
+    {% for ref_key_col in ns.refkey_columns %}
+    "{{ ref_key_col }}"{{ "," if not loop.last }}
+    {% endfor %}
 
   FROM {{ ref_no_link(node.location.name, node.name) }}
 
@@ -68,11 +80,14 @@ new_records AS (
   SELECT 
   "SRC".* 
   FROM incoming "SRC"
-  WHERE
-    {{ refkey_column }} NOT IN 
-    (
-      SELECT {{ refkey_column }} FROM distinct_target_ref_keys
-    )
+  WHERE NOT EXISTS
+    ( SELECT 1 
+      FROM distinct_target_ref_keys dt
+      WHERE 1 = 1
+        {% for ref_key_col in ns.refkey_columns %}
+        AND "SRC"."{{ ref_key_col }}" = dt."{{ ref_key_col }}"
+        {% endfor %}
+      )
 )
 
 

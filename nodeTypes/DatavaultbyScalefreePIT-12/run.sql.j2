@@ -20,6 +20,13 @@
 {%- set ns = namespace(sdts_node_name='', hub_node_name='', hub_node_schema='') -%}
 
 INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+
+(
+  {% for col in sources[0].columns %}
+    "{{ col.name }}"{{ "," if not loop.last }}
+  {% endfor %}
+)
+
 WITH records_to_insert AS (
   SELECT
   {% for col in sources[0].columns %}
